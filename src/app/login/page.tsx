@@ -10,7 +10,7 @@ export default function LoginPage() {
         <div className="flex min-h-screen items-center justify-center p-4 bg-slate-50 relative overflow-hidden">
             <Card className="w-full max-w-md border-border bg-white shadow-sm z-10">
                 <CardHeader className="space-y-4">
-                    <div className="flex justify-center items-center h-20 relative mb-0">
+                    <div className="flex justify-center items-center h-14 relative mb-0">
                         <Image src="/logos/nexus_logo_equalized.png" alt="Nexus Clínicas Logo" fill className="object-contain" priority />
                     </div>
                     <CardDescription className="text-center text-muted-foreground">

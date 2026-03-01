@@ -48,7 +48,7 @@ export function DashboardSidebar({ email }: DashboardSidebarProps) {
     return (
         <aside className="w-64 border-r border-border bg-card hidden md:flex flex-col">
             <div className="p-6 flex items-center justify-center min-h-[6rem]">
-                <div className="relative w-56 h-12">
+                <div className="relative w-48 h-10">
                     <Image src="/logos/nexus_logo_equalized.png" alt="Nexus Clínicas Logo" fill className="object-contain" priority />
                 </div>
             </div>
