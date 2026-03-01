@@ -35,25 +35,28 @@ export default async function IntegrationsPage() {
                 </p>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm relative overflow-hidden">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-3">
-                            <Image src="/logos/google_calendar_logo.png" alt="Google Calendar Logo" width={26} height={26} className="object-contain" />
-                            Google Calendar
-                        </CardTitle>
-                        <CardDescription>
-                            A mágica dos agendamentos autônomos. Permite que a IA médica faça consultas em tempo real da disponibilidade e adicione os eventos de marcação na hora para seus pacientes.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="text-sm text-foreground bg-muted/50 p-4 rounded-lg border border-border space-y-2">
-                            <p className="text-primary font-medium">Permissão Necessária: <span className="text-foreground font-normal">Consulta e Agendamento de Eventos</span></p>
-                            <p><strong>O que nosso Cérebro fará:</strong> Analisará as lacunas vazias do seu calendário para sugerir horários ativamente no WhatsApp e preencherá novos slots com os nomes dos interessados.</p>
-                        </div>
-
+            <div className="grid gap-6">
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center">
+                    <div className="flex-1 md:pr-6 md:border-r border-border/50">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-3">
+                                <Image src="/logos/google_calendar_logo.png" alt="Google Calendar Logo" width={32} height={32} className="object-contain" />
+                                Google Calendar
+                            </CardTitle>
+                            <CardDescription className="text-base mt-2">
+                                A mágica dos agendamentos autônomos. Permite que a IA médica faça consultas em tempo real da disponibilidade e adicione os eventos de marcação na hora para seus pacientes.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="text-sm text-foreground bg-muted/50 p-4 rounded-lg border border-border space-y-2">
+                                <p className="text-primary font-medium">Permissão Necessária: <span className="text-foreground font-normal">Consulta e Agendamento de Eventos</span></p>
+                                <p><strong>O que nosso Cérebro fará:</strong> Analisará as lacunas vazias do seu calendário para sugerir horários ativamente no WhatsApp e preencherá novos slots com os nomes dos interessados.</p>
+                            </div>
+                        </CardContent>
+                    </div>
+                    <div className="flex-1 p-6 flex items-center justify-center w-full md:w-auto h-full">
                         <GoogleConnectButton isConnected={isGoogleConnected} />
-                    </CardContent>
+                    </div>
                 </Card>
             </div>
         </div>

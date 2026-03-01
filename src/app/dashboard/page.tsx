@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/utils/supabase/server'
-import { Activity, Users, MessageCircle, Settings, QrCode, Calendar as CalendarIcon, ArrowRight } from 'lucide-react'
+import { Activity, Users, MessageCircle, Settings, QrCode, Calendar as CalendarIcon, ArrowRight, TrendingUp, Zap, Server, Rocket } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -105,7 +105,7 @@ export default async function DashboardPage() {
                 <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-primary/5 transition-all duration-300 group">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">Conversão do Dia</CardTitle>
-                        <Activity className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+                        <TrendingUp className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-bold">{estimatedConversion}</div>
@@ -118,8 +118,8 @@ export default async function DashboardPage() {
                 <Card className={`bg-card/50 backdrop-blur-sm border-border/50 shadow-lg relative overflow-hidden transition-all duration-300 group ${isConnected ? 'hover:shadow-green-500/10' : 'hover:shadow-destructive/10'}`}>
                     <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl transition-colors duration-500 ${isConnected ? 'bg-green-500/10' : 'bg-destructive/10'}`} />
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Status da IA</CardTitle>
-                        <Activity className={`h-4 w-4 ${isConnected ? 'text-green-500' : 'text-destructive'} group-hover:scale-110 transition-transform`} />
+                        <CardTitle className="text-sm font-medium">Status da Z-API</CardTitle>
+                        <Server className={`h-4 w-4 ${isConnected ? 'text-green-500' : 'text-destructive'} group-hover:scale-110 transition-transform`} />
                     </CardHeader>
                     <CardContent>
                         <div className={`text-3xl font-bold ${isConnected ? 'text-green-500' : 'text-destructive'}`}>
@@ -177,7 +177,7 @@ export default async function DashboardPage() {
                     <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-primary/50 to-primary/10"></div>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <Activity className="h-5 w-5 text-primary" />
+                            <Rocket className="h-5 w-5 text-primary" />
                             Ações Rápidas
                         </CardTitle>
                         <CardDescription>Atalhos úteis para o dia a dia.</CardDescription>
