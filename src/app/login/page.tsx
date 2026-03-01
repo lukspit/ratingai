@@ -10,8 +10,8 @@ export default function LoginPage() {
         <div className="flex min-h-screen items-center justify-center p-4 bg-slate-50 relative overflow-hidden">
             <Card className="w-full max-w-md border-border bg-white shadow-sm z-10">
                 <CardHeader className="space-y-4">
-                    <div className="flex justify-center items-center h-20 relative">
-                        <Image src="/logos/nexus_clinicas_logo.png" alt="Nexus Clínicas Logo" fill className="object-contain mix-blend-multiply" priority />
+                    <div className="flex justify-center items-center h-32 relative mb-2">
+                        <Image src="/logos/nexus_logo_equalized.png" alt="Nexus Clínicas Logo" fill className="object-contain" priority />
                     </div>
                     <CardDescription className="text-center text-muted-foreground">
                         Acesse o painel de gestão da sua clínica.

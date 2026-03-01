@@ -23,9 +23,9 @@ export default async function DashboardLayout({
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-                <header className="h-16 border-b border-border bg-card flex items-center justify-center px-6 md:hidden">
-                    <div className="relative w-32 h-10">
-                        <Image src="/logos/nexus_clinicas_logo.png" alt="Nexus Clínicas Logo" fill className="object-contain mix-blend-multiply" priority />
+                <header className="h-20 border-b border-border bg-card flex items-center justify-center px-6 md:hidden">
+                    <div className="relative w-12 h-12">
+                        <Image src="/logos/nexus_logo_symbol.png" alt="Nexus Clínicas Symbol" fill className="object-contain" priority />
                     </div>
                 </header>
                 <div className="p-8 max-w-6xl mx-auto w-full flex-1">
