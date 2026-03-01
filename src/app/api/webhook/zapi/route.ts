@@ -210,7 +210,9 @@ Você TEM a habilidade ativa de consultar a agenda e marcar consultas usando as 
 - SEMPRE valide a disponibilidade primeiro chamando a tool ANTES de dar uma resposta definitiva para o usuário.
 - IMPORTANTE: Se a ferramenta \`check_availability\` retornar uma lista VAZIA (exemplo: \`[]\`), isso significa que NENHUM horário está ocupado! Ou seja, o dia inteiro está livre. Nesse caso, ofereça horários disponíveis baseados no "Horário de atendimento" da clínica. NUNCA diga que o "dia está lotado" só porque a lista veio vazia.
 - A menos que as Regras da Clínica digam explicitamente que um dia (ex: Domingo) é fechado, sempre consulte o calendário primeiro.
-- Você DEVE chamar \`book_appointment\` para fixar a consulta no sistema quando tiver a data, hora confirmada e nome. Após o sucesso da ferramenta de agendamento, notifique o paciente.`
+- Quando você já souber e validar a Data, o Horário (ex: 16h) e o Nome do Paciente, VOCÊ É OBRIGADA A CHAMAR A FERRAMENTA \`book_appointment\`! Não tente inventar que não conseguiu agendar. CHAME A FUNÇÃO e aguarde o retorno de sucesso para confirmar ao paciente.
+- REGRAS PARALELAS: NUNCA chame "check_availability" DEPOIS de já ter os dados do usuário e estar pronto para chamar "book_appointment". Apenas agende.
+- NUNCA ENVIE LINKS ao paciente (inclusive links do Google Calendar). Apenas diga que o agendamento foi realizado com sucesso em nosso sistema.`
       : ""
     }
 
@@ -459,7 +461,7 @@ export async function POST(req: Request) {
         .eq("instance_id", contextData.instance_uuid)
         .eq("phone_number", phone)
         .eq("role", "user")
-        .ilike("content", userMessageText.trim())
+        .ilike("content", `%${userMessageText.trim()}%`)
         .gte("created_at", timeAgo)
         .limit(1);
 
@@ -707,6 +709,7 @@ export async function POST(req: Request) {
     if (tools.length > 0) {
       payload.tools = tools;
       payload.tool_choice = "auto";
+      payload.parallel_tool_calls = false;
     }
 
     let aiResponse = "";
@@ -741,12 +744,11 @@ export async function POST(req: Request) {
         if (funcName === "check_availability") {
           const args = JSON.parse(funcArgs);
           try {
-            const timeMin = new Date(
-              `${args.date}T00:00:00-03:00`,
-            ).toISOString();
-            const timeMax = new Date(
-              `${args.date}T23:59:59-03:00`,
-            ).toISOString();
+            // O TS Date com .toISOString() transforma "-03:00" em UTC (+3h) quebrando o timezone
+            // Precisamos construir a string literal para o Google Calendar entender como São Paulo
+            const timeMin = `${args.date}T00:00:00-03:00`;
+            const timeMax = `${args.date}T23:59:59-03:00`;
+
             console.log(
               `[CALENDAR] Buscando eventos entre ${timeMin} e ${timeMax}`,
             );
@@ -757,6 +759,7 @@ export async function POST(req: Request) {
               timeMax,
               singleEvents: true,
               orderBy: "startTime",
+              timeZone: "America/Sao_Paulo"
             });
             const busySlots =
               events.data.items?.map((e) => ({
@@ -838,7 +841,7 @@ export async function POST(req: Request) {
               tool_call_id: toolCall.id,
               content: JSON.stringify({
                 success: true,
-                eventLink: event.data.htmlLink,
+                message: "A consulta foi gravada com sucesso no sistema da clínica.",
               }),
             });
           } catch (e: any) {
