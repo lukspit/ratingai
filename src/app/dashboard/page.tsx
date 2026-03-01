@@ -79,7 +79,10 @@ export default async function DashboardPage() {
     return (
         <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             <div>
-                <h1 className="text-4xl font-bold tracking-tight">Bem-vindo(a){clinic?.name ? `, ${clinic.name}` : ''}</h1>
+                <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                    <Activity className="w-8 h-8 text-primary" />
+                    Bem-vindo(a){clinic?.name ? `, ${clinic.name}` : ''}
+                </h1>
                 <p className="text-muted-foreground text-lg mt-2">
                     Visão geral da sua inteligência artificial.
                 </p>

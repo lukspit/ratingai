@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { WhatsAppManager } from './components/WhatsAppManager'
+import { Smartphone } from 'lucide-react'
 
 export default async function WhatsAppConnectionPage() {
     const supabase = await createClient()
@@ -40,7 +41,10 @@ export default async function WhatsAppConnectionPage() {
     return (
         <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             <div>
-                <h1 className="text-4xl font-bold tracking-tight">Conexão WhatsApp</h1>
+                <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                    <Smartphone className="w-8 h-8 text-primary" />
+                    Conexão WhatsApp
+                </h1>
                 <p className="text-muted-foreground text-lg mt-2">
                     Vincule seu número para que a inteligência artificial comece a operar.
                 </p>
