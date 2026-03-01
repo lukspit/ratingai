@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Smartphone, QrCode, Wifi, AlertTriangle } from 'lucide-react'
+import { Radio, QrCode, Wifi, AlertTriangle } from 'lucide-react'
 
 export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialIsConnected: boolean, instanceInfo?: { id: string, zapi_instance_id: string } }) {
     const [isGenerating, setIsGenerating] = useState(false)
@@ -36,7 +36,7 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
             <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg">
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                        <Smartphone className="w-5 h-5 text-primary" />
+                        <Radio className="w-5 h-5 text-primary" />
                         Sua Instância (Z-API)
                     </CardTitle>
                     <CardDescription>Status da conexão com a central de mensagens.</CardDescription>

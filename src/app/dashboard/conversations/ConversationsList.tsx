@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { MessageSquare, Phone, Clock, User, X, MessageCircle } from 'lucide-react'
+import { Phone, Clock, User, X, Inbox, MousePointerClick } from 'lucide-react'
 
 export interface Message {
     id?: string;
@@ -26,7 +26,7 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
     if (leads.length === 0) {
         return (
             <Card className="p-8 text-center bg-card border-border mt-6 shadow-sm">
-                <MessageSquare className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                <Inbox className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                 <h3 className="text-xl font-semibold text-foreground">Nenhuma conversa encontrada</h3>
                 <p className="text-muted-foreground mt-2">Assim que a IA começar a atender, os leads aparecerão aqui.</p>
             </Card>
@@ -112,7 +112,7 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                     </Card>
                 ) : (
                     <Card className="flex flex-col items-center justify-center h-full bg-card/50 backdrop-blur-md border-border border-dashed shadow-sm">
-                        <MessageCircle className="w-16 h-16 text-primary/40 mb-4 animate-pulse" />
+                        <MousePointerClick className="w-16 h-16 text-primary/40 mb-4 animate-pulse" />
                         <h4 className="text-xl font-semibold text-foreground">Nenhum Lead Selecionado</h4>
                         <p className="text-sm text-muted-foreground mt-2 text-center max-w-[250px]">Clique em um chat à esquerda para visualizar todo o histórico da conversa entre o cliente e a IA Médica.</p>
                     </Card>
