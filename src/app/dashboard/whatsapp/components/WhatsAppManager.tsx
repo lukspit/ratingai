@@ -44,18 +44,18 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
                 <CardContent>
                     {isConnected ? (
                         <div className="flex flex-col items-center justify-center py-6 space-y-4">
-                            <div className="w-20 h-20 rounded-full bg-green-500/10 flex items-center justify-center relative">
-                                <div className="absolute inset-0 rounded-full animate-ping bg-green-500/20" />
-                                <Wifi className="w-10 h-10 text-green-500" />
+                            <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center relative">
+                                <div className="absolute inset-0 rounded-full animate-ping bg-secondary/20" />
+                                <Wifi className="w-10 h-10 text-secondary" />
                             </div>
                             <div className="text-center">
-                                <h3 className="text-xl font-bold text-green-500">Conectado e Operando</h3>
+                                <h3 className="text-xl font-bold text-secondary">Conectado e Operando</h3>
                                 <p className="text-sm text-muted-foreground mt-1">A IA está monitorando as mensagens.</p>
                                 {instanceInfo && (
                                     <p className="text-xs text-muted-foreground mt-2">ID: {instanceInfo.zapi_instance_id}</p>
                                 )}
                             </div>
-                            <Button variant="destructive" onClick={handleDisconnect} className="mt-4">
+                            <Button variant="outline" onClick={handleDisconnect} className="mt-4 text-destructive border-destructive/30 hover:bg-destructive/10">
                                 Desconectar Instância
                             </Button>
                         </div>

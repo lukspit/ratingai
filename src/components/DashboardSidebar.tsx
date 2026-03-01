@@ -53,7 +53,7 @@ export function DashboardSidebar({ email }: DashboardSidebarProps) {
                 </div>
             </div>
 
-            <nav className="flex-1 px-4 space-y-2">
+            <nav className="flex-1 px-4 space-y-2 mt-4">
                 {navItems.map((item) => {
                     const isActive = item.exact ? pathname === item.href : pathname?.startsWith(item.href)
 
