@@ -49,13 +49,13 @@ export function GoogleConnectButton({ isConnected }: { isConnected: boolean }) {
 
     if (isConnected) {
         return (
-            <div className="flex flex-col items-center justify-center p-6 border border-green-500/30 bg-green-500/5 rounded-xl space-y-3">
-                <CheckCircle2 className="w-12 h-12 text-green-500" />
+            <div className="flex flex-col items-center justify-center p-6 border border-border bg-card shadow-sm rounded-xl space-y-3">
+                <CheckCircle2 className="w-12 h-12 text-primary" />
                 <div className="text-center">
-                    <h3 className="font-semibold text-green-400">Google Calendar Conectado!</h3>
-                    <p className="text-sm text-green-500/80 mb-6">A IA já tem acesso de permissão para ler sua conta.</p>
+                    <h3 className="font-semibold text-foreground">Google Calendar Conectado!</h3>
+                    <p className="text-sm text-muted-foreground mb-6">A IA já tem permissão para gerenciar sua agenda.</p>
                 </div>
-                <div className="w-full max-w-2xl border-t border-green-500/20 pt-4">
+                <div className="w-full max-w-2xl border-t border-border pt-4">
                     <CalendarSelector />
                 </div>
                 <Button

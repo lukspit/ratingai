@@ -72,7 +72,7 @@ export function CalendarSelector() {
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center p-4 text-purple-400">
+            <div className="flex items-center justify-center p-4 text-primary">
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
                 <span className="text-sm">Buscando suas agendas...</span>
             </div>
@@ -80,7 +80,7 @@ export function CalendarSelector() {
     }
 
     if (error) {
-        return <div className="p-4 text-sm text-red-400 text-center">{error}</div>;
+        return <div className="p-4 text-sm text-destructive text-center">{error}</div>;
     }
 
     if (calendars.length === 0) {
@@ -90,25 +90,25 @@ export function CalendarSelector() {
     const hasChanged = selectedId !== initialId;
 
     return (
-        <div className="mt-4 p-4 border border-purple-500/20 bg-purple-500/5 rounded-lg space-y-4">
+        <div className="mt-4 p-4 border border-border bg-muted/30 rounded-lg space-y-4">
             <div>
-                <h4 className="flex items-center gap-2 text-sm font-medium text-purple-300">
+                <h4 className="flex items-center gap-2 text-sm font-medium text-foreground">
                     <CalendarIcon className="w-4 h-4" />
                     Qual agenda a IA deve gerenciar?
                 </h4>
-                <p className="text-xs text-purple-400/70 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                     Eventos serão agendados e lidos isoladamente desta agenda.
                 </p>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
                 <Select value={selectedId} onValueChange={setSelectedId}>
-                    <SelectTrigger className="w-full sm:w-[300px] border-purple-500/30 bg-black/40 text-purple-200">
+                    <SelectTrigger className="w-full sm:w-[300px] border-border bg-background text-foreground">
                         <SelectValue placeholder="Selecione uma agenda" />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#110C1B] border-purple-500/30 text-purple-200">
+                    <SelectContent className="bg-background border-border text-foreground">
                         {calendars.map((cal) => (
-                            <SelectItem key={cal.id} value={cal.id} className="focus:bg-purple-500/20 focus:text-purple-100">
+                            <SelectItem key={cal.id} value={cal.id} className="focus:bg-muted focus:text-foreground">
                                 {cal.summary} {cal.primary && '(Principal)'}
                             </SelectItem>
                         ))}
@@ -118,14 +118,14 @@ export function CalendarSelector() {
                 <Button
                     onClick={handleSave}
                     disabled={!hasChanged || isSaving}
-                    className="bg-purple-600 hover:bg-purple-500 text-white"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                     Salvar
                 </Button>
             </div>
             {!hasChanged && initialId && (
-                <p className="text-xs text-green-400/80">Agenda ativa e salva no sistema.</p>
+                <p className="text-xs text-primary/80 font-medium tracking-wide">Agenda ativa salva.</p>
             )}
         </div>
     );

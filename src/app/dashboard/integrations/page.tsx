@@ -33,9 +33,7 @@ export default async function IntegrationsPage() {
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg relative overflow-hidden">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#4285F4]/10 rounded-full blur-3xl pointer-events-none" />
-
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-sm relative overflow-hidden">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-3">
                             <Image src="/logos/google_calendar_logo.png" alt="Google Calendar Logo" width={26} height={26} className="object-contain" />
@@ -46,8 +44,8 @@ export default async function IntegrationsPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="text-sm text-muted-foreground bg-black/20 p-4 rounded-lg border border-white/5 space-y-2">
-                            <p><strong>Permissão Necessária:</strong> Consulta e Agendamento de Eventos</p>
+                        <div className="text-sm text-foreground bg-muted/50 p-4 rounded-lg border border-border space-y-2">
+                            <p className="text-primary font-medium">Permissão Necessária: <span className="text-foreground font-normal">Consulta e Agendamento de Eventos</span></p>
                             <p><strong>O que nosso Cérebro fará:</strong> Analisará as lacunas vazias do seu calendário para sugerir horários ativamente no WhatsApp e preencherá novos slots com os nomes dos interessados.</p>
                         </div>
 

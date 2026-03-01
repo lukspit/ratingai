@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Settings, MessageSquare, LogOut, MessageCircle, Blocks } from 'lucide-react'
+import { Activity, MessageCircle, Smartphone, Network, Building2, LogOut } from 'lucide-react'
 
 interface DashboardSidebarProps {
     email?: string;
@@ -16,7 +16,7 @@ export function DashboardSidebar({ email }: DashboardSidebarProps) {
         {
             name: 'Dashboard',
             href: '/dashboard',
-            icon: LayoutDashboard,
+            icon: Activity,
             exact: true
         },
         {
@@ -28,19 +28,19 @@ export function DashboardSidebar({ email }: DashboardSidebarProps) {
         {
             name: 'Conexão WhatsApp',
             href: '/dashboard/whatsapp',
-            icon: MessageSquare,
+            icon: Smartphone,
             exact: false
         },
         {
             name: 'Integrações',
             href: '/dashboard/integrations',
-            icon: Blocks,
+            icon: Network,
             exact: false
         },
         {
             name: 'Minha Clínica',
             href: '/dashboard/settings',
-            icon: Settings,
+            icon: Building2,
             exact: false
         }
     ]
@@ -62,7 +62,7 @@ export function DashboardSidebar({ email }: DashboardSidebarProps) {
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-3 py-2 rounded-md font-medium transition-colors ${isActive
-                                ? 'bg-primary/20 text-primary border border-primary/30 shadow-[0_0_15px_rgba(124,127,242,0.15)]'
+                                ? 'bg-primary/10 text-primary border border-primary/20'
                                 : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
                                 }`}
                         >
