@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { revalidatePath } from 'next/cache'
+import { Building2, Settings } from 'lucide-react'
 
 export default async function SettingsPage() {
     const supabase = await createClient()
@@ -51,15 +52,21 @@ export default async function SettingsPage() {
     return (
         <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             <div>
-                <h1 className="text-4xl font-bold tracking-tight">Minha Clínica</h1>
+                <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                    <Building2 className="w-8 h-8 text-primary" />
+                    Minha Clínica
+                </h1>
                 <p className="text-muted-foreground text-lg mt-2">
                     Configure o contexto e as regras que a inteligência artificial deve seguir.
                 </p>
             </div>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg max-w-3xl">
+            <Card className="bg-card border-border shadow-sm max-w-3xl">
                 <CardHeader>
-                    <CardTitle>Dados de Atendimento</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                        <Settings className="w-5 h-5 text-secondary" />
+                        Dados de Atendimento
+                    </CardTitle>
                     <CardDescription>
                         Essas informações instruem nossa IA sobre como interagir com seus pacientes.
                     </CardDescription>

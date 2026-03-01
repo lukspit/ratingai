@@ -1,6 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { ConversationsList } from './ConversationsList'
+import { MessageCircle } from 'lucide-react'
 
 export default async function ConversationsPage() {
     const supabase = await createClient()
@@ -60,7 +61,10 @@ export default async function ConversationsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white">Histórico de Conversas</h1>
+                <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                    <MessageCircle className="w-8 h-8 text-primary" />
+                    Histórico de Conversas
+                </h1>
                 <p className="text-muted-foreground mt-2">Acompanhe e analise os atendimentos e vendas realizadas pela IA da sua clínica.</p>
             </div>
 
