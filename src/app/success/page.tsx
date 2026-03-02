@@ -9,12 +9,19 @@ export default function PaymentSuccessPage() {
     const [countdown, setCountdown] = useState(5);
 
     useEffect(() => {
-        // Redireciona para o dashboard após um tempo adequado para o webhook rodar
+        const searchParams = new URLSearchParams(window.location.search);
+        const sessionId = searchParams.get('session_id');
+
+        // Redireciona para o register após um tempo adequado para o webhook rodar
         const timer = setInterval(() => {
             setCountdown((prev) => {
                 if (prev <= 1) {
                     clearInterval(timer);
-                    router.push('/dashboard');
+                    if (sessionId) {
+                        router.push(`/register?session_id=${sessionId}`);
+                    } else {
+                        router.push('/dashboard');
+                    }
                     return 0;
                 }
                 return prev - 1;

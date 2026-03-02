@@ -34,14 +34,11 @@ export async function POST(req: Request) {
         );
 
         const customerId = session.customer as string;
-        const clinicId =
-            session.metadata?.clinicId ||
-            session.subscription_data?.metadata?.clinicId ||
-            subscription.metadata?.clinicId;
+        const customerEmail = session.customer_details?.email;
 
-        if (!clinicId) {
-            console.error("No clinicId found in session metadata");
-            return new NextResponse("Webhook Error: Missing clinicId in metadata", { status: 400 });
+        if (!customerEmail) {
+            console.error("No customer email found in session");
+            return new NextResponse("Webhook Error: Missing customer email", { status: 400 });
         }
 
         const currentPeriodEnd = subscription.current_period_end;
@@ -49,13 +46,13 @@ export async function POST(req: Request) {
         const { error } = await supabaseAdmin
             .from("subscriptions")
             .upsert({
-                clinic_id: clinicId,
+                customer_email: customerEmail,
                 stripe_customer_id: customerId,
                 stripe_subscription_id: subscription.id,
                 status: subscription.status,
                 price_id: subscription.items.data[0].price.id,
                 current_period_end: new Date(currentPeriodEnd * 1000).toISOString(),
-            });
+            }, { onConflict: 'stripe_subscription_id' });
 
         if (error) {
             console.error("Error inserting subscription into Supabase", error);
