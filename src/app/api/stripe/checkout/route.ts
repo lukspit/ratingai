@@ -59,7 +59,8 @@ export async function GET(request: Request) {
         }
 
         // 4. Create the Checkout Session
-        const origin = request.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+        const requestUrl = new URL(request.url);
+        const origin = `${requestUrl.protocol}//${requestUrl.host}`;
 
         const stripeSession = await stripe.checkout.sessions.create({
             customer: customerId,
