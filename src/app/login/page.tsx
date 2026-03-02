@@ -1,9 +1,10 @@
-import { login, signup } from './actions'
+import { login } from './actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function LoginPage() {
     return (
@@ -44,8 +45,10 @@ export default function LoginPage() {
                             <Button formAction={login} className="w-full sm:hover:scale-[1.02] transition-transform">
                                 Entrar
                             </Button>
-                            <Button formAction={signup} variant="outline" className="w-full sm:hover:scale-[1.02] transition-transform">
-                                Criar Conta
+                            <Button asChild variant="outline" className="w-full sm:hover:scale-[1.02] transition-transform">
+                                <Link href="/pricing">
+                                    Criar Conta
+                                </Link>
                             </Button>
                         </div>
                     </form>
