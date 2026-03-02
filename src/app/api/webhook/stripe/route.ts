@@ -3,13 +3,13 @@ import { stripe } from "@/utils/stripe";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
 
-// We need a service role client to bypass RLS when updating from a webhook
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(req: Request) {
+    // We need a service role client to bypass RLS when updating from a webhook
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     const body = await req.text();
     const signature = req.headers.get("Stripe-Signature") as string;
 
