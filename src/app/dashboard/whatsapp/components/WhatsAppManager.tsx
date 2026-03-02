@@ -1,14 +1,49 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Radio, QrCode, Wifi, AlertTriangle } from 'lucide-react'
+import { Radio, QrCode, Wifi, AlertTriangle, WifiOff, Loader2, RefreshCw, Smartphone } from 'lucide-react'
+
+interface ZapiStatus {
+    connected: boolean
+    smartphoneConnected: boolean
+    error: string | null
+}
 
 export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialIsConnected: boolean, instanceInfo?: { id: string, zapi_instance_id: string } }) {
     const [isGenerating, setIsGenerating] = useState(false)
     const [isConnected, setIsConnected] = useState(initialIsConnected)
     const [showQR, setShowQR] = useState(false)
+    const [isChecking, setIsChecking] = useState(false)
+    const [smartphoneConnected, setSmartphoneConnected] = useState(true)
+    const [statusError, setStatusError] = useState<string | null>(null)
+    const [lastChecked, setLastChecked] = useState<Date | null>(null)
+
+    const checkRealStatus = async () => {
+        setIsChecking(true)
+        try {
+            const res = await fetch('/api/whatsapp/status')
+            if (res.ok) {
+                const data: ZapiStatus = await res.json()
+                setIsConnected(data.connected)
+                setSmartphoneConnected(data.smartphoneConnected)
+                setStatusError(data.error)
+                setLastChecked(new Date())
+            }
+        } catch (err) {
+            console.error('Erro ao verificar status Z-API:', err)
+        } finally {
+            setIsChecking(false)
+        }
+    }
+
+    // Verificar status real ao montar o componente
+    useEffect(() => {
+        if (instanceInfo) {
+            checkRealStatus()
+        }
+    }, [instanceInfo])
 
     // Simulando delay da Z-API para futuro MVP
     const handleGenerateQR = () => {
@@ -35,14 +70,40 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
             {/* Card de Status */}
             <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg">
                 <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Radio className="w-5 h-5 text-primary" />
-                        Sua Instância (Z-API)
-                    </CardTitle>
-                    <CardDescription>Status da conexão com a central de mensagens.</CardDescription>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <CardTitle className="flex items-center gap-2">
+                                <Radio className="w-5 h-5 text-primary" />
+                                Sua Instância (Z-API)
+                            </CardTitle>
+                            <CardDescription>Status da conexão com a central de mensagens.</CardDescription>
+                        </div>
+                        {instanceInfo && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={checkRealStatus}
+                                disabled={isChecking}
+                                title="Verificar status agora"
+                            >
+                                <RefreshCw className={`w-4 h-4 ${isChecking ? 'animate-spin' : ''}`} />
+                            </Button>
+                        )}
+                    </div>
                 </CardHeader>
                 <CardContent>
-                    {isConnected ? (
+                    {isChecking && !lastChecked ? (
+                        // Primeiro check — loading
+                        <div className="flex flex-col items-center justify-center py-6 space-y-4">
+                            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
+                                <Loader2 className="w-10 h-10 text-muted-foreground animate-spin" />
+                            </div>
+                            <div className="text-center">
+                                <h3 className="text-xl font-bold text-muted-foreground">Verificando...</h3>
+                                <p className="text-sm text-muted-foreground mt-1">Consultando status real na Z-API.</p>
+                            </div>
+                        </div>
+                    ) : isConnected ? (
                         <div className="flex flex-col items-center justify-center py-6 space-y-4">
                             <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center relative">
                                 <div className="absolute inset-0 rounded-full animate-ping bg-secondary/20" />
@@ -55,26 +116,55 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
                                     <p className="text-xs text-muted-foreground mt-2">ID: {instanceInfo.zapi_instance_id}</p>
                                 )}
                             </div>
+
+                            {/* Aviso se celular sem internet */}
+                            {!smartphoneConnected && (
+                                <div className="w-full p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 text-sm flex items-start gap-2">
+                                    <Smartphone className="w-4 h-4 mt-0.5 shrink-0" />
+                                    <p>O celular vinculado parece estar sem internet. As mensagens podem não ser entregues até a conexão voltar.</p>
+                                </div>
+                            )}
+
+                            {lastChecked && (
+                                <p className="text-[11px] text-muted-foreground">
+                                    Verificado às {lastChecked.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                            )}
+
                             <Button variant="outline" onClick={handleDisconnect} className="mt-4 text-destructive border-destructive/30 hover:bg-destructive/10">
                                 Desconectar Instância
                             </Button>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-6 space-y-4">
-                            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-                                <AlertTriangle className="w-10 h-10 text-muted-foreground" />
+                            <div className="w-20 h-20 rounded-full bg-destructive/10 flex items-center justify-center">
+                                <WifiOff className="w-10 h-10 text-destructive" />
                             </div>
                             <div className="text-center">
-                                <h3 className="text-xl font-bold text-muted-foreground">Desconectado</h3>
+                                <h3 className="text-xl font-bold text-destructive">Desconectado</h3>
                                 <p className="text-sm text-muted-foreground mt-1">Nenhum número vinculado no momento.</p>
                             </div>
+
+                            {/* Aviso com detalhes do erro */}
+                            {statusError && (
+                                <div className="w-full p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm flex items-start gap-2">
+                                    <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
+                                    <p>{statusError}</p>
+                                </div>
+                            )}
+
+                            {lastChecked && (
+                                <p className="text-[11px] text-muted-foreground">
+                                    Verificado às {lastChecked.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                            )}
                         </div>
                     )}
                 </CardContent>
             </Card>
 
             {/* Card do QR Code Dinâmico */}
-            {!isConnected && (
+            {!isConnected && !isChecking && (
                 <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
 

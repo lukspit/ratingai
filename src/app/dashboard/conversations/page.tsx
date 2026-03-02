@@ -56,6 +56,30 @@ export default async function ConversationsPage() {
         lead.messages.reverse()
     }
 
+    // Buscar status ai_paused dos pacientes desta clínica
+    const phoneNumbers = Array.from(leadsMap.keys())
+    const patientsMap = new Map<string, boolean>()
+
+    if (phoneNumbers.length > 0 && clinics && clinics.length > 0) {
+        const clinicIds = clinics.map(c => c.id)
+        const { data: patients } = await supabase
+            .from('patients')
+            .select('phone_number, ai_paused')
+            .in('clinic_id', clinicIds)
+            .in('phone_number', phoneNumbers)
+
+        if (patients) {
+            for (const p of patients) {
+                patientsMap.set(p.phone_number, p.ai_paused ?? false)
+            }
+        }
+    }
+
+    // Injetar ai_paused em cada lead
+    for (const lead of leadsMap.values()) {
+        lead.aiPaused = patientsMap.get(lead.phoneNumber) ?? false
+    }
+
     const leads = Array.from(leadsMap.values())
 
     return (

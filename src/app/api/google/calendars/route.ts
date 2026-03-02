@@ -30,7 +30,7 @@ export async function GET(request: Request) {
             process.env.GOOGLE_CLIENT_ID,
             process.env.GOOGLE_CLIENT_SECRET
         );
-        
+
         oauth2Client.setCredentials({
             access_token: clinic.google_access_token,
             refresh_token: clinic.google_refresh_token,
@@ -57,9 +57,9 @@ export async function GET(request: Request) {
 
     } catch (error: any) {
         console.error('Error fetching google calendars:', error);
-        return NextResponse.json({ 
-            error: 'Internal Server Error', 
-            details: error.message 
+        return NextResponse.json({
+            error: 'Internal Server Error',
+            details: error.message
         }, { status: 500 });
     }
 }

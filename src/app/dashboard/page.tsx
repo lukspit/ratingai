@@ -1,8 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/utils/supabase/server'
-import { Activity, Users, MessageCircle, Settings, QrCode, Calendar as CalendarIcon, ArrowRight, TrendingUp, Zap, Server, Rocket } from 'lucide-react'
+import { Activity, Users, MessageCircle, Settings, QrCode, Calendar as CalendarIcon, ArrowRight, TrendingUp, Rocket } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { ZapiStatusCard } from './ZapiStatusCard'
 
 export default async function DashboardPage() {
     const supabase = await createClient()
@@ -21,6 +22,7 @@ export default async function DashboardPage() {
 
     let status = 'Desconectada'
     let isConnected = false
+    let hasInstance = false
     let patientsTodayCount = 0
     let upcomingAppointments: any[] = []
     let estimatedConversion = '0%'
@@ -33,9 +35,12 @@ export default async function DashboardPage() {
             .eq('clinic_id', clinic.id)
             .single()
 
-        if (instance?.status === 'CONNECTED') {
-            status = 'Online'
-            isConnected = true
+        if (instance) {
+            hasInstance = true
+            if (instance.status === 'CONNECTED') {
+                status = 'Online'
+                isConnected = true
+            }
         }
 
         // 3. Pacientes Novos Hoje
@@ -115,21 +120,11 @@ export default async function DashboardPage() {
                     </CardContent>
                 </Card>
 
-                <Card className={`bg-card/50 backdrop-blur-sm border-border/50 shadow-lg relative overflow-hidden transition-all duration-300 group ${isConnected ? 'hover:shadow-green-500/10' : 'hover:shadow-destructive/10'}`}>
-                    <div className={`absolute top-0 right-0 w-32 h-32 rounded-full blur-3xl transition-colors duration-500 ${isConnected ? 'bg-green-500/10' : 'bg-destructive/10'}`} />
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium">Status da Z-API</CardTitle>
-                        <Server className={`h-4 w-4 ${isConnected ? 'text-green-500' : 'text-destructive'} group-hover:scale-110 transition-transform`} />
-                    </CardHeader>
-                    <CardContent>
-                        <div className={`text-3xl font-bold ${isConnected ? 'text-green-500' : 'text-destructive'}`}>
-                            {status}
-                        </div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {isConnected ? 'Conectada na Z-API e operando.' : 'API offline.'}
-                        </p>
-                    </CardContent>
-                </Card>
+                <ZapiStatusCard
+                    initialStatus={status}
+                    initialIsConnected={isConnected}
+                    hasInstance={hasInstance}
+                />
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">

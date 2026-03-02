@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { Phone, Clock, User, X, Inbox, MousePointerClick } from 'lucide-react'
+import { Phone, Clock, User, X, Inbox, MousePointerClick, Bot, UserRound, Loader2 } from 'lucide-react'
 
 export interface Message {
     id?: string;
@@ -18,12 +18,119 @@ export interface Lead {
     lastMessage: string;
     lastMessageTime: string;
     messages: Message[];
+    aiPaused: boolean;
+}
+
+function AiToggleBadge({ phoneNumber, isPaused, onToggle }: {
+    phoneNumber: string;
+    isPaused: boolean;
+    onToggle: (newState: boolean) => void;
+}) {
+    const [loading, setLoading] = useState(false)
+
+    const handleClick = async (e: React.MouseEvent) => {
+        e.stopPropagation()
+        setLoading(true)
+        try {
+            const res = await fetch(`/api/patients/${encodeURIComponent(phoneNumber)}/ai-toggle`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paused: !isPaused })
+            })
+            if (res.ok) {
+                onToggle(!isPaused)
+            }
+        } catch (err) {
+            console.error('Erro ao alternar IA:', err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <button
+            onClick={handleClick}
+            disabled={loading}
+            className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium transition-all shrink-0 ${
+                isPaused
+                    ? 'bg-amber-500/15 text-amber-600 hover:bg-amber-500/25'
+                    : 'bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25'
+            }`}
+            title={isPaused ? 'Secretária no controle. Clique para devolver à IA.' : 'IA ativa. Clique para assumir.'}
+        >
+            {loading ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+            ) : isPaused ? (
+                <UserRound className="w-3 h-3" />
+            ) : (
+                <Bot className="w-3 h-3" />
+            )}
+            {isPaused ? 'Manual' : 'IA'}
+        </button>
+    )
+}
+
+function AiToggleButton({ phoneNumber, isPaused, onToggle }: {
+    phoneNumber: string;
+    isPaused: boolean;
+    onToggle: (newState: boolean) => void;
+}) {
+    const [loading, setLoading] = useState(false)
+
+    const handleClick = async () => {
+        setLoading(true)
+        try {
+            const res = await fetch(`/api/patients/${encodeURIComponent(phoneNumber)}/ai-toggle`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ paused: !isPaused })
+            })
+            if (res.ok) {
+                onToggle(!isPaused)
+            }
+        } catch (err) {
+            console.error('Erro ao alternar IA:', err)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <button
+            onClick={handleClick}
+            disabled={loading}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
+                isPaused
+                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 hover:bg-amber-500/20'
+                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/20'
+            }`}
+        >
+            {loading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+            ) : isPaused ? (
+                <UserRound className="w-4 h-4" />
+            ) : (
+                <Bot className="w-4 h-4" />
+            )}
+            {isPaused ? 'Secretária no Controle' : 'IA Ativa'}
+        </button>
+    )
 }
 
 export function ConversationsList({ leads }: { leads: Lead[] }) {
+    const [leadsState, setLeadsState] = useState<Lead[]>(leads)
     const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
 
-    if (leads.length === 0) {
+    const handleToggle = (phoneNumber: string, newPaused: boolean) => {
+        setLeadsState(prev => prev.map(l =>
+            l.phoneNumber === phoneNumber ? { ...l, aiPaused: newPaused } : l
+        ))
+        if (selectedLead?.phoneNumber === phoneNumber) {
+            setSelectedLead(prev => prev ? { ...prev, aiPaused: newPaused } : null)
+        }
+    }
+
+    if (leadsState.length === 0) {
         return (
             <Card className="p-8 text-center bg-card border-border mt-6 shadow-sm">
                 <Inbox className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
@@ -37,7 +144,7 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-200px)] min-h-[500px]">
             {/* Leads List */}
             <div className="md:col-span-1 space-y-3 overflow-y-auto pr-2 custom-scrollbar">
-                {leads.map(lead => (
+                {leadsState.map(lead => (
                     <Card
                         key={lead.phoneNumber}
                         className={`p-4 cursor-pointer transition-all hover:translate-x-1 hover:shadow-sm border-border bg-card/50 backdrop-blur-md ${selectedLead?.phoneNumber === lead.phoneNumber ? 'ring-1 ring-primary bg-primary/5 shadow-sm' : ''}`}
@@ -48,7 +155,15 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                                 <Phone className="w-5 h-5" />
                             </div>
                             <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-foreground tracking-wide truncate">{lead.phoneNumber}</h4>
+                                <div className="flex items-center gap-2">
+                                    <h4 className="font-semibold text-foreground tracking-wide truncate">{lead.phoneNumber}</h4>
+                                    {/* Lugar 2: Badge compacto na lista de leads */}
+                                    <AiToggleBadge
+                                        phoneNumber={lead.phoneNumber}
+                                        isPaused={lead.aiPaused}
+                                        onToggle={(newState) => handleToggle(lead.phoneNumber, newState)}
+                                    />
+                                </div>
                                 <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                                     <Clock className="w-3 h-3" />
                                     {new Date(lead.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -77,9 +192,17 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                                     <p className="text-xs text-muted-foreground">Paciente ativo</p>
                                 </div>
                             </div>
-                            <button onClick={() => setSelectedLead(null)} className="text-muted-foreground hover:text-foreground transition-colors">
-                                <X className="w-6 h-6" />
-                            </button>
+                            <div className="flex items-center gap-2">
+                                {/* Lugar 1: Botão completo no header do chat */}
+                                <AiToggleButton
+                                    phoneNumber={selectedLead.phoneNumber}
+                                    isPaused={selectedLead.aiPaused}
+                                    onToggle={(newState) => handleToggle(selectedLead.phoneNumber, newState)}
+                                />
+                                <button onClick={() => setSelectedLead(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                                    <X className="w-6 h-6" />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Background Clean Canvas */}
