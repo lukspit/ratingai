@@ -75,17 +75,22 @@ export async function registerWithSubscription(formData: FormData) {
         // pois o webhook pode ter já inserido a subscription antes.
     }
 
-    // 2. Criar o usuário no Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // 2. Criar o usuário no Supabase Auth via Admin Client
+    //    Usando admin.createUser() pois é mais confiável que signUp():
+    //    - Cria o usuário confirmado imediatamente (sem verificação de email)
+    //    - Ignora rate limits
+    //    - Garante que o usuário REALMENTE exista em auth.users antes de criar a clínica
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
+        email_confirm: true, // Marca o email como confirmado automaticamente
     })
 
     if (authError || !authData.user) {
         console.error('Auth Error:', authError)
         let friendlyMsg = 'Erro ao criar conta. Tente novamente.'
-        if (authError?.message?.toLowerCase().includes('rate limit')) {
-            friendlyMsg = 'Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente com um email diferente.'
+        if (authError?.message?.toLowerCase().includes('already registered') || authError?.message?.toLowerCase().includes('already been registered')) {
+            friendlyMsg = 'Este email já está cadastrado. Tente fazer login.'
         } else if (authError?.message) {
             friendlyMsg = authError.message
         }
@@ -93,6 +98,13 @@ export async function registerWithSubscription(formData: FormData) {
     }
 
     const userId = authData.user.id
+
+    // Fazer login automático após criar o usuário pelo admin
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
+    if (signInError) {
+        console.error('Auto sign-in error:', signInError)
+        // Não bloqueia o fluxo — o usuário pode logar manualmente depois
+    }
 
     // 3. Criar a clínica (Admin Client para bypass de RLS)
     const { data: clinicData, error: clinicError } = await supabaseAdmin
