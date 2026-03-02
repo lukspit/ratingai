@@ -399,7 +399,7 @@ export async function POST(req: Request) {
 
     // 6. Chamada de Inferência (LLM via OpenRouter)
     const payload: any = {
-      model: "google/gemini-2.5-flash",
+      model: "deepseek/deepseek-v3.2",
       messages: messagesForLLM,
       temperature: 0.7,
       max_tokens: 1024,
@@ -611,7 +611,7 @@ export async function POST(req: Request) {
 
       // Segunda chamada para gerar a resposta final ao usuário
       completion = await openai.chat.completions.create({
-        model: "google/gemini-2.5-flash",
+        model: "deepseek/deepseek-v3.2",
         messages: messagesForLLM as any,
         temperature: 0.7,
         max_tokens: 1024,

@@ -1,10 +1,7 @@
 import { createClient } from '@/utils/supabase/server'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
 import { revalidatePath } from 'next/cache'
-import { Building2, Settings } from 'lucide-react'
+import { Building2 } from 'lucide-react'
+import { OnboardingWizard } from '@/components/dashboard/onboarding-wizard'
 
 export default async function SettingsPage() {
     const supabase = await createClient()
@@ -17,19 +14,61 @@ export default async function SettingsPage() {
         .eq('owner_id', user?.id)
         .single()
 
-    async function saveClinicData(formData: FormData) {
+    async function saveClinicData(formData: any) {
         'use server'
         const supabase = await createClient()
         const { data: { user } } = await supabase.auth.getUser()
 
         if (!user) return
 
-        const data = {
-            name: formData.get('name') as string,
-            specialties: formData.get('specialties') as string,
-            consultation_fee: parseFloat(formData.get('fee') as string) || 0,
-            rules: formData.get('rules') as string,
-            assistant_name: (formData.get('assistant_name') as string) || 'Liz',
+        // Compiler - Juntar todas as etaps em um markdown perfeito para a IA
+
+        let paymentMethodsStr = ''
+        const pm = []
+        if (formData.payment_methods.pix) pm.push('PIX')
+        if (formData.payment_methods.credit) pm.push('Cartão de Crédito')
+        if (formData.payment_methods.debit) pm.push('Cartão de Débito')
+        if (formData.payment_methods.cash) pm.push('Dinheiro')
+        if (pm.length > 0) paymentMethodsStr = pm.join(', ')
+
+        let serviceModesStr = ''
+        const sm = []
+        if (formData.service_modes.presencial) sm.push('Atendimento Presencial')
+        if (formData.service_modes.online) sm.push('Telemedicina (Online)')
+        if (sm.length > 0) serviceModesStr = sm.join(' e ')
+
+        const compiledRulesMarkdown = `
+### IDENTIDADE E TOM DE VOZ
+- Tom de Voz Escolhido pela Clínica: ${formData.tone.toUpperCase()}
+- Diretriz: O tom ${formData.tone} afeta diretamente sua escolha de palavras e emojis.
+
+### OPERAÇÃO GERAL DA CLÍNICA
+- Modalidades de Atendimento: ${serviceModesStr}
+- Horários de Funcionamento: ${formData.hours}
+
+### POLÍTICA FINANCEIRA E CONVÊNIOS
+- Formas de Pagamento Aceitas (Atendimentos Particulares): ${paymentMethodsStr || 'Consulte'}
+- Convênios Médicos Aceitos: ${formData.insurance || 'Não atende convênios (apenas particular)'}
+- Diretriz sobre outros Convênios (Como responder a pacientes que perguntem sobre planos não listados): ${formData.insurance_policy}
+- Política de Retorno de Consulta: ${formData.return_policy || 'Não informado (verificar internamente)'}
+
+### DIFERENCIAIS DA CLÍNICA (Vender o Valor)
+- Caso o paciente demonstre objeção de preço, destaque nossos diferenciais: ${formData.differentials}
+
+### PROCEDIMENTOS NÃO REALIZADOS (ANTI-ALUCINAÇÃO)
+- IMPORTANTE: NÃO FAZEMOS os seguintes procedimentos: ${formData.restrictions}
+- Se o paciente pedir isso ou perguntar, negue educadamente e NÃO faça falsas promessas.
+
+### DIRETRIZES DE URGÊNCIA MÉDICA
+- Protocolo para sintomas graves/emergenciais: ${formData.emergency_rules}
+`.trim()
+
+        const dbData = {
+            name: formData.name as string,
+            specialties: formData.specialties as string,
+            consultation_fee: parseFloat(formData.consultation_fee) || 0,
+            rules: compiledRulesMarkdown, // Salvando o Big Markdown
+            assistant_name: formData.assistant_name as string,
             owner_id: user.id
         }
 
@@ -41,112 +80,28 @@ export default async function SettingsPage() {
             .single()
 
         if (existing) {
-            await supabase.from('clinics').update(data).eq('id', existing.id)
+            await supabase.from('clinics').update(dbData).eq('id', existing.id)
         } else {
-            await supabase.from('clinics').insert(data)
+            await supabase.from('clinics').insert(dbData)
         }
 
         revalidatePath('/dashboard/settings')
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in zoom-in duration-500">
+        <div className="space-y-8 animate-in fade-in zoom-in duration-500 pb-12">
             <div>
                 <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
                     <Building2 className="w-8 h-8 text-primary" />
-                    Minha Clínica
+                    Setup da Inteligência
                 </h1>
                 <p className="text-muted-foreground text-lg mt-2">
-                    Configure o contexto e as regras que a inteligência artificial deve seguir.
+                    Preencha o contexto da sua clínica para blindar nossa IA contra erros e alucinações.
                 </p>
             </div>
 
-            <Card className="bg-card border-border shadow-sm max-w-3xl">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <Settings className="w-5 h-5 text-secondary" />
-                        Dados de Atendimento
-                    </CardTitle>
-                    <CardDescription>
-                        Essas informações instruem nossa IA sobre como interagir com seus pacientes.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <form action={saveClinicData} className="space-y-6">
-                        <div className="space-y-4">
-                            <div className="grid gap-2">
-                                <Label htmlFor="assistant_name">Nome da Assistente Virtual</Label>
-                                <Input
-                                    id="assistant_name"
-                                    name="assistant_name"
-                                    defaultValue={clinic?.assistant_name || 'Liz'}
-                                    placeholder="Ex: Liz, Ana, Clara..."
-                                    className="bg-background/50"
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                    Este é o nome que a IA usará para se apresentar aos pacientes no WhatsApp.
-                                </p>
-                            </div>
+            <OnboardingWizard initialData={clinic} onSave={saveClinicData} />
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="name">Nome da Clínica ou Doutor</Label>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    defaultValue={clinic?.name || ''}
-                                    placeholder="Ex: Clínica Nexus ou Dr. Lucas"
-                                    required
-                                    className="bg-background/50"
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="grid gap-2">
-                                    <Label htmlFor="specialties">Especialidade Principal</Label>
-                                    <Input
-                                        id="specialties"
-                                        name="specialties"
-                                        defaultValue={clinic?.specialties || ''}
-                                        placeholder="Ex: Dermatologia Estética"
-                                        className="bg-background/50"
-                                    />
-                                </div>
-                                <div className="grid gap-2">
-                                    <Label htmlFor="fee">Valor da Consulta (R$)</Label>
-                                    <Input
-                                        id="fee"
-                                        name="fee"
-                                        type="number"
-                                        step="0.01"
-                                        defaultValue={clinic?.consultation_fee || ''}
-                                        placeholder="Ex: 250.00"
-                                        className="bg-background/50"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="grid gap-2">
-                                <Label htmlFor="rules">Regras de Atendimento e Ton de Voz</Label>
-                                <textarea
-                                    id="rules"
-                                    name="rules"
-                                    rows={5}
-                                    defaultValue={clinic?.rules || ''}
-                                    className="w-full rounded-md border border-border bg-background/50 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                    placeholder="Ex: Somos uma clínica premium. Atendemos apenas particular. Horário de funcionamento: Seg a Sex das 09h às 18h..."
-                                ></textarea>
-                                <p className="text-xs text-muted-foreground">
-                                    Descreva detalhadamente. Isso fará o cérebro da Z-API agir de forma muito mais inteligente.
-                                </p>
-                            </div>
-                        </div>
-
-                        <Button type="submit" className="w-full sm:w-auto">
-                            Salvar Configurações
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
         </div>
     )
 }
