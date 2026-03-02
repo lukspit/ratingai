@@ -101,7 +101,7 @@ export default async function SettingsPage() {
                 </p>
             </div>
 
-            <OnboardingWizard initialData={clinic?.wizard_settings || clinic} onSave={saveClinicData} />
+            <OnboardingWizard initialData={clinic?.wizard_settings || clinic} hasCompleted={!!clinic?.rules} onSave={saveClinicData} />
 
         </div>
     )

@@ -25,9 +25,11 @@ const TONES = [
     { id: 'desenrolado', label: 'Descontraído e Moderno ✌️', desc: 'Usa gírias leves, muitos emojis divertidos.' }
 ]
 
-export function OnboardingWizard({ initialData, onSave }: { initialData: any, onSave: (data: any) => void }) {
+export function OnboardingWizard({ initialData, hasCompleted, onSave }: { initialData: any, hasCompleted?: boolean, onSave: (data: any) => void }) {
     const [step, setStep] = useState(0)
     const [isLoading, setIsLoading] = useState(false)
+    const [isEditing, setIsEditing] = useState(!hasCompleted)
+    const [isSuccess, setIsSuccess] = useState(false)
 
     // Form State
     const [formData, setFormData] = useState({
@@ -69,9 +71,73 @@ export function OnboardingWizard({ initialData, onSave }: { initialData: any, on
         setIsLoading(true)
         await onSave(formData)
         setIsLoading(false)
+        setIsSuccess(true)
     }
 
     const CurrentIcon = STEPS[step].icon
+
+    if (isSuccess) {
+        return (
+            <Card className="border-none shadow-xl bg-emerald-50 dark:bg-emerald-950/20 text-center py-12">
+                <CardContent className="flex flex-col items-center justify-center space-y-4">
+                    <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/40 rounded-full flex items-center justify-center animate-in zoom-in duration-500">
+                        <CheckCircle2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground">Configurações Salvas!</h2>
+                    <p className="text-muted-foreground max-w-md mx-auto">
+                        O cérebro da sua IA foi atualizado com sucesso. As novas regras, preços e restrições já estão em vigor para os próximos atendimentos.
+                    </p>
+                    <Button className="mt-6 shadow-md" onClick={() => {
+                        setIsSuccess(false)
+                        setIsEditing(false)
+                        setStep(0)
+                    }}>
+                        Voltar ao Painel
+                    </Button>
+                </CardContent>
+            </Card>
+        )
+    }
+
+    if (!isEditing) {
+        return (
+            <Card className="border-none shadow-xl bg-primary/5">
+                <CardHeader>
+                    <div className="flex items-center gap-3">
+                        <div className="p-3 bg-primary/10 rounded-xl shadow-sm">
+                            <CheckCircle2 className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                            <CardTitle className="text-2xl">Inteligência Configurada</CardTitle>
+                            <CardDescription className="text-base">Sua clínica já possui diretrizes personalizadas ativas na IA.</CardDescription>
+                        </div>
+                    </div>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 bg-background rounded-xl border border-border/50">
+                            <p className="text-sm text-muted-foreground font-medium mb-1">Assistente</p>
+                            <p className="font-semibold">{formData.assistant_name} ({TONES.find(t => t.id === formData.tone)?.label || formData.tone})</p>
+                        </div>
+                        <div className="p-4 bg-background rounded-xl border border-border/50">
+                            <p className="text-sm text-muted-foreground font-medium mb-1">Valor Particular</p>
+                            <p className="font-semibold">R$ {formData.consultation_fee}</p>
+                        </div>
+                        <div className="p-4 bg-background rounded-xl border border-border/50 col-span-1 md:col-span-2">
+                            <p className="text-sm text-muted-foreground font-medium mb-1">Restrições Padrão (Anti-Alucinação)</p>
+                            <p className="font-semibold text-rose-600 dark:text-rose-400">{formData.restrictions || 'Nenhuma restrição informada'}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-end pt-4">
+                        <Button onClick={() => setIsEditing(true)} className="shadow-md">
+                            Editar Configurações da IA
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+        )
+    }
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
