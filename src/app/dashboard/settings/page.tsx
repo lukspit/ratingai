@@ -68,6 +68,7 @@ export default async function SettingsPage() {
             specialties: formData.specialties as string,
             consultation_fee: parseFloat(formData.consultation_fee) || 0,
             rules: compiledRulesMarkdown, // Salvando o Big Markdown
+            wizard_settings: formData, // Salva o estado bruto do Wizard
             assistant_name: formData.assistant_name as string,
             owner_id: user.id
         }
@@ -100,7 +101,7 @@ export default async function SettingsPage() {
                 </p>
             </div>
 
-            <OnboardingWizard initialData={clinic} onSave={saveClinicData} />
+            <OnboardingWizard initialData={clinic?.wizard_settings || clinic} onSave={saveClinicData} />
 
         </div>
     )

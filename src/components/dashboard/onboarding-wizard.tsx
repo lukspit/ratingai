@@ -35,23 +35,23 @@ export function OnboardingWizard({ initialData, onSave }: { initialData: any, on
         name: initialData?.name || '',
         assistant_name: initialData?.assistant_name || 'Liz',
         specialties: initialData?.specialties || '',
-        tone: 'acolhedor', // Default
+        tone: initialData?.tone || 'acolhedor', // Default
 
         // Etapa 2
         consultation_fee: initialData?.consultation_fee || '',
-        hours: '',
-        service_modes: { presencial: false, online: false },
+        hours: initialData?.hours || '',
+        service_modes: initialData?.service_modes || { presencial: false, online: false },
 
         // Etapa 3
-        payment_methods: { pix: false, credit: false, debit: false, cash: false },
-        insurance: '',
-        insurance_policy: 'Aceitamos os convênios acima e o restante apenas particular.',
-        return_policy: '',
+        payment_methods: initialData?.payment_methods || { pix: false, credit: false, debit: false, cash: false },
+        insurance: initialData?.insurance || '',
+        insurance_policy: initialData?.insurance_policy || 'Aceitamos os convênios acima e o restante apenas particular.',
+        return_policy: initialData?.return_policy || '',
 
         // Etapa 4
-        differentials: '',
-        restrictions: '',
-        emergency_rules: 'Se o paciente relatar dor intensa, sangramento ou falta de ar, orientar ir ao pronto-socorro mais próximo.'
+        differentials: initialData?.differentials || '',
+        restrictions: initialData?.restrictions || '',
+        emergency_rules: initialData?.emergency_rules || 'Se o paciente relatar dor intensa, sangramento ou falta de ar, orientar ir ao pronto-socorro mais próximo.'
     })
 
     const bgColors = ['bg-rose-50 dark:bg-rose-950/20', 'bg-blue-50 dark:bg-blue-950/20', 'bg-emerald-50 dark:bg-emerald-950/20', 'bg-amber-50 dark:bg-amber-950/20']
