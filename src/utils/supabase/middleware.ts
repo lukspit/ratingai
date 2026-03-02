@@ -66,9 +66,9 @@ export async function updateSession(request: NextRequest) {
                 return NextResponse.redirect(new URL('/pricing', request.url))
             }
         } else {
-            // If they don't have a clinic yet, you might want to redirect them to a setup page
-            // For now, let's redirect to pricing as a fallback or keep them going
-            // return NextResponse.redirect(new URL('/onboarding', request.url))
+            // If they don't have a clinic yet, they shouldn't access the dashboard either.
+            // Redirect them to pricing.
+            return NextResponse.redirect(new URL('/pricing', request.url))
         }
     }
 
