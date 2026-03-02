@@ -34,7 +34,10 @@ export async function POST(req: Request) {
         );
 
         const customerId = session.customer as string;
-        const clinicId = session.subscription_data?.metadata?.clinicId || session.metadata?.clinicId;
+        const clinicId =
+            session.metadata?.clinicId ||
+            session.subscription_data?.metadata?.clinicId ||
+            subscription.metadata?.clinicId;
 
         if (!clinicId) {
             console.error("No clinicId found in session metadata");
