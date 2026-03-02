@@ -13,6 +13,8 @@ export async function POST(req: Request) {
     const body = await req.text();
     const signature = req.headers.get("Stripe-Signature") as string;
 
+    console.log("Webhook received. Signature length:", signature?.length);
+
     let event;
 
     try {
@@ -21,13 +23,16 @@ export async function POST(req: Request) {
             signature,
             process.env.STRIPE_WEBHOOK_SECRET!
         );
+        console.log("Webhook event constructed:", event.type);
     } catch (error: any) {
+        console.error("Webhook Signature Verification Failed:", error.message);
         return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 });
     }
 
     const session = event.data.object as any;
 
     if (event.type === "checkout.session.completed") {
+        console.log("Processing checkout.session.completed...");
         // Retrieve the subscription details from Stripe
         const subscription: any = await stripe.subscriptions.retrieve(
             session.subscription as string
@@ -35,6 +40,8 @@ export async function POST(req: Request) {
 
         const customerId = session.customer as string;
         const customerEmail = session.customer_details?.email;
+
+        console.log("Customer Email:", customerEmail);
 
         if (!customerEmail) {
             console.error("No customer email found in session");
@@ -55,9 +62,10 @@ export async function POST(req: Request) {
             }, { onConflict: 'stripe_subscription_id' });
 
         if (error) {
-            console.error("Error inserting subscription into Supabase", error);
+            console.error("Error inserting subscription into Supabase:", error);
             return new NextResponse("Webhook Error: Database insert failed", { status: 500 });
         }
+        console.log("Subscription inserted/updated successfully!");
     }
 
     if (event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {

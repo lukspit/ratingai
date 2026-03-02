@@ -33,6 +33,7 @@ export async function registerWithSubscription(formData: FormData) {
     const userId = authData.user.id
 
     // 2. Criar a clínica (Usamos o Admin Client para pular RLS no Onboarding)
+    console.log('Attempting to create clinic for user:', userId)
     const { data: clinicData, error: clinicError } = await supabaseAdmin
         .from('clinics')
         .insert({
@@ -44,8 +45,9 @@ export async function registerWithSubscription(formData: FormData) {
         .single()
 
     if (clinicError || !clinicData) {
-        console.error('Clinic Error:', clinicError)
-        return redirect(`/register?session_id=${sessionId}&error=Erro ao criar clínica`)
+        console.error('Clinic Creation Error Details:', JSON.stringify(clinicError))
+        const errorMsg = clinicError?.message || 'Erro ao criar clínica'
+        return redirect(`/register?session_id=${sessionId}&error=${encodeURIComponent(errorMsg)}`)
     }
 
     // 3. Vincular a assinatura existente a esta clínica (Admin Client para garantir o vínculo)
