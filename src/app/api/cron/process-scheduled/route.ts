@@ -36,10 +36,12 @@ export async function GET(req: Request) {
         for (const msg of pendingMessages) {
             try {
                 // 2. Busca o histórico recente para dar contexto ao Follow-up/Lembrete
+                // NOTA: a tabela `messages` usa `phone_number` + `instance_id`, não `patient_id`
                 const { data: history } = await supabase
                     .from("messages")
                     .select("role, content")
-                    .eq("patient_id", msg.patient_id)
+                    .eq("phone_number", msg.phone_number)
+                    .eq("instance_id", msg.instance_id)
                     .order("created_at", { ascending: false })
                     .limit(10);
 
@@ -60,7 +62,7 @@ export async function GET(req: Request) {
 
                 // 4. Gera o texto com a IA
                 const completion = await openai.chat.completions.create({
-                    model: "openai/gpt-4o-mini",
+                    model: "google/gemini-2.5-flash",
                     messages: [
                         {
                             role: "system",
