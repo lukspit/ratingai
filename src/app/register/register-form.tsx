@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RefreshCw } from 'lucide-react'
+import Link from 'next/link'
 import { registerWithSubscription } from './actions'
 
 interface RegisterFormProps {
@@ -100,8 +101,8 @@ export function RegisterForm({ email, sessionId, error }: RegisterFormProps) {
             </div>
 
             {error && (
-                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm text-center font-medium">
-                    {error}
+                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm text-center font-medium space-y-2">
+                    <p>{error}</p>
                 </div>
             )}
 
@@ -109,6 +110,13 @@ export function RegisterForm({ email, sessionId, error }: RegisterFormProps) {
                 <Button type="submit" className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99]">
                     Ativar meu Acesso
                 </Button>
+
+                <p className="text-center text-sm text-muted-foreground">
+                    Já tem uma conta?{' '}
+                    <Link href="/login" className="text-primary font-semibold hover:underline">
+                        Fazer login
+                    </Link>
+                </p>
             </div>
         </form>
     )

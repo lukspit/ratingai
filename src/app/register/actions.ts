@@ -23,8 +23,7 @@ export async function registerWithSubscription(formData: FormData) {
         return redirect(`/pricing?error=Sessão de pagamento inválida.`)
     }
 
-    // 1. Verificar e garantir assinatura no banco (sem depender do webhook)
-    //    Busca a sessão do Stripe diretamente pelo session_id que veio da URL.
+    // 1. Verificar/garantir subscription no banco (sem depender do webhook)
     let stripeCustomerEmail = email
     let stripeCustomerId = ''
     let stripeSubscriptionId = ''
@@ -49,9 +48,8 @@ export async function registerWithSubscription(formData: FormData) {
             ? new Date(sub.current_period_end * 1000)
             : new Date()
 
-        // Upsert no banco: cria a subscription se não existir (caso webhook tenha falhado)
         if (stripeSubscriptionId) {
-            const { error: upsertError } = await supabaseAdmin
+            await supabaseAdmin
                 .from('subscriptions')
                 .upsert(
                     {
@@ -64,75 +62,100 @@ export async function registerWithSubscription(formData: FormData) {
                     },
                     { onConflict: 'stripe_subscription_id' }
                 )
-
-            if (upsertError) {
-                console.error('Subscription upsert error:', upsertError)
-            }
         }
     } catch (stripeError: any) {
         console.error('Stripe session fetch error:', stripeError.message)
-        // Continua o fluxo mesmo se houver erro ao buscar sessão Stripe,
-        // pois o webhook pode ter já inserido a subscription antes.
     }
 
-    // 2. Criar o usuário no Supabase Auth via Admin Client
-    //    Usando admin.createUser() pois é mais confiável que signUp():
-    //    - Cria o usuário confirmado imediatamente (sem verificação de email)
-    //    - Ignora rate limits
-    //    - Garante que o usuário REALMENTE exista em auth.users antes de criar a clínica
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    // 2. Criar usuário OU atualizar senha se já existir
+    let userId = ''
+
+    const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email,
         password,
-        email_confirm: true, // Marca o email como confirmado automaticamente
+        email_confirm: true,
     })
 
-    if (authError || !authData.user) {
-        console.error('Auth Error:', authError)
-        let friendlyMsg = 'Erro ao criar conta. Tente novamente.'
-        if (authError?.message?.toLowerCase().includes('already registered') || authError?.message?.toLowerCase().includes('already been registered')) {
-            friendlyMsg = 'Este email já está cadastrado. Tente fazer login.'
-        } else if (authError?.message) {
-            friendlyMsg = authError.message
+    if (createError) {
+        // Se o erro for "already registered", recupera o usuário existente e atualiza a senha
+        const isAlreadyRegistered =
+            createError.message?.toLowerCase().includes('already registered') ||
+            createError.message?.toLowerCase().includes('already been registered') ||
+            createError.code === 'email_exists'
+
+        if (isAlreadyRegistered) {
+            // Busca o usuário existente pelo email via SQL com service role
+            const { data: existingUsers, error: listError } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+
+            if (listError || !existingUsers) {
+                return redirect(`/register?session_id=${sessionId}&error=Erro ao recuperar conta existente.`)
+            }
+
+            const existingUser = existingUsers.users.find(u => u.email === email)
+
+            if (!existingUser) {
+                return redirect(`/login?error=${encodeURIComponent('Conta já existe. Faça login com sua senha.')}`)
+            }
+
+            userId = existingUser.id
+
+            // Atualiza a senha do usuário existente
+            const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, { password })
+
+            if (updateError) {
+                console.error('Password update error:', updateError)
+                return redirect(`/login?error=${encodeURIComponent('Conta já existe. Faça login com sua senha.')}`)
+            }
+        } else {
+            return redirect(`/register?session_id=${sessionId}&error=${encodeURIComponent(createError.message || 'Erro ao criar conta')}`)
         }
-        return redirect(`/register?session_id=${sessionId}&error=${encodeURIComponent(friendlyMsg)}`)
+    } else {
+        userId = newUser.user.id
     }
 
-    const userId = authData.user.id
-
-    // Fazer login automático após criar o usuário pelo admin
+    // 3. Login automático com as credenciais
     const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
     if (signInError) {
         console.error('Auto sign-in error:', signInError)
-        // Não bloqueia o fluxo — o usuário pode logar manualmente depois
+        return redirect(`/login?error=${encodeURIComponent('Conta criada! Faça login para continuar.')}`)
     }
 
-    // 3. Criar a clínica (Admin Client para bypass de RLS)
-    const { data: clinicData, error: clinicError } = await supabaseAdmin
+    // 4. Verificar se já existe uma clínica para esse usuário
+    const { data: existingClinic } = await supabaseAdmin
         .from('clinics')
-        .insert({
-            name: clinicName,
-            owner_id: userId,
-            assistant_name: 'Liz',
-        })
-        .select()
+        .select('id')
+        .eq('owner_id', userId)
         .single()
 
-    if (clinicError || !clinicData) {
-        console.error('Clinic Error:', JSON.stringify(clinicError))
-        const errorMsg = clinicError?.message || 'Erro ao criar clínica'
-        return redirect(`/register?session_id=${sessionId}&error=${encodeURIComponent(errorMsg)}`)
+    let clinicId = existingClinic?.id
+
+    // Se não tem clínica, cria uma nova
+    if (!clinicId) {
+        const { data: clinicData, error: clinicError } = await supabaseAdmin
+            .from('clinics')
+            .insert({
+                name: clinicName,
+                owner_id: userId,
+                assistant_name: 'Liz',
+            })
+            .select()
+            .single()
+
+        if (clinicError || !clinicData) {
+            console.error('Clinic Error:', JSON.stringify(clinicError))
+            const errorMsg = clinicError?.message || 'Erro ao criar clínica'
+            return redirect(`/register?session_id=${sessionId}&error=${encodeURIComponent(errorMsg)}`)
+        }
+
+        clinicId = clinicData.id
     }
 
-    // 4. Vincular a assinatura à clínica (pelo email usado no checkout)
-    const { error: subError } = await supabaseAdmin
+    // 5. Vincular a subscription à clínica (pelo email do Stripe)
+    await supabaseAdmin
         .from('subscriptions')
-        .update({ clinic_id: clinicData.id })
+        .update({ clinic_id: clinicId })
         .eq('customer_email', stripeCustomerEmail)
         .is('clinic_id', null)
-
-    if (subError) {
-        console.error('Subscription Linking Error:', subError)
-    }
 
     revalidatePath('/', 'layout')
     redirect('/dashboard')
