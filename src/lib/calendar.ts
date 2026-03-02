@@ -1,8 +1,10 @@
 import { google } from "googleapis";
+import { createClient } from "@supabase/supabase-js";
 
 interface CalendarAuthArgs {
     accessToken: string;
     refreshToken: string;
+    clinicId?: string;
 }
 
 function getGoogleCalendarClient(authArgs: CalendarAuthArgs) {
@@ -14,6 +16,28 @@ function getGoogleCalendarClient(authArgs: CalendarAuthArgs) {
         access_token: authArgs.accessToken,
         refresh_token: authArgs.refreshToken,
     });
+
+    if (authArgs.clinicId) {
+        oauth2Client.on("tokens", async (tokens) => {
+            if (tokens.access_token) {
+                console.log(`[CALENDAR] Novo access_token gerado via Refresh Token. Atualizando clínica ${authArgs.clinicId}`);
+                try {
+                    const supabaseAdmin = createClient(
+                        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                        process.env.SUPABASE_SERVICE_ROLE_KEY!
+                    );
+                    await supabaseAdmin
+                        .from("clinics")
+                        .update({ google_access_token: tokens.access_token })
+                        .eq("id", authArgs.clinicId);
+                    console.log("[CALENDAR] Novo access_token salvo com sucesso no banco de dados.");
+                } catch (error) {
+                    console.error("[CALENDAR] Erro ao salvar o novo access_token no Supabase:", error);
+                }
+            }
+        });
+    }
+
     return google.calendar({ version: "v3", auth: oauth2Client });
 }
 

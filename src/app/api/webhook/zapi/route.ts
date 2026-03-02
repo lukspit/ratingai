@@ -399,10 +399,10 @@ export async function POST(req: Request) {
 
     // 6. Chamada de Inferência (LLM via OpenRouter)
     const payload: any = {
-      model: "openai/gpt-4o-mini",
+      model: "google/gemini-2.5-flash",
       messages: messagesForLLM,
       temperature: 0.7,
-      max_tokens: 500,
+      max_tokens: 1024,
     };
     if (tools.length > 0) {
       payload.tools = tools;
@@ -446,6 +446,7 @@ export async function POST(req: Request) {
               {
                 accessToken: contextData.google_access_token as string,
                 refreshToken: contextData.google_refresh_token as string,
+                clinicId: contextData.clinic_id
               },
               contextData.google_calendar_id as string,
               args.date
@@ -477,6 +478,7 @@ export async function POST(req: Request) {
               {
                 accessToken: contextData.google_access_token as string,
                 refreshToken: contextData.google_refresh_token as string,
+                clinicId: contextData.clinic_id
               },
               contextData.google_calendar_id as string,
               args.patient_name,
@@ -499,7 +501,11 @@ export async function POST(req: Request) {
                 p_status: "CONFIRMED"
               });
 
-              if (apptError) console.error("[RPC ERROR] Falha ao inserir agendamento:", apptError);
+              if (apptError) {
+                console.error("[RPC ERROR] Falha ao inserir agendamento:", apptError);
+              } else {
+                console.log(`[SUPABASE] Agendamento salvo com sucesso para patient_id: ${patientId}`);
+              }
 
               const { error: updError } = await supabase.rpc('update_patient_info', {
                 p_patient_id: patientId,
@@ -533,16 +539,19 @@ export async function POST(req: Request) {
                   scheduled_for: reminder2h.toISOString(),
                 });
               }
-
-              messagesForLLM.push({
-                role: "tool",
-                tool_call_id: toolCall.id,
-                content: JSON.stringify({
-                  success: true,
-                  message: "A consulta foi gravada com sucesso no sistema da clínica.",
-                }),
-              });
+            } else {
+              console.error(`[APPT ERRO CRÍTICO] Google Calendar agendou com sucesso mas patientId é null! Agendamento de ${args.patient_name} às ${isoStart} NÃO foi salvo no Supabase.`);
             }
+
+            // SEMPRE retornar resultado para o LLM (protocolo de tool calling exige resposta para toda tool chamada)
+            messagesForLLM.push({
+              role: "tool",
+              tool_call_id: toolCall.id,
+              content: JSON.stringify({
+                success: true,
+                message: "A consulta foi agendada com sucesso no Google Calendar e registrada em nosso sistema.",
+              }),
+            });
           } catch (e: any) {
             console.error(
               "[CALENDAR ERROR] Falha no book_appointment:",
@@ -602,10 +611,10 @@ export async function POST(req: Request) {
 
       // Segunda chamada para gerar a resposta final ao usuário
       completion = await openai.chat.completions.create({
-        model: "openai/gpt-4o-mini",
+        model: "google/gemini-2.5-flash",
         messages: messagesForLLM as any,
         temperature: 0.7,
-        max_tokens: 500,
+        max_tokens: 1024,
       });
       let finalMessage = completion.choices[0].message;
 
