@@ -1,11 +1,8 @@
 import { stripe } from '@/utils/stripe'
-import { registerWithSubscription } from './actions'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
+import { RegisterForm } from './register-form'
 
 export default async function RegisterPage({
     searchParams,
@@ -47,59 +44,11 @@ export default async function RegisterPage({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form action={registerWithSubscription} className="space-y-5">
-                        <input type="hidden" name="sessionId" value={sessionId} />
-
-                        <div className="space-y-2">
-                            <Label htmlFor="email" className="text-slate-700 font-medium">E-mail da Assinatura</Label>
-                            <Input
-                                id="email"
-                                name="email"
-                                type="email"
-                                readOnly
-                                defaultValue={email}
-                                className="bg-slate-50 border-slate-200 cursor-not-allowed font-medium text-slate-600"
-                            />
-                            <p className="text-[10px] text-muted-foreground italic">* Este é o e-mail utilizado no pagamento.</p>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="clinicName" className="text-slate-700 font-medium">Nome da sua Clínica / Consultório</Label>
-                            <Input
-                                id="clinicName"
-                                name="clinicName"
-                                type="text"
-                                required
-                                placeholder="Ex: Clínica Santa Luzia"
-                                className="bg-white border-slate-200 focus:border-primary focus:ring-primary/20 transition-all"
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="password" className="text-slate-700 font-medium">Crie uma Senha</Label>
-                            <Input
-                                id="password"
-                                name="password"
-                                type="password"
-                                required
-                                minLength={6}
-                                placeholder="Mínimo 6 caracteres"
-                                className="bg-white border-slate-200 focus:border-primary focus:ring-primary/20 transition-all"
-                            />
-                        </div>
-
-                        {params.error && (
-                            <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm text-center font-medium">
-                                {params.error}
-                            </div>
-                        )}
-
-                        <div className="flex flex-col gap-3 pt-4">
-                            <Button type="submit" className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99]">
-                                Ativar meu Acesso
-                            </Button>
-                        </div>
-                    </form>
+                    <RegisterForm
+                        email={email}
+                        sessionId={sessionId}
+                        error={params.error}
+                    />
                 </CardContent>
             </Card>
 

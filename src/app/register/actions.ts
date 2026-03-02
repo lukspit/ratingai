@@ -3,10 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 import { stripe } from '@/utils/stripe'
 
 export async function registerWithSubscription(formData: FormData) {
     const supabase = await createClient()
+    const supabaseAdmin = createAdminClient()
 
     const email = formData.get('email') as string
     const password = formData.get('password') as string
@@ -30,12 +32,13 @@ export async function registerWithSubscription(formData: FormData) {
 
     const userId = authData.user.id
 
-    // 2. Criar a clínica
-    const { data: clinicData, error: clinicError } = await supabase
+    // 2. Criar a clínica (Usamos o Admin Client para pular RLS no Onboarding)
+    const { data: clinicData, error: clinicError } = await supabaseAdmin
         .from('clinics')
         .insert({
             name: clinicName,
             owner_id: userId,
+            assistant_name: 'Liz' // Valor padrão por segurança
         })
         .select()
         .single()
@@ -45,18 +48,15 @@ export async function registerWithSubscription(formData: FormData) {
         return redirect(`/register?session_id=${sessionId}&error=Erro ao criar clínica`)
     }
 
-    // 3. Vincular a assinatura existente a esta clínica
-    // Procuramos na tabela subscriptions pelo email que veio do Stripe
-    const { error: subError } = await supabase
+    // 3. Vincular a assinatura existente a esta clínica (Admin Client para garantir o vínculo)
+    const { error: subError } = await supabaseAdmin
         .from('subscriptions')
         .update({ clinic_id: clinicData.id })
         .eq('customer_email', email)
-        .is('clinic_id', null) // Apenas se ainda não estiver vinculado
+        .is('clinic_id', null)
 
     if (subError) {
         console.error('Subscription Linking Error:', subError)
-        // Mesmo se falhar o vínculo, o usuário foi criado. 
-        // Podemos tentar de novo ou logar para depurar.
     }
 
     revalidatePath('/', 'layout')
