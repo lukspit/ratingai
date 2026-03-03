@@ -277,7 +277,7 @@ async function runAIPipeline(
 
   // Chamada ao LLM
   const payload: any = {
-    model: "deepseek/deepseek-v3.2",
+    model: "openai/gpt-4o-mini",
     messages: messagesForLLM,
     temperature: 0.7,
     max_tokens: 1024,
@@ -472,7 +472,7 @@ async function runAIPipeline(
 
     // Segunda chamada — resposta final após tools executarem
     completion = await openai.chat.completions.create({
-      model: "deepseek/deepseek-v3.2",
+      model: "openai/gpt-4o-mini",
       messages: messagesForLLM as any,
       temperature: 0.7,
       max_tokens: 1024,
