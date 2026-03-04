@@ -36,8 +36,25 @@ import {
   transcribeAudio,
   describeImage,
   summarizeOlderMessages,
+  type CalendarInfo,
 } from "@/lib/ai-helpers";
 import { checkAvailability, bookAppointment } from "@/lib/calendar";
+
+/**
+ * Parse seguro do google_calendar_id.
+ * Aceita tanto o formato legado (string simples) quanto o novo (JSON array).
+ */
+function parseCalendarsFromContext(raw: string | null): CalendarInfo[] {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return parsed;
+  } catch {
+    // Formato legado: string simples
+    return [{ id: raw, summary: 'Agenda Principal', description: '' }];
+  }
+  return [];
+}
 
 // =============================================================================
 // TIPOS
@@ -175,8 +192,11 @@ async function runAIPipeline(
   // Constrói o System Prompt
   const { greeting, datetime } = getBrazilianGreeting();
   const isReturning = allMessages.length > 0;
+
+  // Parse das agendas configuradas (compatível com formato antigo e novo)
+  const calendars = parseCalendarsFromContext(contextData.google_calendar_id);
   const hasCalendarTools = !!(
-    contextData.google_access_token && contextData.google_calendar_id
+    contextData.google_access_token && calendars.length > 0
   );
 
   const systemPrompt = buildSystemPromptV2({
@@ -189,6 +209,7 @@ async function runAIPipeline(
     greeting: greeting,
     isReturningPatient: isReturning,
     hasCalendarTools: hasCalendarTools,
+    calendars: calendars,
   });
 
   // Monta mensagens para o LLM
@@ -242,8 +263,9 @@ async function runAIPipeline(
           type: "object",
           properties: {
             date: { type: "string", description: "A data alvo (YYYY-MM-DD)" },
+            calendar_id: { type: "string", description: "O ID da agenda a ser consultada (da lista de agendas disponíveis)" },
           },
-          required: ["date"],
+          required: ["date", "calendar_id"],
         },
       },
     });
@@ -268,8 +290,12 @@ async function runAIPipeline(
               type: "string",
               description: "Hora de término exata no formato ISO 8601 COM timezone (normalmente 1 hora de duração, ex: 2024-05-20T15:00:00-03:00)",
             },
+            calendar_id: {
+              type: "string",
+              description: "O ID da agenda onde marcar (da lista de agendas disponíveis)",
+            },
           },
-          required: ["patient_name", "start_time", "end_time"],
+          required: ["patient_name", "start_time", "end_time", "calendar_id"],
         },
       },
     });
@@ -324,17 +350,28 @@ async function runAIPipeline(
 
       if (funcName === "check_availability") {
         const args = JSON.parse(funcArgs);
+        // === TRANSIÇÃO AUTOMÁTICA: INTERESSE ===
+        if (patientId) {
+          await supabase
+            .from("patients")
+            .update({ lead_status: "INTERESSE" })
+            .eq("id", patientId)
+            .in("lead_status", ["NOVO", "EM_ATENDIMENTO"]);
+          console.log(`[LEAD STATUS] ${phone} → INTERESSE (check_availability chamado)`);
+        }
         try {
+          // Usa o calendar_id escolhido pela IA, com fallback para a primeira agenda
+          const targetCalendarId = args.calendar_id || calendars[0]?.id || '';
           const busySlots = await checkAvailability(
             {
               accessToken: contextData.google_access_token as string,
               refreshToken: contextData.google_refresh_token as string,
               clinicId: contextData.clinic_id,
             },
-            contextData.google_calendar_id as string,
+            targetCalendarId,
             args.date,
           );
-          console.log(`[CALENDAR] Encontrados ${busySlots.length} slots ocupados.`);
+          console.log(`[CALENDAR] Encontrados ${busySlots.length} slots ocupados na agenda ${targetCalendarId}.`);
           messagesForLLM.push({
             role: "tool",
             tool_call_id: toolCall.id,
@@ -351,13 +388,15 @@ async function runAIPipeline(
       } else if (funcName === "book_appointment") {
         const args = JSON.parse(funcArgs);
         try {
+          // Usa o calendar_id escolhido pela IA, com fallback para a primeira agenda
+          const bookCalendarId = args.calendar_id || calendars[0]?.id || '';
           const result = await bookAppointment(
             {
               accessToken: contextData.google_access_token as string,
               refreshToken: contextData.google_refresh_token as string,
               clinicId: contextData.clinic_id,
             },
-            contextData.google_calendar_id as string,
+            bookCalendarId,
             args.patient_name,
             phone,
             args.start_time,
@@ -375,6 +414,13 @@ async function runAIPipeline(
             });
             if (apptError) console.error("[RPC ERROR] Falha ao inserir agendamento:", apptError);
             else console.log(`[SUPABASE] Agendamento salvo para patient_id: ${patientId}`);
+
+            // === TRANSIÇÃO AUTOMÁTICA: AGENDADO ===
+            await supabase
+              .from("patients")
+              .update({ lead_status: "AGENDADO" })
+              .eq("id", patientId);
+            console.log(`[LEAD STATUS] ${phone} → AGENDADO (book_appointment concluído)`);
 
             const { error: updError } = await supabase.rpc("update_patient_info", {
               p_patient_id: patientId,
@@ -776,6 +822,17 @@ export async function POST(req: Request) {
       .eq("role", "user");
 
     const isReturningPatient = (messageCount ?? 0) > 1; // > 1 pois já salvamos a mensagem atual
+
+    // === TRANSIÇÃO AUTOMÁTICA: EM_ATENDIMENTO ===
+    if (isReturningPatient && patientId) {
+      // Só promove para EM_ATENDIMENTO se ainda estiver como NOVO
+      await supabase
+        .from("patients")
+        .update({ lead_status: "EM_ATENDIMENTO" })
+        .eq("id", patientId)
+        .eq("lead_status", "NOVO");
+      console.log(`[LEAD STATUS] ${phone} → EM_ATENDIMENTO (paciente recorrente)`);
+    }
 
     if (!isReturningPatient) {
       // PRIMEIRO CONTATO: responde imediatamente, sem buffer

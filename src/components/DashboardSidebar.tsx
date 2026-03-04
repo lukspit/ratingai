@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Activity, MessageCircle, Smartphone, Network, Building2, LogOut } from 'lucide-react'
+import { Activity, MessageCircle, SquareKanban, Smartphone, Network, Building2, LogOut } from 'lucide-react'
 
 interface DashboardSidebarProps {
     email?: string;
@@ -24,6 +24,12 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
             name: 'Conversas',
             href: '/dashboard/conversations',
             icon: MessageCircle,
+            exact: false
+        },
+        {
+            name: 'Kanban',
+            href: '/dashboard/kanban',
+            icon: SquareKanban,
             exact: false
         },
         {

@@ -34,6 +34,41 @@ export function getBrazilianGreeting(): { greeting: string; datetime: string } {
     return { greeting, datetime };
 }
 
+export type CalendarInfo = {
+    id: string;
+    summary: string;
+    description: string;
+};
+
+function buildCalendarToolsPrompt(calendars?: CalendarInfo[]): string {
+    const calendarList = (calendars && calendars.length > 0)
+        ? calendars.map((c, i) =>
+            `  ${i + 1}. ID: "${c.id}"\n     Nome: "${c.summary}"\n     Propósito: ${c.description || '(sem descrição)'}`
+        ).join('\n')
+        : '  (agenda única)';
+
+    const multiCalendarRules = (calendars && calendars.length > 1)
+        ? `
+- REGRA DE ROTEAMENTO: Ao chamar check_availability ou book_appointment, você DEVE escolher o calendar_id correto com base na intenção do paciente e nos propósitos descritos acima.
+- Se o paciente não especificar qual tipo de consulta deseja e houver dúvida sobre qual agenda usar, PERGUNTE de forma natural e humanizada qual é o tipo de atendimento.
+- NUNCA mencione IDs, nomes técnicos de agendas ou que existem múltiplas agendas ao paciente. Para ele, existe "a agenda da clínica".`
+        : '';
+
+    return `=== FERRAMENTAS DE AGENDA ===
+Você TEM a habilidade ativa de consultar a agenda e marcar consultas usando as ferramentas (\`check_availability\` e \`book_appointment\`).
+
+=== AGENDAS DISPONÍVEIS ===
+${calendarList}
+${multiCalendarRules}
+
+- SEMPRE valide a disponibilidade primeiro chamando check_availability ANTES de confirmar um horário ao paciente.
+- IMPORTANTE: Se \`check_availability\` retornar lista VAZIA (\`[]\`), significa que o dia está completamente LIVRE. Ofereça horários baseados no horário de atendimento da clínica. NUNCA diga "dia lotado" porque a lista veio vazia.
+- Quando tiver Data, Horário e Nome confirmados pelo paciente, CHAME \`book_appointment\` imediatamente. Não procrastine.
+- NUNCA envie links ao paciente (inclusive links do Google Calendar). Apenas confirme que o agendamento foi registrado em nosso sistema.
+- BASTIDORES INVISÍVEIS: NUNCA diga ao paciente que você avaliou documentos, procurou no sistema, ou que usou uma ferramenta (tool) nessa rodada. Aja fluidamente como um humano que simplesmente consultou o sistema interno invisívelmente.
+- REGRA CRÍTICA DE TOOL CALLS: Quando precisar usar uma ferramenta (check_availability ou book_appointment), CHAME-A DIRETAMENTE sem mandar nenhuma mensagem antes. NUNCA envie frases como "Vou verificar a agenda, um instante!", "Deixa eu checar aqui...", "Só um momento..." antes de chamar a tool. Você deve chamar a ferramenta silenciosamente e só responder ao paciente APÓS ter o resultado real em mãos.`;
+}
+
 export function buildSystemPromptV2(context: {
     assistant_name: string;
     clinic_name: string;
@@ -44,6 +79,7 @@ export function buildSystemPromptV2(context: {
     greeting: string;
     isReturningPatient: boolean;
     hasCalendarTools: boolean;
+    calendars?: CalendarInfo[];
 }): string {
     const returningContext = context.isReturningPatient
         ? `Este paciente JÁ CONVERSOU antes conosco. NÃO repita a saudação inicial de boas-vindas nem se reapresente. Seja natural como quem retoma uma conversa.`
@@ -161,17 +197,7 @@ Após coletar nome e horário, sempre confirme num resumo antes de acionar o age
 "Perfeito! Então vou confirmar: *[Nome]*, consulta na *[Data]* às *[Horário]*. Tudo certo?"
 Só após confirmação positiva do paciente, acione a ferramenta de agendamento.
 
-${context.hasCalendarTools
-            ? `=== FERRAMENTAS DE AGENDA ===
-Você TEM a habilidade ativa de consultar a agenda e marcar consultas usando as ferramentas (\`check_availability\` e \`book_appointment\`).
-- SEMPRE valide a disponibilidade primeiro chamando check_availability ANTES de confirmar um horário ao paciente.
-- IMPORTANTE: Se \`check_availability\` retornar lista VAZIA (\`[]\`), significa que o dia está completamente LIVRE. Ofereça horários baseados no horário de atendimento da clínica. NUNCA diga "dia lotado" porque a lista veio vazia.
-- Quando tiver Data, Horário e Nome confirmados pelo paciente, CHAME \`book_appointment\` imediatamente. Não procrastine.
-- NUNCA envie links ao paciente (inclusive links do Google Calendar). Apenas confirme que o agendamento foi registrado em nosso sistema.
-- BASTIDORES INVISÍVEIS: NUNCA diga ao paciente que você avaliou documentos, procurou no sistema, ou que usou uma ferramenta (tool) nessa rodada. Aja fluidamente como um humano que simplesmente consultou o sistema interno invisívelmente.
-- REGRA CRÍTICA DE TOOL CALLS: Quando precisar usar uma ferramenta (check_availability ou book_appointment), CHAME-A DIRETAMENTE sem mandar nenhuma mensagem antes. NUNCA envie frases como \"Vou verificar a agenda, um instante!\", \"Deixa eu checar aqui...\", \"Só um momento...\" antes de chamar a tool. Você deve chamar a ferramenta silenciosamente e só responder ao paciente APÓS ter o resultado real em mãos.`
-            : ""
-        }
+${context.hasCalendarTools ? buildCalendarToolsPrompt(context.calendars) : ""}
 
 === FORMATAÇÃO WHATSAPP ===
 IMPORTANTE — O WhatsApp NÃO usa markdown. Use APENAS a formatação nativa do WhatsApp:
