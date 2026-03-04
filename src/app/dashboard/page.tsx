@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/utils/supabase/server'
-import { Activity, Users, MessageCircle, Settings, QrCode, Calendar as CalendarIcon, ArrowRight, TrendingUp, Rocket } from 'lucide-react'
+import { Activity, Users, MessageCircle, Settings, QrCode, Calendar as CalendarIcon, ArrowRight, TrendingUp, Rocket, AlertTriangle, Sparkles, Brain } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ZapiStatusCard } from './ZapiStatusCard'
@@ -16,9 +16,11 @@ export default async function DashboardPage() {
     // 1. Puxar clínica associada ao usuário
     const { data: clinic } = await supabase
         .from('clinics')
-        .select('id, name')
+        .select('id, name, rules')
         .eq('owner_id', user.id)
         .single()
+
+    const hasCompletedOnboarding = !!(clinic?.rules)
 
     let status = 'Desconectada'
     let isConnected = false
@@ -83,6 +85,53 @@ export default async function DashboardPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in zoom-in duration-500">
+
+            {/* ─── BANNER DE ONBOARDING PENDENTE ─── */}
+            {!hasCompletedOnboarding && (
+                <div className="relative overflow-hidden rounded-xl border border-orange-500/30 bg-gradient-to-r from-orange-950/60 via-orange-900/40 to-amber-900/30 p-6 shadow-lg">
+                    {/* Glow de fundo */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-amber-500/5 pointer-events-none" />
+                    <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-orange-500/10 blur-2xl pointer-events-none" />
+
+                    <div className="relative flex flex-col md:flex-row md:items-center gap-5">
+                        <div className="flex-shrink-0">
+                            <div className="w-12 h-12 rounded-full bg-orange-500/20 border border-orange-500/30 flex items-center justify-center">
+                                <Brain className="w-6 h-6 text-orange-400" />
+                            </div>
+                        </div>
+
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
+                                </span>
+                                <span className="text-xs font-semibold uppercase tracking-widest text-orange-400">
+                                    Ação necessária
+                                </span>
+                            </div>
+                            <h3 className="text-lg font-bold text-foreground mb-1">
+                                Sua IA ainda não conhece a sua clínica
+                            </h3>
+                            <p className="text-sm text-muted-foreground leading-relaxed max-w-2xl">
+                                Sem o setup, a IA não tem como responder corretamente sobre preços, horários, convênios ou localização.
+                                Configure agora — leva menos de 10 minutos e é o que transforma o sistema numa máquina que agenda por você.
+                            </p>
+                        </div>
+
+                        <div className="flex-shrink-0">
+                            <Link href="/dashboard/settings">
+                                <Button className="bg-orange-500 hover:bg-orange-400 text-white font-semibold h-11 px-5 transition-all shadow-lg shadow-orange-500/20 group">
+                                    <Sparkles className="w-4 h-4 mr-2 group-hover:rotate-12 transition-transform" />
+                                    Configurar IA
+                                    <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-0.5 transition-transform" />
+                                </Button>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div>
                 <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
                     <Activity className="w-8 h-8 text-primary" />
@@ -197,11 +246,19 @@ export default async function DashboardPage() {
                         </Link>
 
                         <Link href="/dashboard/settings" legacyBehavior passHref>
-                            <Button variant="outline" className="w-full justify-start h-12 relative group overflow-hidden border-border/50 hover:border-primary/50 transition-all">
+                            <Button
+                                variant="outline"
+                                className={`w-full justify-start h-12 relative group overflow-hidden transition-all ${!hasCompletedOnboarding
+                                    ? 'border-orange-500/40 hover:border-orange-400/60 bg-orange-500/5'
+                                    : 'border-border/50 hover:border-primary/50'
+                                    }`}
+                            >
                                 <div className="absolute inset-0 bg-primary/5 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                                <Settings className="mr-3 h-5 w-5 text-gray-500 dark:text-gray-400" />
-                                <span className="relative z-10 font-medium tracking-wide">Configurações Base</span>
-                                <ArrowRight className="ml-auto h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-gray-500 dark:text-gray-400 relative z-10" />
+                                <Settings className={`mr-3 h-5 w-5 ${!hasCompletedOnboarding ? 'text-orange-400' : 'text-gray-500 dark:text-gray-400'}`} />
+                                <span className="relative z-10 font-medium tracking-wide">
+                                    {!hasCompletedOnboarding ? 'Configurar Clínica ⚡' : 'Configurações Base'}
+                                </span>
+                                <ArrowRight className={`ml-auto h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all relative z-10 ${!hasCompletedOnboarding ? 'text-orange-400' : 'text-gray-500'}`} />
                             </Button>
                         </Link>
                     </CardContent>
