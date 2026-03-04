@@ -61,7 +61,7 @@ type ContextData = {
 // BUFFER DE MENSAGENS — DEBOUNCE DE 20 SEGUNDOS
 // Agrupa mensagens enviadas em sequência rápida antes de acionar a IA.
 // =============================================================================
-const BUFFER_WINDOW_MS = 20_000; // 20 segundos
+const BUFFER_WINDOW_MS = 8_000; // 8 segundos — tempo ideal para agrupar mensagens picadas no WhatsApp
 
 /**
  * Cria ou atualiza o buffer de mensagens para um paciente.
@@ -745,7 +745,29 @@ export async function POST(req: Request) {
     // ==========================================
     // BUFFER DE MENSAGENS (DEBOUNCE)
     // ==========================================
-    // Verifica se é um paciente recorrente (tem histórico de mensagens)
+    // Áudio, imagem e documento: resposta IMEDIATA, sem buffer.
+    // São mensagens completas por natureza — a pessoa não vai complementar em seguida.
+    if (detectedType !== "text") {
+      console.log(`[BUFFER] Mídia (${detectedType}) de ${phone}. Processando imediatamente, sem buffer.`);
+      after(async () => {
+        try {
+          await runAIPipeline(
+            phone,
+            instanceId,
+            userMessage,
+            patientId,
+            contextData,
+            fetchHeaders,
+            body.messageId ?? null,
+          );
+        } catch (err) {
+          console.error("[PIPELINE] Erro ao processar mídia:", err);
+        }
+      });
+      return NextResponse.json({ status: "processing_immediate_media" });
+    }
+
+    // Texto: verifica se é paciente recorrente (tem histórico de mensagens)
     const { count: messageCount } = await supabase
       .from("messages")
       .select("id", { count: "exact", head: true })
