@@ -28,8 +28,12 @@ export async function GET() {
       .eq('clinic_id', clinic.id)
       .single()
 
-    if (!instance || !instance.zapi_instance_id || !instance.zapi_token) {
-      return NextResponse.json({ connected: false, smartphoneConnected: false, error: 'Nenhuma instância configurada' })
+    if (!instance) {
+      return NextResponse.json({ connected: false, provisioning: true, smartphoneConnected: false, error: 'Nenhuma instância criada ainda' })
+    }
+
+    if (!instance.zapi_instance_id || !instance.zapi_token) {
+      return NextResponse.json({ connected: false, provisioning: true, smartphoneConnected: false, error: null })
     }
 
     // Chamar endpoint real da Z-API pra checar status

@@ -148,6 +148,19 @@ export async function registerWithSubscription(formData: FormData) {
         }
 
         clinicId = clinicData.id
+
+        // Criar instância em branco associada a clínica
+        const { error: instanceError } = await supabaseAdmin
+            .from('instances')
+            .insert({
+                clinic_id: clinicId,
+                status: 'PROVISIONING'
+            })
+
+        if (instanceError) {
+            console.error('Instance Error:', instanceError)
+            // Não bloqueamos o registro, a clínica já foi criada.
+        }
     }
 
     // 5. Vincular a subscription à clínica (pelo email do Stripe)

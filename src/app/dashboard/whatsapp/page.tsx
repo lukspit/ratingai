@@ -20,20 +20,28 @@ export default async function WhatsAppConnectionPage() {
 
     // Buscar possível instância dessa clínica
     let isConnected = false
+    let isProvisioning = true // default para quem não tem DB atualizado, na prática a rules action cadastra em branco 
     let instanceInfo = undefined
 
     if (clinic) {
         const { data: instance } = await supabase
             .from('instances')
-            .select('id, zapi_instance_id')
+            .select('id, zapi_instance_id, zapi_token, status')
             .eq('clinic_id', clinic.id)
             .single()
 
         if (instance) {
-            isConnected = true
-            instanceInfo = {
-                id: instance.id,
-                zapi_instance_id: instance.zapi_instance_id || 'Desconhecido'
+            if (!instance.zapi_instance_id || !instance.zapi_token) {
+                isProvisioning = true
+            } else {
+                isProvisioning = false
+                // isConnected can only be precisely known by the client making an API status call.
+                // However, we initially assume it is false to force the UI check.
+                isConnected = instance.status === 'CONNECTED'
+                instanceInfo = {
+                    id: instance.id,
+                    zapi_instance_id: instance.zapi_instance_id
+                }
             }
         }
     }
@@ -50,7 +58,7 @@ export default async function WhatsAppConnectionPage() {
                 </p>
             </div>
 
-            <WhatsAppManager initialIsConnected={isConnected} instanceInfo={instanceInfo} />
+            <WhatsAppManager initialIsProvisioning={isProvisioning} initialIsConnected={isConnected} instanceInfo={instanceInfo} />
         </div>
     )
 }

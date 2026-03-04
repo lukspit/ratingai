@@ -3,18 +3,27 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Radio, QrCode, Wifi, AlertTriangle, WifiOff, Loader2, RefreshCw, Smartphone } from 'lucide-react'
+import { Radio, QrCode, Wifi, AlertTriangle, WifiOff, Loader2, RefreshCw, Smartphone, Clock } from 'lucide-react'
+import Image from 'next/image'
 
 interface ZapiStatus {
     connected: boolean
     smartphoneConnected: boolean
     error: string | null
+    provisioning?: boolean
 }
 
-export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialIsConnected: boolean, instanceInfo?: { id: string, zapi_instance_id: string } }) {
+interface QrCodeResponse {
+    value?: string;
+    error?: string;
+}
+
+export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, instanceInfo }: { initialIsProvisioning: boolean, initialIsConnected: boolean, instanceInfo?: { id: string, zapi_instance_id: string } }) {
+    const [isProvisioning, setIsProvisioning] = useState(initialIsProvisioning)
     const [isGenerating, setIsGenerating] = useState(false)
     const [isConnected, setIsConnected] = useState(initialIsConnected)
     const [showQR, setShowQR] = useState(false)
+    const [qrCodeImage, setQrCodeImage] = useState<string | null>(null)
     const [isChecking, setIsChecking] = useState(false)
     const [smartphoneConnected, setSmartphoneConnected] = useState(true)
     const [statusError, setStatusError] = useState<string | null>(null)
@@ -29,7 +38,13 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
                 setIsConnected(data.connected)
                 setSmartphoneConnected(data.smartphoneConnected)
                 setStatusError(data.error)
+                setIsProvisioning(data.provisioning ?? false)
                 setLastChecked(new Date())
+
+                // Se conectou enquanto estávamos mostrando o QR, tira o QR
+                if (data.connected && showQR) {
+                    setShowQR(false)
+                }
             }
         } catch (err) {
             console.error('Erro ao verificar status Z-API:', err)
@@ -40,28 +55,52 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
 
     // Verificar status real ao montar o componente
     useEffect(() => {
-        if (instanceInfo) {
+        if (!isProvisioning) {
             checkRealStatus()
         }
-    }, [instanceInfo])
+    }, [isProvisioning])
 
-    // Simulando delay da Z-API para futuro MVP
-    const handleGenerateQR = () => {
+    // Polling a cada 5s quando está aguardando scan do QR
+    useEffect(() => {
+        let interval: NodeJS.Timeout
+        if (showQR && !isConnected && !isProvisioning) {
+            interval = setInterval(() => {
+                checkRealStatus()
+            }, 5000)
+        }
+        return () => {
+            if (interval) clearInterval(interval)
+        }
+    }, [showQR, isConnected, isProvisioning])
+
+
+    const handleGenerateQR = async () => {
         setIsGenerating(true)
-        setTimeout(() => {
-            setIsGenerating(false)
-            setShowQR(true)
-        }, 2000)
-    }
+        setQrCodeImage(null)
+        setStatusError(null)
 
-    const handleSimulateConnected = () => {
-        setShowQR(false)
-        setIsConnected(true)
+        try {
+            const res = await fetch('/api/whatsapp/qrcode')
+            const data: QrCodeResponse = await res.json()
+
+            if (res.ok && data.value) {
+                setQrCodeImage(data.value)
+                setShowQR(true)
+            } else {
+                setStatusError(data.error || 'Não foi possível gerar o QR Code no momento.')
+            }
+        } catch (err) {
+            console.error('Erro ao gerar QR:', err)
+            setStatusError('Erro interno ao buscar QR Code.')
+        } finally {
+            setIsGenerating(false)
+        }
     }
 
     const handleDisconnect = () => {
         setIsConnected(false)
         setShowQR(false)
+        setQrCodeImage(null)
     }
 
     return (
@@ -78,7 +117,7 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
                             </CardTitle>
                             <CardDescription>Status da conexão com a central de mensagens.</CardDescription>
                         </div>
-                        {instanceInfo && (
+                        {(!isProvisioning && instanceInfo) && (
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -92,7 +131,17 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
                     </div>
                 </CardHeader>
                 <CardContent>
-                    {isChecking && !lastChecked ? (
+                    {isProvisioning ? (
+                        <div className="flex flex-col items-center justify-center py-6 space-y-4">
+                            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                                <Clock className="w-10 h-10 text-primary animate-pulse" />
+                            </div>
+                            <div className="text-center">
+                                <h3 className="text-xl font-bold text-primary">Provisionando...</h3>
+                                <p className="text-sm text-muted-foreground mt-2 max-w-[280px]">Estamos preparando sua infraestrutura dedicada de mensagens. Em breve você poderá conectar seu WhatsApp aqui.</p>
+                            </div>
+                        </div>
+                    ) : isChecking && !lastChecked ? (
                         // Primeiro check — loading
                         <div className="flex flex-col items-center justify-center py-6 space-y-4">
                             <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
@@ -131,9 +180,7 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
                                 </p>
                             )}
 
-                            <Button variant="outline" onClick={handleDisconnect} className="mt-4 text-destructive border-destructive/30 hover:bg-destructive/10">
-                                Desconectar Instância
-                            </Button>
+                            {/* Desabilitado o botão visualmente para simulação, já que é manual */}
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-6 space-y-4">
@@ -164,14 +211,14 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
             </Card>
 
             {/* Card do QR Code Dinâmico */}
-            {!isConnected && !isChecking && (
+            {!isProvisioning && !isConnected && !isChecking && (
                 <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
 
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <QrCode className="w-5 h-5 text-primary" />
-                            Vincular Novo Aparelho
+                            Vincular Aparelho
                         </CardTitle>
                         <CardDescription>
                             Aponte a câmera do WhatsApp para iniciar o atendimento IA.
@@ -180,12 +227,12 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
                     <CardContent className="flex flex-col items-center justify-center min-h-[250px]">
 
                         {!showQR && !isGenerating && (
-                            <div className="text-center space-y-4">
+                            <div className="text-center space-y-4 z-10 relative">
                                 <p className="text-sm text-muted-foreground">
-                                    Clique abaixo para solicitar uma nova ponte criptografada com a Z-API.
+                                    Clique abaixo para buscar o QR Code da sua instância e conectar o número da clínica.
                                 </p>
                                 <Button onClick={handleGenerateQR} size="lg" className="w-full sm:w-auto shadow-primary/20 shadow-lg">
-                                    Gerar QR Code de Conexão
+                                    Exibir QR Code
                                 </Button>
                             </div>
                         )}
@@ -193,32 +240,28 @@ export function WhatsAppManager({ initialIsConnected, instanceInfo }: { initialI
                         {isGenerating && (
                             <div className="flex flex-col items-center justify-center space-y-4 animate-pulse">
                                 <div className="w-48 h-48 border-4 border-dashed border-primary/40 rounded-xl flex items-center justify-center">
-                                    <span className="text-sm font-medium text-primary">Provisionando...</span>
+                                    <span className="text-sm font-medium text-primary">Buscando...</span>
                                 </div>
-                                <p className="text-sm text-muted-foreground">Alocando infraestrutura na Z-API...</p>
+                                <p className="text-sm text-muted-foreground">Conectando à Z-API...</p>
                             </div>
                         )}
 
-                        {showQR && (
-                            <div className="flex flex-col items-center space-y-6">
-                                {/* Mock do QR Code */}
-                                <div className="p-4 bg-white rounded-xl shadow-lg relative cursor-pointer" onClick={handleSimulateConnected} title="Clique aqui para simular que escaneou">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="1" strokeLinecap="square" strokeLinejoin="miter">
-                                        <rect x="3" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="3" width="7" height="7"></rect>
-                                        <rect x="14" y="14" width="7" height="7"></rect>
-                                        <rect x="3" y="14" width="7" height="7"></rect>
-                                        <rect x="5" y="5" width="3" height="3"></rect>
-                                        <rect x="16" y="5" width="3" height="3"></rect>
-                                        <rect x="16" y="16" width="3" height="3"></rect>
-                                        <rect x="5" y="16" width="3" height="3"></rect>
-                                        <path d="M12 3v18"></path>
-                                        <path d="M3 12h18"></path>
-                                    </svg>
-                                    <div className="absolute inset-0 bg-primary/10 animate-pulse rounded-xl" />
+                        {showQR && qrCodeImage && (
+                            <div className="flex flex-col items-center space-y-6 z-10 relative">
+                                <div className="p-4 bg-white rounded-xl shadow-lg">
+                                    <div className="relative w-[200px] h-[200px]">
+                                        <Image
+                                            src={qrCodeImage.startsWith('data:image') ? qrCodeImage : `data:image/png;base64,${qrCodeImage}`}
+                                            alt="QR Code do WhatsApp"
+                                            fill
+                                            className="object-contain"
+                                            unoptimized
+                                        />
+                                    </div>
                                 </div>
                                 <div className="text-center">
-                                    <p className="text-sm font-medium text-primary">(Simulação: Clique no QR Code para conectar)</p>
+                                    <p className="text-sm font-medium text-primary">Escaneie o código acima no seu WhatsApp</p>
+                                    <p className="text-xs text-muted-foreground mt-1 text-center">Configurações &gt; Aparelhos conectados &gt; Conectar aparelho</p>
                                 </div>
                             </div>
                         )}
