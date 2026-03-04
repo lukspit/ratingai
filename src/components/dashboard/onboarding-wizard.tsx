@@ -97,9 +97,12 @@ export function OnboardingWizard({ initialData, hasCompleted, onSave }: { initia
 
     const handleSpecialtySelect = (id: string) => {
         const template = getSpecialtyTemplate(id)
+        const category = SPECIALTY_CATEGORIES.find(c => c.id === id)
+
         setFormData({
             ...formData,
             specialty_category: id,
+            specialties: category ? category.label : formData.specialties,
             restrictions: template.restrictions,
             differentials: template.differentials,
             emergency_rules: template.emergency_rules,
