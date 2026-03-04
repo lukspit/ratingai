@@ -812,9 +812,11 @@ export async function POST(req: Request) {
           console.log(`[BUFFER] Buffer ${bufferId} já processado. Abandonando.`);
           return;
         }
-        if (bufferRecord.updated_at !== myUpdatedAt) {
+        const dbTime = new Date(bufferRecord.updated_at).getTime();
+        const myTime = new Date(myUpdatedAt).getTime();
+        if (dbTime !== myTime) {
           console.log(
-            `[BUFFER] Buffer ${bufferId} foi atualizado por mensagem mais recente (${bufferRecord.updated_at} != ${myUpdatedAt}). Abandonando — outro timer processará.`,
+            `[BUFFER] Buffer ${bufferId} foi atualizado por mensagem mais recente (db=${bufferRecord.updated_at} [${dbTime}] != my=${myUpdatedAt} [${myTime}]). Abandonando — outro timer processará.`,
           );
           return;
         }
