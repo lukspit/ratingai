@@ -244,10 +244,10 @@ function DashboardContent({
                     <span className="text-xs font-bold uppercase tracking-widest text-primary/70">Dashboard Operacional</span>
                 </div>
                 <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
-                    {greeting}{clinic?.name ? `, ${clinic.name.split(' ')[0]}` : ''} 👋
+                    {greeting}, {user.user_metadata?.full_name?.split(' ')[0] || 'Doutor(a)'} 👋🏻
                 </h1>
-                <p className="text-muted-foreground text-lg mt-1 italic">
-                    "Sua clínica no piloto automático enquanto você cuida do que importa."
+                <p className="text-muted-foreground text-lg mt-2 font-medium">
+                    Veja como sua assistente cuidou dos seus pacientes hoje.
                 </p>
             </div>
 

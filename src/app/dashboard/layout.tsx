@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { DashboardSidebar } from '@/components/DashboardSidebar'
+import { SidebarProvider } from '@/contexts/SidebarContext'
 import Image from 'next/image'
 
 export default async function DashboardLayout({
@@ -17,21 +18,23 @@ export default async function DashboardLayout({
     }
 
     return (
-        <div className="flex min-h-screen bg-background text-foreground">
-            {/* Sidebar (Client Component com Active State Tracking) */}
-            <DashboardSidebar email={user.email} hasCompletedOnboarding={undefined} />
+        <SidebarProvider>
+            <div className="flex min-h-screen bg-background text-foreground overflow-hidden">
+                {/* Sidebar (Client Component com Active State Tracking) */}
+                <DashboardSidebar email={user.email || undefined} hasCompletedOnboarding={undefined} />
 
-            {/* Main Content */}
-            <main className="flex-1 flex flex-col h-screen overflow-y-auto">
-                <header className="h-16 border-b border-border bg-card flex items-center justify-center px-6 md:hidden">
-                    <div className="relative w-10 h-10">
-                        <Image src="/logos/nexus_logo_symbol.png" alt="Nexus Clínicas Symbol" fill className="object-contain" priority />
+                {/* Main Content */}
+                <main className="flex-1 flex flex-col h-screen overflow-y-auto">
+                    <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6 md:hidden">
+                        <div className="relative w-10 h-10">
+                            <Image src="/logos/nexus_logo_symbol.png" alt="Nexus Clínicas Symbol" fill className="object-contain" priority />
+                        </div>
+                    </header>
+                    <div className="p-4 md:p-8 max-w-6xl mx-auto w-full flex-1">
+                        {children}
                     </div>
-                </header>
-                <div className="p-8 max-w-6xl mx-auto w-full flex-1">
-                    {children}
-                </div>
-            </main>
-        </div>
+                </main>
+            </div>
+        </SidebarProvider>
     )
 }

@@ -58,6 +58,7 @@ export function DashboardCharts({ leadsData, appointmentsData }: DashboardCharts
                                         borderRadius: '8px',
                                         fontSize: '12px'
                                     }}
+                                    labelStyle={{ color: '#ffffff', fontWeight: 'bold', marginBottom: '4px' }}
                                     itemStyle={{ color: '#3b82f6' }}
                                 />
                                 <Area
@@ -101,6 +102,8 @@ export function DashboardCharts({ leadsData, appointmentsData }: DashboardCharts
                                         borderRadius: '8px',
                                         fontSize: '12px'
                                     }}
+                                    labelStyle={{ color: '#ffffff', fontWeight: 'bold', marginBottom: '4px' }}
+                                    itemStyle={{ color: '#3b82f6' }}
                                 />
                                 <Bar dataKey="value" radius={[4, 4, 0, 0]} barSize={40}>
                                     {appointmentsData.map((entry, index) => (
