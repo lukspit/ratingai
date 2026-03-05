@@ -557,17 +557,20 @@ async function runAIPipeline(
     }
   }
 
-  // Agendamento de follow-up
+  // Agendamento de follow-ups (2h e 24h)
   if (patientId && aiResponse && aiResponse !== "...") {
-    const followUpTime = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+    const followUpTime2h = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString();
+    const followUpTime24h = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
     await supabase.rpc("upsert_follow_up", {
       p_clinic_id: contextData.clinic_id,
       p_patient_id: patientId,
       p_instance_id: contextData.instance_uuid,
       p_phone_number: phone,
-      p_scheduled_for: followUpTime,
+      p_scheduled_for_2h: followUpTime2h,
+      p_scheduled_for_24h: followUpTime24h,
     });
-    console.log(`[FOLLOW-UP] Agendado para ${followUpTime} (daqui a 2h)`);
+    console.log(`[FOLLOW-UP] Agendados para ${followUpTime2h} (2h) e ${followUpTime24h} (24h)`);
   }
 
   // Envio da resposta via Z-API com efeito de digitação

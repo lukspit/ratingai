@@ -52,17 +52,21 @@ export async function GET(req: Request) {
 
                 // 3. Define o "Objetivo" da IA baseado no tipo de mensagem
                 let promptGoal = "";
-                if (msg.type === 'FOLLOW_UP') {
-                    promptGoal = "O paciente parou de responder há algum tempo. Mande uma mensagem curta, amigável e humana (não robótica) para tentar retomar o contato, baseando-se no que foi falado por último.";
+                if (msg.type === 'FOLLOW_UP_2H') {
+                    promptGoal = "1. O paciente parou de responder a nossa última mensagem há cerca de 2 horas.\n2. Seja prestativo, curto e amigável. Diga que está passando só pra ver se restou alguma dúvida ou se pode ajudar a encontrar um horário.";
+                } else if (msg.type === 'FOLLOW_UP_24H') {
+                    promptGoal = "1. O paciente não respondeu nossa mensagem de ontem.\n2. Crie um gatilho muito sutil de esgotamento de agenda (diga que a agenda do médico para essa semana/mês está enchendo rápido).\n3. Pergunte de forma super amigável se ele ainda tem interesse na consulta.";
                 } else if (msg.type === 'REMINDER_24H') {
-                    promptGoal = "Este é um lembrete amigável de que a consulta é AMANHÃ. Confirme se ele recebeu a informação.";
+                    promptGoal = "1. O paciente tem uma consulta agendada para AMANHÃ.\n2. Peça uma confirmação explícita (um 'sim' ou 'não').\n3. Diga de forma natural que, caso ocorra algum imprevisto, ele pode avisar para reagendarmos.";
                 } else if (msg.type === 'CONFIRMATION_2H') {
-                    promptGoal = "A consulta é em 2 horas. Peça uma confirmação final de presença de forma educada.";
+                    promptGoal = "1. A consulta do paciente é em exatas 2 HORAS.\n2. Seja muuuito prático. Passe (ou lembre se necessário) as informações de chegada/link e diga que a clínica já o aguarda.";
+                } else if (msg.type === 'FOLLOW_UP') { // Fallback para lógicas antigas que já foram agendadas
+                    promptGoal = "O paciente parou de responder. Mande uma mensagem curta e amigável para tentar retomar o contato, baseando-se no que foi falado por último.";
                 }
 
                 // 4. Gera o texto com a IA
                 const completion = await openai.chat.completions.create({
-                    model: "deepseek/deepseek-v3.2",
+                    model: "openai/gpt-4o-mini", // Alterado para um modelo mais estável e rápido para crons
                     messages: [
                         {
                             role: "system",
@@ -72,12 +76,14 @@ export async function GET(req: Request) {
               CONTEXTO DA CONVERSA ATÉ AGORA:
               ${historyContext}
               
-              OBJETIVO AGORA: ${promptGoal}
+              === OBJETIVO ESTRATÉGICO DESTA MENSAGEM AGORA ===
+              ${promptGoal}
+              =================================================
               
-              REGRAS:
-              1. Resposta curta (máximo 2-3 frases).
-              2. Tom humano, empático e profissional.
-              3. Não use placeholders como [Nome]. Se não souber o nome, não use.`
+              REGRAS DE OURO:
+              1. Resposta SUPER curta e direta. Vá direto ao ponto.
+              2. Tom humano, empático e natural como o WhatsApp exige. Nada muito robótico ou formal demais.
+              3. NUNCA use placeholders como [Nome do Paciente] ou [Assunto]. Você JÁ tem o contexto acima. Se não tiver o nome da pessoa na conversa, apenas não chame pelo nome.`
                         }
                     ],
                     temperature: 0.7,
