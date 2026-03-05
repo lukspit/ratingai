@@ -46,6 +46,18 @@ export function RegisterForm({ email, sessionId, error }: RegisterFormProps) {
             </div>
 
             <div className="space-y-2">
+                <Label htmlFor="nome" className="text-slate-700 font-medium">Seu Nome Completo</Label>
+                <Input
+                    id="nome"
+                    name="nome"
+                    type="text"
+                    required
+                    placeholder="Ex: Dr. João Silva"
+                    className="bg-white border-slate-200 focus:border-primary focus:ring-primary/20 transition-all font-sans"
+                />
+            </div>
+
+            <div className="space-y-2">
                 <Label htmlFor="clinicName" className="text-slate-700 font-medium">Nome da sua Clínica / Consultório</Label>
                 <Input
                     id="clinicName"

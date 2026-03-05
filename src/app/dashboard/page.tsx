@@ -168,7 +168,7 @@ export default async function DashboardPage() {
             <Rocket className="h-12 w-12 text-primary mb-4 opacity-20" />
             <h2 className="text-xl font-bold">Nenhuma clínica encontrada</h2>
             <p className="text-muted-foreground">Parece que você ainda não configurou sua clínica.</p>
-            <Link href="/onboarding" className="mt-4">
+            <Link href="/dashboard/settings" className="mt-4">
                 <Button>Começar Onboarding</Button>
             </Link>
         </div>

@@ -6,7 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/
 import Image from 'next/image'
 import Link from 'next/link'
 
-export default function LoginPage() {
+export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
+    const params = await searchParams
     return (
         <div className="flex min-h-screen items-center justify-center p-4 bg-slate-50 relative overflow-hidden">
             <Card className="w-full max-w-md border-border bg-white shadow-sm z-10">
@@ -19,6 +20,11 @@ export default function LoginPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
+                    {params?.error && (
+                        <div className="mb-4 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+                            E-mail ou senha incorretos. Tente novamente.
+                        </div>
+                    )}
                     <form className="space-y-4">
                         <div className="space-y-2">
                             <Label htmlFor="email">E-mail</Label>
