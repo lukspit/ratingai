@@ -119,11 +119,11 @@ export function VideoPlayer() {
                             </div>
                             <div className="text-center px-6">
                                 <p className="text-white font-semibold text-lg">
-                                    Assista antes de escolher seu plano
+                                    Não feche ainda.
                                 </p>
                                 <p className="text-white/55 text-sm mt-1.5">
-                                    A parte de recuperação de pacientes aparece em{' '}
-                                    <span className="text-white/85 font-medium">3:15</span>
+                                    O trecho que muda a decisão da maioria das clínicas{' '}
+                                    <span className="text-white/85 font-medium">está logo à frente.</span>
                                 </p>
                             </div>
                         </div>
