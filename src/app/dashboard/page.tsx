@@ -1,9 +1,10 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/utils/supabase/server'
-import { Activity, Users, MessageCircle, Settings, QrCode, Calendar as CalendarIcon, ArrowRight, TrendingUp, Rocket, AlertTriangle, Sparkles, Brain, CalendarDays, KanbanSquare } from 'lucide-react'
+import { Activity, Users, MessageCircle, Settings, QrCode, Calendar as CalendarIcon, ArrowRight, TrendingUp, Rocket, AlertTriangle, Sparkles, Brain, CalendarDays, KanbanSquare, CheckCircle2 } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ZapiStatusCard } from './ZapiStatusCard'
+import { DashboardCharts } from './components/DashboardCharts'
 
 export default async function DashboardPage() {
     const supabase = await createClient()
@@ -109,10 +110,87 @@ export default async function DashboardPage() {
 
         upcomingAppointments = appointments || []
         recentMessages = messages || []
+
+        // 7. Preparar dados para os gráficos
+        // Gráfico de Leads (últimos 7 dias)
+        const days = []
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date()
+            d.setDate(d.getDate() - i)
+            days.push(d.toLocaleDateString('pt-BR', { weekday: 'short' }))
+        }
+
+        // Simulação de distribuição diária (em um cenário real, faríamos group by no DB)
+        // Como temos o count total e os objetos, podemos agrupar aqui
+        const { data: allPatients7Days } = await supabase
+            .from('patients')
+            .select('created_at')
+            .eq('clinic_id', clinic.id)
+            .gte('created_at', last7Days.toISOString())
+
+        const leadsByDay = days.map(dayName => {
+            const count = allPatients7Days?.filter(p => {
+                const pDate = new Date(p.created_at).toLocaleDateString('pt-BR', { weekday: 'short' })
+                return pDate === dayName
+            }).length || 0
+            return { day: dayName, count }
+        })
+
+        const leadsChartData = leadsByDay
+
+        const appointmentsChartData = [
+            { name: 'Leads', value: newPatients7Days, color: '#3b82f6' },
+            { name: 'Agendados', value: appointments7Days, color: '#10b981' }
+        ]
+
+        return (
+            <DashboardContent
+                clinic={clinic}
+                greeting={greeting}
+                hasCompletedOnboarding={hasCompletedOnboarding}
+                newPatients7Days={newPatients7Days}
+                appointments7Days={appointments7Days}
+                estimatedConversion={estimatedConversion}
+                status={status}
+                isConnected={isConnected}
+                hasInstance={hasInstance}
+                recentMessages={recentMessages}
+                upcomingAppointments={upcomingAppointments}
+                leadsChartData={leadsChartData}
+                appointmentsChartData={appointmentsChartData}
+            />
+        )
     }
 
     return (
-        <div className="space-y-8 animate-in fade-in zoom-in duration-500">
+        <div className="p-8 flex flex-col items-center justify-center min-h-[400px] text-center">
+            <Rocket className="h-12 w-12 text-primary mb-4 opacity-20" />
+            <h2 className="text-xl font-bold">Nenhuma clínica encontrada</h2>
+            <p className="text-muted-foreground">Parece que você ainda não configurou sua clínica.</p>
+            <Link href="/onboarding" className="mt-4">
+                <Button>Começar Onboarding</Button>
+            </Link>
+        </div>
+    )
+}
+
+function DashboardContent({
+    clinic,
+    greeting,
+    hasCompletedOnboarding,
+    newPatients7Days,
+    appointments7Days,
+    estimatedConversion,
+    status,
+    isConnected,
+    hasInstance,
+    recentMessages,
+    upcomingAppointments,
+    leadsChartData,
+    appointmentsChartData
+}: any) {
+    return (
+        <div className="space-y-8 animate-in fade-in zoom-in duration-500 pb-12">
 
             {/* ─── BANNER DE ONBOARDING PENDENTE ─── */}
             {!hasCompletedOnboarding && (
@@ -174,50 +252,59 @@ export default async function DashboardPage() {
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 group">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-125 transition-transform">
-                        <Users className="h-12 w-12 text-blue-500" />
-                    </div>
+                <Card className="relative overflow-hidden bg-card/40 backdrop-blur-sm border-border/50 border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-all duration-300">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium group-hover:text-blue-500 transition-colors">Novos Leads (7 dias)</CardTitle>
-                        <Users className="h-4 w-4 text-blue-500 mt-1" />
+                        <CardTitle className="text-sm font-semibold tracking-tight text-muted-foreground uppercase">Novos Leads</CardTitle>
+                        <div className="p-2 bg-blue-500/10 rounded-lg">
+                            <Users className="h-4 w-4 text-blue-500" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">{newPatients7Days}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            Pessoas que chamaram no WhatsApp
+                        <div className="flex items-baseline gap-2">
+                            <div className="text-3xl font-bold">{newPatients7Days}</div>
+                            <span className="text-[10px] font-bold text-blue-500/80 bg-blue-500/5 px-1.5 py-0.5 rounded italic">7 dias</span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
+                            <TrendingUp className="h-3 w-3 text-blue-500" />
+                            Potenciais pacientes captados
                         </p>
                     </CardContent>
                 </Card>
 
-                <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-emerald-500/10 transition-all duration-300 group">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-125 transition-transform">
-                        <CalendarDays className="h-12 w-12 text-emerald-500" />
-                    </div>
+                <Card className="relative overflow-hidden bg-card/40 backdrop-blur-sm border-border/50 border-l-4 border-l-emerald-500 shadow-sm hover:shadow-md transition-all duration-300">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium group-hover:text-emerald-500 transition-colors">Agendamentos (7 dias)</CardTitle>
-                        <CalendarDays className="h-4 w-4 text-emerald-500 mt-1" />
+                        <CardTitle className="text-sm font-semibold tracking-tight text-muted-foreground uppercase">Agendamentos</CardTitle>
+                        <div className="p-2 bg-emerald-500/10 rounded-lg">
+                            <CalendarDays className="h-4 w-4 text-emerald-500" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">{appointments7Days}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
+                        <div className="flex items-baseline gap-2">
+                            <div className="text-3xl font-bold">{appointments7Days}</div>
+                            <span className="text-[10px] font-bold text-emerald-500/80 bg-emerald-500/5 px-1.5 py-0.5 rounded italic">7 dias</span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
+                            <CheckCircle2 className="h-3 w-3 text-emerald-500" />
                             Consultas marcadas pela IA
                         </p>
                     </CardContent>
                 </Card>
 
-                <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-indigo-500/10 transition-all duration-300 group">
-                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-125 transition-transform">
-                        <TrendingUp className="h-12 w-12 text-indigo-500" />
-                    </div>
+                <Card className="relative overflow-hidden bg-card/40 backdrop-blur-sm border-border/50 border-l-4 border-l-indigo-500 shadow-sm hover:shadow-md transition-all duration-300">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium group-hover:text-indigo-500 transition-colors">Taxa Conversão (7 dias)</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-indigo-500 mt-1" />
+                        <CardTitle className="text-sm font-semibold tracking-tight text-muted-foreground uppercase">Conversão</CardTitle>
+                        <div className="p-2 bg-indigo-500/10 rounded-lg">
+                            <TrendingUp className="h-4 w-4 text-indigo-500" />
+                        </div>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-3xl font-bold">{estimatedConversion}</div>
-                        <p className="text-xs text-muted-foreground mt-1">
-                            Eficiência da sua assistente IA
+                        <div className="flex items-baseline gap-2">
+                            <div className="text-3xl font-bold">{estimatedConversion}</div>
+                            <span className="text-[10px] font-bold text-indigo-500/80 bg-indigo-500/5 px-1.5 py-0.5 rounded italic">Taxa</span>
+                        </div>
+                        <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
+                            <Sparkles className="h-3 w-3 text-indigo-500" />
+                            Eficiência da sua assistente
                         </p>
                     </CardContent>
                 </Card>
@@ -228,6 +315,12 @@ export default async function DashboardPage() {
                     hasInstance={hasInstance}
                 />
             </div>
+
+            {/* ─── SEÇÃO DE GRÁFICOS ─── */}
+            <DashboardCharts
+                leadsData={leadsChartData}
+                appointmentsData={appointmentsChartData}
+            />
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12">
                 {/* Atividade Recente - IA em Ação */}
@@ -383,5 +476,6 @@ export default async function DashboardPage() {
                 </Card>
             </div>
         </div>
+        </div >
     )
 }
