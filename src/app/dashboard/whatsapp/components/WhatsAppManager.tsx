@@ -202,7 +202,9 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
                         <div className="flex flex-col items-center justify-center py-6 space-y-4">
                             <div className="w-20 h-20 rounded-full bg-secondary/10 flex items-center justify-center relative">
                                 <div className="absolute inset-0 rounded-full animate-ping bg-secondary/20" />
-                                <Wifi className="w-10 h-10 text-secondary" />
+                                <div className="relative w-12 h-12">
+                                    <Image src="/logos/whatsapp.png" alt="WhatsApp" fill className="object-contain" />
+                                </div>
                             </div>
                             <div className="text-center">
                                 <h3 className="text-xl font-bold text-secondary">Conectado e Operando</h3>

@@ -50,7 +50,9 @@ export default async function WhatsAppConnectionPage() {
         <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             <div>
                 <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
-                    <Smartphone className="w-8 h-8 text-primary" />
+                    <div className="relative w-10 h-10">
+                        <Image src="/logos/whatsapp.png" alt="WhatsApp" fill className="object-contain" />
+                    </div>
                     Conexão WhatsApp
                 </h1>
                 <p className="text-muted-foreground text-lg mt-2">
