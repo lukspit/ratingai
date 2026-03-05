@@ -55,9 +55,15 @@ export default function LoginPage() {
                 </CardContent>
             </Card>
 
-            <div className="absolute bottom-4 left-0 right-0 text-center flex items-center justify-center gap-2 text-sm text-muted-foreground z-10">
-                <span>Powered by</span>
-                <span className="font-semibold text-foreground">lucaspit.ai</span>
+            <div className="absolute bottom-4 left-0 right-0 text-center flex flex-col items-center justify-center gap-1 text-sm text-muted-foreground z-10">
+                <div className="flex items-center gap-2">
+                    <span>Powered by</span>
+                    <span className="font-semibold text-foreground">lucaspit.ai</span>
+                </div>
+                <div className="flex gap-4 text-xs mt-1">
+                    <Link href="/termos" className="hover:text-primary transition-colors hover:underline">Termos de Uso</Link>
+                    <Link href="/privacidade" className="hover:text-primary transition-colors hover:underline">Política de Privacidade</Link>
+                </div>
             </div>
         </div>
     )

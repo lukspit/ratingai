@@ -118,6 +118,10 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
                         Sair
                     </button>
                 </form>
+                <div className="flex items-center justify-between px-3 mt-4 text-[10px] text-muted-foreground/60">
+                    <Link href="/termos" target="_blank" className="hover:text-primary hover:underline transition-colors">Termos de Uso</Link>
+                    <Link href="/privacidade" target="_blank" className="hover:text-primary hover:underline transition-colors">Privacidade</Link>
+                </div>
             </div>
         </aside>
     )

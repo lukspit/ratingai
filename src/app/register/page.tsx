@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { RegisterForm } from './register-form'
+import Link from 'next/link'
 
 export default async function RegisterPage({
     searchParams,
@@ -52,8 +53,12 @@ export default async function RegisterPage({
                 </CardContent>
             </Card>
 
-            <div className="absolute bottom-6 left-0 right-0 text-center flex items-center justify-center gap-2 text-sm text-muted-foreground/60 z-10 italic">
-                <span>Segurança garantida por tecnologia Supabase & Stripe</span>
+            <div className="absolute bottom-6 left-0 right-0 text-center flex flex-col items-center justify-center gap-2 text-sm text-muted-foreground/60 z-10">
+                <span className="italic">Segurança garantida por tecnologia Supabase & Stripe</span>
+                <div className="flex items-center gap-4 text-xs not-italic">
+                    <Link href="/termos" className="hover:text-primary transition-colors hover:underline">Termos de Uso</Link>
+                    <Link href="/privacidade" className="hover:text-primary transition-colors hover:underline">Política de Privacidade</Link>
+                </div>
             </div>
         </div>
     )

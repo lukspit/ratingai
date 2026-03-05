@@ -106,6 +106,27 @@ export function RegisterForm({ email, sessionId, error }: RegisterFormProps) {
                 </div>
             )}
 
+            <div className="flex items-start space-x-2 pt-2">
+                <input
+                    type="checkbox"
+                    id="terms"
+                    name="terms"
+                    required
+                    className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                />
+                <Label htmlFor="terms" className="text-sm text-slate-600 font-normal leading-relaxed">
+                    Li e concordo com os{' '}
+                    <Link href="/termos" target="_blank" className="font-semibold text-primary hover:underline">
+                        Termos de Uso
+                    </Link>{' '}
+                    e a{' '}
+                    <Link href="/privacidade" target="_blank" className="font-semibold text-primary hover:underline">
+                        Política de Privacidade
+                    </Link>
+                    .
+                </Label>
+            </div>
+
             <div className="flex flex-col gap-3 pt-4">
                 <Button type="submit" className="w-full h-12 text-lg font-semibold bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all hover:scale-[1.01] active:scale-[0.99]">
                     Ativar meu Acesso
