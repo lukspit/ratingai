@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Radio, QrCode, Wifi, AlertTriangle, WifiOff, Loader2, RefreshCw, Smartphone, Clock } from 'lucide-react'
+import { Input } from '@/components/ui/input'
+import { Radio, QrCode, Wifi, AlertTriangle, WifiOff, Loader2, RefreshCw, Smartphone, Clock, Bell } from 'lucide-react'
 import Image from 'next/image'
 
 interface ZapiStatus {
@@ -11,6 +12,7 @@ interface ZapiStatus {
     smartphoneConnected: boolean
     error: string | null
     provisioning?: boolean
+    notificationPhone?: string | null
 }
 
 interface QrCodeResponse {
@@ -24,6 +26,8 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
     const [isConnected, setIsConnected] = useState(initialIsConnected)
     const [showQR, setShowQR] = useState(false)
     const [qrCodeImage, setQrCodeImage] = useState<string | null>(null)
+    const [notificationPhone, setNotificationPhone] = useState('')
+    const [isSavingPhone, setIsSavingPhone] = useState(false)
     const [isChecking, setIsChecking] = useState(false)
     const [smartphoneConnected, setSmartphoneConnected] = useState(true)
     const [statusError, setStatusError] = useState<string | null>(null)
@@ -40,6 +44,7 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
                 setSmartphoneConnected(data.smartphoneConnected)
                 setStatusError(data.error)
                 setIsProvisioning(data.provisioning ?? false)
+                if (data.notificationPhone) setNotificationPhone(data.notificationPhone)
                 setLastChecked(new Date())
 
                 // Se conectou enquanto estávamos mostrando o QR, tira o QR
@@ -51,6 +56,27 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
             console.error('Erro ao verificar status Z-API:', err)
         } finally {
             setIsChecking(false)
+        }
+    }
+
+    const handleSaveNotificationPhone = async () => {
+        setIsSavingPhone(true)
+        try {
+            const res = await fetch('/api/whatsapp/notification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ notification_phone: notificationPhone })
+            })
+            if (res.ok) {
+                alert('Número de notificação salvo com sucesso!')
+            } else {
+                alert('Erro ao salvar número.')
+            }
+        } catch (err) {
+            console.error(err)
+            alert('Erro ao salvar número.')
+        } finally {
+            setIsSavingPhone(false)
         }
     }
 
@@ -303,6 +329,41 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
                     </CardContent>
                 </Card>
             )}
+
+            {/* Configuração de Notificações */}
+            <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg md:col-span-2">
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <Bell className="w-5 h-5 text-primary" />
+                        Notificações de Agendamento
+                    </CardTitle>
+                    <CardDescription>
+                        Receba um aviso no seu WhatsApp pessoal sempre que a IA fechar um agendamento para a clínica.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex flex-col sm:flex-row gap-4 items-end">
+                        <div className="space-y-2 flex-grow">
+                            <label htmlFor="notif_phone" className="text-sm font-medium">Seu Número de WhatsApp (com DDI +55)</label>
+                            <Input
+                                id="notif_phone"
+                                placeholder="+5511999999999"
+                                value={notificationPhone}
+                                onChange={(e) => setNotificationPhone(e.target.value)}
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">Exemplo: +5511988887777. Deixe em branco se não quiser ser avisado.</p>
+                        </div>
+                        <Button
+                            onClick={handleSaveNotificationPhone}
+                            disabled={isSavingPhone}
+                            className="w-full sm:w-auto shrink-0"
+                        >
+                            {isSavingPhone ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : 'Salvar Número'}
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
+
         </div>
     )
 }

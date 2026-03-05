@@ -5,7 +5,7 @@ import { createClient } from '@/utils/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Calendar, Loader2, CheckCircle2 } from 'lucide-react'
 import { CalendarSelector } from './CalendarSelector'
-export function GoogleConnectButton({ isConnected }: { isConnected: boolean }) {
+export function GoogleConnectButton({ isConnected, savedCalendarsRaw }: { isConnected: boolean, savedCalendarsRaw: string | null }) {
     const [isLoading, setIsLoading] = useState(false)
     const [isDisconnecting, setIsDisconnecting] = useState(false)
     const supabase = createClient()
@@ -56,7 +56,7 @@ export function GoogleConnectButton({ isConnected }: { isConnected: boolean }) {
                     <p className="text-sm text-muted-foreground mb-6">A IA já tem permissão para gerenciar sua agenda.</p>
                 </div>
                 <div className="w-full max-w-2xl border-t border-border pt-4">
-                    <CalendarSelector />
+                    <CalendarSelector savedCalendarsRaw={savedCalendarsRaw} />
                 </div>
                 <Button
                     variant="outline"

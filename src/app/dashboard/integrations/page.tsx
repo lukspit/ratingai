@@ -16,12 +16,13 @@ export default async function IntegrationsPage() {
     // Buscar a clínica vinculada
     const { data: clinic } = await supabase
         .from('clinics')
-        .select('google_refresh_token, google_access_token')
+        .select('google_refresh_token, google_access_token, google_calendar_id')
         .eq('owner_id', user.id)
         .single()
 
     // O médico está com a conexão habilitada se a tabela clinic já capturou o Refresh Token.
     const isGoogleConnected = !!(clinic?.google_refresh_token || clinic?.google_access_token);
+    const savedCalendarsRaw = clinic?.google_calendar_id || null;
 
     return (
         <div className="space-y-8 animate-in fade-in zoom-in duration-500">
@@ -55,7 +56,7 @@ export default async function IntegrationsPage() {
                         </CardContent>
                     </div>
                     <div className="flex-1 p-6 flex items-center justify-center w-full md:w-auto h-full">
-                        <GoogleConnectButton isConnected={isGoogleConnected} />
+                        <GoogleConnectButton isConnected={isGoogleConnected} savedCalendarsRaw={savedCalendarsRaw} />
                     </div>
                 </Card>
             </div>

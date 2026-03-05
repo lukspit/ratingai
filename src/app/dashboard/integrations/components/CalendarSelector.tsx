@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Loader2, Calendar as CalendarIcon, Save, Plus, X, Info } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon, Save, Info, Edit2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 type CalendarItem = {
@@ -17,19 +17,40 @@ type ActiveCalendar = {
     description: string;
 };
 
-export function CalendarSelector() {
+function parseActiveCalendars(raw: string | null): ActiveCalendar[] {
+    if (!raw) return [];
+
+    try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+    } catch {
+        // Formato legado: string simples com o ID da agenda
+        return [{ id: raw, summary: 'Agenda Principal', description: '' }];
+    }
+
+    return [];
+}
+
+export function CalendarSelector({ savedCalendarsRaw }: { savedCalendarsRaw: string | null }) {
+    const initialSaved = parseActiveCalendars(savedCalendarsRaw);
+
+    const [isEditing, setIsEditing] = useState(initialSaved.length === 0);
     const [calendars, setCalendars] = useState<CalendarItem[]>([]);
-    const [activeCalendars, setActiveCalendars] = useState<ActiveCalendar[]>([]);
-    const [savedCalendars, setSavedCalendars] = useState<ActiveCalendar[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const [activeCalendars, setActiveCalendars] = useState<ActiveCalendar[]>(initialSaved);
+    const [savedCalendars, setSavedCalendars] = useState<ActiveCalendar[]>(initialSaved);
+    const [isLoading, setIsLoading] = useState(initialSaved.length === 0);
     const [isSaving, setIsSaving] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        fetchCalendars();
-    }, []);
+        if (isEditing && calendars.length === 0) {
+            fetchCalendars();
+        }
+    }, [isEditing]);
 
     const fetchCalendars = async () => {
+        setIsLoading(true);
+        setError('');
         try {
             const res = await fetch('/api/google/calendars');
             if (!res.ok) throw new Error('Falha ao buscar agendas');
@@ -38,6 +59,7 @@ export function CalendarSelector() {
             setCalendars(data.calendars);
 
             if (data.activeCalendars && data.activeCalendars.length > 0) {
+                // Sincroniza o estado atual com o que veio da API caso houvesse descompasso
                 setActiveCalendars(data.activeCalendars);
                 setSavedCalendars(data.activeCalendars);
             }
@@ -79,6 +101,7 @@ export function CalendarSelector() {
             if (!res.ok) throw new Error('Erro ao salvar agendas');
 
             setSavedCalendars([...activeCalendars]);
+            setIsEditing(false); // Fecha a edição após salvar
         } catch (err) {
             console.error(err);
             alert('Falha ao salvar as agendas selecionadas.');
@@ -86,6 +109,49 @@ export function CalendarSelector() {
             setIsSaving(false);
         }
     };
+
+    if (!isEditing) {
+        return (
+            <div className="mt-4 p-4 border border-border bg-muted/30 rounded-lg space-y-4">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h4 className="flex items-center gap-2 text-sm font-medium text-foreground">
+                            <CalendarIcon className="w-4 h-4" />
+                            Agendas Gerenciadas
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-1">
+                            A IA está monitorando estas agendas para sugerir e realizar os agendamentos.
+                        </p>
+                    </div>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setIsEditing(true)}
+                        className="text-xs"
+                    >
+                        <Edit2 className="w-3 h-3 mr-2" />
+                        Editar Agendas
+                    </Button>
+                </div>
+
+                <div className="space-y-2">
+                    {savedCalendars.map((cal) => (
+                        <div key={cal.id} className="p-3 bg-background border border-border rounded-lg">
+                            <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 rounded-full bg-primary" />
+                                <span className="text-sm font-medium text-foreground">{cal.summary}</span>
+                            </div>
+                            {cal.description && (
+                                <p className="text-xs text-muted-foreground mt-2 bg-muted/50 p-2 rounded">
+                                    <span className="font-medium">Propósito:</span> {cal.description}
+                                </p>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
 
     if (isLoading) {
         return (
@@ -108,14 +174,29 @@ export function CalendarSelector() {
 
     return (
         <div className="mt-4 p-4 border border-border bg-muted/30 rounded-lg space-y-4">
-            <div>
-                <h4 className="flex items-center gap-2 text-sm font-medium text-foreground">
-                    <CalendarIcon className="w-4 h-4" />
-                    Quais agendas a IA deve gerenciar?
-                </h4>
-                <p className="text-xs text-muted-foreground mt-1">
-                    Selecione uma ou mais agendas e descreva o propósito de cada uma para a IA saber quando usá-las.
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h4 className="flex items-center gap-2 text-sm font-medium text-foreground">
+                        <CalendarIcon className="w-4 h-4" />
+                        Quais agendas a IA deve gerenciar?
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-1">
+                        Selecione uma ou mais agendas e descreva o propósito de cada uma para a IA saber quando usá-las.
+                    </p>
+                </div>
+                {savedCalendars.length > 0 && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                            setActiveCalendars(savedCalendars);
+                            setIsEditing(false);
+                        }}
+                        className="text-xs text-muted-foreground hover:text-foreground"
+                    >
+                        Cancelar
+                    </Button>
+                )}
             </div>
 
             {/* Lista de agendas disponíveis */}
@@ -128,8 +209,8 @@ export function CalendarSelector() {
                         <div
                             key={cal.id}
                             className={`rounded-lg border transition-all duration-200 ${isActive
-                                    ? 'border-primary/50 bg-primary/5'
-                                    : 'border-border/50 bg-background hover:border-border'
+                                ? 'border-primary/50 bg-primary/5'
+                                : 'border-border/50 bg-background hover:border-border'
                                 }`}
                         >
                             {/* Header da agenda (clicável) */}
@@ -140,8 +221,8 @@ export function CalendarSelector() {
                             >
                                 {/* Checkbox visual */}
                                 <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors flex-shrink-0 ${isActive
-                                        ? 'bg-primary border-primary'
-                                        : 'border-muted-foreground/40'
+                                    ? 'bg-primary border-primary'
+                                    : 'border-muted-foreground/40'
                                     }`}>
                                     {isActive && (
                                         <svg className="w-3 h-3 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>

@@ -13,7 +13,7 @@ export async function GET() {
     // Buscar clínica do usuário
     const { data: clinic } = await supabase
       .from('clinics')
-      .select('id')
+      .select('id, notification_phone')
       .eq('owner_id', user.id)
       .single()
 
@@ -64,7 +64,8 @@ export async function GET() {
     return NextResponse.json({
       connected: zapiStatus.connected ?? false,
       smartphoneConnected: zapiStatus.smartphoneConnected ?? false,
-      error: zapiStatus.error || null
+      error: zapiStatus.error || null,
+      notificationPhone: clinic.notification_phone || null
     })
   } catch (error: any) {
     console.error('[Z-API STATUS] Erro:', error)

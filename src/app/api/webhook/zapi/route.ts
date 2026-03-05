@@ -75,6 +75,7 @@ type ContextData = {
   google_access_token: string | null;
   google_refresh_token: string | null;
   google_calendar_id: string | null;
+  notification_phone: string | null;
 };
 
 // =============================================================================
@@ -431,6 +432,32 @@ async function runAIPipeline(
               p_status: "AGENDADO",
             });
             if (updError) console.error("[RPC ERROR] Falha ao atualizar paciente:", updError);
+
+            // === DISPARO DE NOTIFICAÇÃO PARA O DONO ===
+            if (contextData.notification_phone) {
+              try {
+                const notifUrl = `https://api.z-api.io/instances/${instanceId}/token/${contextData.zapi_token}/send-text`;
+                const d = new Date(isoStart);
+                const dataFormatada = d.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo" });
+                const horaFormatada = d.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
+
+                const avisoText = `🚨 *NOVO AGENDAMENTO PELA IA* 🚨\n\n*Paciente:* ${args.patient_name}\n*Telefone:* ${phone}\n*Data:* ${dataFormatada}\n*Horário:* ${horaFormatada}\n\n_O paciente já foi avisado e a agenda está bloqueada._`;
+
+                await fetch(notifUrl, {
+                  method: "POST",
+                  headers: fetchHeaders,
+                  body: JSON.stringify({
+                    phone: contextData.notification_phone,
+                    message: avisoText,
+                    delayMessage: 0,
+                    delayTyping: 0,
+                  }),
+                });
+                console.log(`[NOTIFICAÇÃO] Aviso de agendamento enviado com sucesso para ${contextData.notification_phone}`);
+              } catch (notifErr) {
+                console.error("[NOTIFICAÇÃO] Falha ao enviar aviso para o dono da clínica:", notifErr);
+              }
+            }
 
             // Lembretes automáticos
             const reminder24h = new Date(new Date(isoStart).getTime() - 24 * 60 * 60 * 1000);
