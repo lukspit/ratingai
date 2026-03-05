@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Activity, MessageCircle, SquareKanban, Smartphone, Network, Building2, LogOut, ChevronLeft, PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { Activity, MessageCircle, SquareKanban, Smartphone, Network, Building2, LogOut, ChevronLeft, PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react'
 import { useSidebar } from '@/contexts/SidebarContext'
 
 interface DashboardSidebarProps {
@@ -52,6 +52,12 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
             icon: Building2,
             exact: false,
             requiresOnboarding: true
+        },
+        {
+            name: 'Configurações',
+            href: '/dashboard/account',
+            icon: Settings,
+            exact: false
         }
     ]
 
@@ -93,8 +99,8 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
                             key={item.href}
                             href={item.href}
                             className={`flex items-center gap-3 px-3 py-2 rounded-md font-medium transition-all relative ${isActive
-                                    ? 'bg-primary/10 text-primary border border-primary/20'
-                                    : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
+                                ? 'bg-primary/10 text-primary border border-primary/20'
+                                : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
                                 } ${isCollapsed ? 'justify-center px-0' : ''}`}
                             title={isCollapsed ? item.name : ""}
                         >
