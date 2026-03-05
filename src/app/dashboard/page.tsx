@@ -22,12 +22,19 @@ export default async function DashboardPage() {
 
     const hasCompletedOnboarding = !!(clinic?.rules)
 
+    // Saudação baseada no horário
+    const hour = new Date().getHours()
+    let greeting = 'Boa noite'
+    if (hour >= 5 && hour < 12) greeting = 'Bom dia'
+    else if (hour >= 12 && hour < 18) greeting = 'Boa tarde'
+
     let status = 'Desconectada'
     let isConnected = false
     let hasInstance = false
     let newPatients7Days = 0
     let appointments7Days = 0
     let upcomingAppointments: any[] = []
+    let recentMessages: any[] = []
     let estimatedConversion = '0%'
 
     if (clinic) {
@@ -42,7 +49,8 @@ export default async function DashboardPage() {
             { data: instance },
             { count: newPatientsCount },
             { count: appointments7DaysCount },
-            { data: appointments }
+            { data: appointments },
+            { data: messages }
         ] = await Promise.all([
             // Instância (Z-API)
             supabase
@@ -72,7 +80,15 @@ export default async function DashboardPage() {
                 .eq('clinic_id', clinic.id)
                 .gte('scheduled_at', now.toISOString())
                 .order('scheduled_at', { ascending: true })
-                .limit(5)
+                .limit(5),
+
+            // Mensagens recentes (IA em Ação)
+            supabase
+                .from('messages')
+                .select('content, role, created_at, phone_number')
+                .eq('clinic_id', clinic.id)
+                .order('created_at', { ascending: false })
+                .limit(4)
         ])
 
         if (instance) {
@@ -92,6 +108,7 @@ export default async function DashboardPage() {
         }
 
         upcomingAppointments = appointments || []
+        recentMessages = messages || []
     }
 
     return (
@@ -144,20 +161,26 @@ export default async function DashboardPage() {
             )}
 
             <div>
+                <div className="flex items-center gap-2 mb-2">
+                    <div className="h-1 w-8 bg-primary rounded-full" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-primary/70">Dashboard Operacional</span>
+                </div>
                 <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
-                    <Activity className="w-8 h-8 text-primary" />
-                    Bem-vindo(a){clinic?.name ? `, ${clinic.name}` : ''}
+                    {greeting}{clinic?.name ? `, ${clinic.name.split(' ')[0]}` : ''} 👋
                 </h1>
-                <p className="text-muted-foreground text-lg mt-2">
-                    Visão geral da sua inteligência artificial.
+                <p className="text-muted-foreground text-lg mt-1 italic">
+                    "Sua clínica no piloto automático enquanto você cuida do que importa."
                 </p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-primary/5 transition-all duration-300 group">
+                <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-blue-500/10 transition-all duration-300 group">
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-125 transition-transform">
+                        <Users className="h-12 w-12 text-blue-500" />
+                    </div>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">Novos Leads (7 dias)</CardTitle>
-                        <Users className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+                        <CardTitle className="text-sm font-medium group-hover:text-blue-500 transition-colors">Novos Leads (7 dias)</CardTitle>
+                        <Users className="h-4 w-4 text-blue-500 mt-1" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-bold">{newPatients7Days}</div>
@@ -167,10 +190,13 @@ export default async function DashboardPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-primary/5 transition-all duration-300 group">
+                <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-emerald-500/10 transition-all duration-300 group">
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-125 transition-transform">
+                        <CalendarDays className="h-12 w-12 text-emerald-500" />
+                    </div>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">Agendamentos (7 dias)</CardTitle>
-                        <CalendarDays className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+                        <CardTitle className="text-sm font-medium group-hover:text-emerald-500 transition-colors">Agendamentos (7 dias)</CardTitle>
+                        <CalendarDays className="h-4 w-4 text-emerald-500 mt-1" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-bold">{appointments7Days}</div>
@@ -180,15 +206,18 @@ export default async function DashboardPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-primary/5 transition-all duration-300 group">
+                <Card className="relative overflow-hidden bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-indigo-500/10 transition-all duration-300 group">
+                    <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:scale-125 transition-transform">
+                        <TrendingUp className="h-12 w-12 text-indigo-500" />
+                    </div>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium group-hover:text-primary transition-colors">Taxa Conversão (7 dias)</CardTitle>
-                        <TrendingUp className="h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+                        <CardTitle className="text-sm font-medium group-hover:text-indigo-500 transition-colors">Taxa Conversão (7 dias)</CardTitle>
+                        <TrendingUp className="h-4 w-4 text-indigo-500 mt-1" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-3xl font-bold">{estimatedConversion}</div>
                         <p className="text-xs text-muted-foreground mt-1">
-                            Agendamentos / Novos Leads
+                            Eficiência da sua assistente IA
                         </p>
                     </CardContent>
                 </Card>
@@ -200,22 +229,73 @@ export default async function DashboardPage() {
                 />
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-                <Card className="col-span-4 bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-primary/5 transition-all duration-300">
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-12">
+                {/* Atividade Recente - IA em Ação */}
+                <Card className="lg:col-span-4 bg-card/50 backdrop-blur-sm border-border/50 shadow-lg flex flex-col">
+                    <CardHeader className="pb-3 text-sm">
+                        <div className="flex items-center justify-between">
+                            <CardTitle className="flex items-center gap-2 text-base">
+                                <Sparkles className="h-4 w-4 text-amber-500" />
+                                Inteligência em Ação
+                            </CardTitle>
+                            <span className="text-[10px] bg-amber-500/10 text-amber-500 px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Live</span>
+                        </div>
+                        <CardDescription>Últimas interações da sua assistente.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex-1 space-y-4">
+                        {recentMessages.length === 0 ? (
+                            <div className="h-full flex flex-col items-center justify-center text-muted-foreground opacity-50 py-8">
+                                <MessageCircle className="h-8 w-8 mb-2" />
+                                <p className="text-sm">Aguardando mensagens...</p>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                {recentMessages.map((msg: any, i: number) => (
+                                    <div key={i} className={`flex flex-col gap-1 p-3 rounded-xl border ${msg.role === 'assistant' ? 'bg-primary/5 border-primary/10 mr-4' : 'bg-muted/30 border-border/50 ml-4'}`}>
+                                        <div className="flex items-center justify-between mb-1">
+                                            <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                                                {msg.role === 'assistant' ? 'Assistente IA' : `Paciente (${msg.phone_number?.slice(-4)})`}
+                                            </span>
+                                            <span className="text-[10px] text-muted-foreground italic">
+                                                {new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs line-clamp-2 leading-relaxed">
+                                            {msg.content}
+                                        </p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                    <div className="p-4 pt-0">
+                        <Link href="/dashboard/conversations">
+                            <Button variant="ghost" className="w-full text-xs text-muted-foreground hover:text-primary py-0">
+                                Ver todas as conversas
+                                <ArrowRight className="h-3 w-3 ml-2" />
+                            </Button>
+                        </Link>
+                    </div>
+                </Card>
+
+                {/* Próximos Agendamentos */}
+                <Card className="lg:col-span-5 bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-primary/5 transition-all duration-300">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
-                            <CalendarIcon className="h-5 w-5 text-primary" />
-                            Próximos Agendamentos
+                            <CalendarIcon className="h-5 w-5 text-emerald-500" />
+                            Escala de Atendimento
                         </CardTitle>
                         <CardDescription>
-                            Os últimos compromissos marcados pela IA na sua agenda.
+                            Próximos pacientes agendados pela IA.
                         </CardDescription>
                     </CardHeader>
-                    <CardContent className="h-56 overflow-y-auto pr-2">
+                    <CardContent className="h-64 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-border">
                         {upcomingAppointments.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center h-full text-muted-foreground space-y-3 opacity-80 mt-4 pb-4">
-                                <CalendarIcon className="h-10 w-10 text-muted-foreground/30" />
-                                <p className="text-sm">Nenhum agendamento futuro no momento.</p>
+                            <div className="flex flex-col items-center justify-center h-full text-muted-foreground space-y-3 opacity-80 py-4">
+                                <div className="w-12 h-12 rounded-full bg-muted/30 flex items-center justify-center">
+                                    <CalendarIcon className="h-6 w-6 text-muted-foreground/30" />
+                                </div>
+                                <p className="text-sm text-center px-4 italic">Sua agenda está livre por enquanto.</p>
                             </div>
                         ) : (
                             <div className="space-y-3">
@@ -225,14 +305,23 @@ export default async function DashboardPage() {
                                     const timeFormatted = aptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
 
                                     return (
-                                        <div key={apt.id} className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-border/50 hover:bg-muted/30 transition-colors">
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-sm">{apt.patients?.name || 'Paciente sem nome'}</span>
-                                                <span className="text-xs text-muted-foreground capitalize">{apt.status === 'PENDING' ? 'Pendente' : apt.status}</span>
+                                        <div key={apt.id} className="group flex items-center justify-between p-3 rounded-xl bg-background/40 border border-border/50 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all duration-300">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 font-bold text-xs uppercase">
+                                                    {apt.patients?.name?.charAt(0) || 'P'}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-semibold text-sm group-hover:text-emerald-400 transition-colors">{apt.patients?.name || 'Paciente sem nome'}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] text-muted-foreground uppercase tracking-tighter">Consulta</span>
+                                                        <div className="h-1 w-1 bg-muted-foreground rounded-full opacity-30" />
+                                                        <span className="text-[10px] text-emerald-500 font-bold italic tracking-tighter ">Confirmado IA</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                             <div className="flex flex-col items-end">
-                                                <span className="font-semibold text-primary">{timeFormatted}</span>
-                                                <span className="text-xs text-muted-foreground">{dateFormatted}</span>
+                                                <span className="font-bold text-sm text-foreground">{timeFormatted}</span>
+                                                <span className="text-[10px] text-muted-foreground font-medium">{dateFormatted}</span>
                                             </div>
                                         </div>
                                     )
@@ -241,71 +330,53 @@ export default async function DashboardPage() {
                         )}
                     </CardContent>
                 </Card>
-                <Card className="col-span-3 bg-card/50 backdrop-blur-sm border-border/50 shadow-lg hover:shadow-primary/5 transition-all duration-300 relative overflow-hidden flex flex-col">
-                    <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-primary/50 to-primary/10"></div>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Rocket className="h-5 w-5 text-primary" />
+
+                {/* Ações Rápidas */}
+                <Card className="lg:col-span-3 bg-card/50 backdrop-blur-sm border-border/50 shadow-lg relative overflow-hidden flex flex-col">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+                    <CardHeader className="pb-4">
+                        <CardTitle className="flex items-center gap-2 text-base">
+                            <Rocket className="h-4 w-4 text-primary" />
                             Ações Rápidas
                         </CardTitle>
-                        <CardDescription>Atalhos úteis para o dia a dia.</CardDescription>
                     </CardHeader>
-                    <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1 auto-rows-min">
+                    <CardContent className="grid grid-cols-1 gap-2 flex-1">
                         <Link href="/dashboard/kanban" legacyBehavior passHref>
-                            <Button variant="outline" className="w-full justify-start h-14 relative group overflow-hidden border-border/50 hover:border-primary/50 transition-all">
-                                <div className="absolute inset-0 bg-primary/5 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                                <KanbanSquare className="mr-3 h-5 w-5 text-indigo-500" />
-                                <div className="flex flex-col items-start relative z-10">
-                                    <span className="font-medium tracking-wide">Gestão de Leads</span>
-                                    <span className="text-xs text-muted-foreground font-normal">Ver Kanban</span>
-                                </div>
-                                <ArrowRight className="ml-auto h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-indigo-500 relative z-10" />
+                            <Button variant="outline" className="w-full justify-start h-12 relative group overflow-hidden border-border/50 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all">
+                                <KanbanSquare className="mr-3 h-4 w-4 text-indigo-500 group-hover:scale-110 transition-transform" />
+                                <span className="text-xs font-semibold">CRM / Kanban</span>
+                                <ArrowRight className="ml-auto h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </Button>
                         </Link>
 
-                        <Link href="/dashboard/conversations" legacyBehavior passHref>
-                            <Button variant="outline" className="w-full justify-start h-14 relative group overflow-hidden border-border/50 hover:border-primary/50 transition-all">
-                                <div className="absolute inset-0 bg-primary/5 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                                <MessageCircle className="mr-3 h-5 w-5 text-blue-500" />
-                                <div className="flex flex-col items-start relative z-10">
-                                    <span className="font-medium tracking-wide">Conversas</span>
-                                    <span className="text-xs text-muted-foreground font-normal">Acessar Chat</span>
-                                </div>
-                                <ArrowRight className="ml-auto h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-blue-500 relative z-10" />
+                        <Link href="/dashboard/whatsapp" legacyBehavior passHref>
+                            <Button variant="outline" className="w-full justify-start h-12 relative group overflow-hidden border-border/50 hover:border-primary/50 hover:bg-primary/5 transition-all">
+                                <QrCode className="mr-3 h-4 w-4 text-primary group-hover:scale-110 transition-transform" />
+                                <span className="text-xs font-semibold">QR Code WhatsApp</span>
+                                <ArrowRight className="ml-auto h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </Button>
                         </Link>
 
                         <Link href="/dashboard/integrations" legacyBehavior passHref>
-                            <Button variant="outline" className="w-full justify-start h-14 relative group overflow-hidden border-border/50 hover:border-primary/50 transition-all">
-                                <div className="absolute inset-0 bg-primary/5 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                                <CalendarDays className="mr-3 h-5 w-5 text-emerald-500" />
-                                <div className="flex flex-col items-start relative z-10">
-                                    <span className="font-medium tracking-wide">Integração Agenda</span>
-                                    <span className="text-xs text-muted-foreground font-normal">Google Calendar</span>
-                                </div>
-                                <ArrowRight className="ml-auto h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-emerald-500 relative z-10" />
+                            <Button variant="outline" className="w-full justify-start h-12 relative group overflow-hidden border-border/50 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all">
+                                <CalendarDays className="mr-3 h-4 w-4 text-emerald-500 group-hover:scale-110 transition-transform" />
+                                <span className="text-xs font-semibold">Google Agenda</span>
+                                <ArrowRight className="ml-auto h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </Button>
                         </Link>
 
                         <Link href="/dashboard/settings" legacyBehavior passHref>
                             <Button
                                 variant="outline"
-                                className={`w-full justify-start h-14 relative group overflow-hidden transition-all ${!hasCompletedOnboarding
-                                    ? 'border-orange-500/40 hover:border-orange-400/60 bg-orange-500/5'
-                                    : 'border-border/50 hover:border-primary/50'
+                                className={`w-full justify-start h-12 relative group transition-all ${!hasCompletedOnboarding
+                                    ? 'border-orange-500/40 bg-orange-500/5 hover:border-orange-500'
+                                    : 'border-border/50 hover:border-primary/50 hover:bg-primary/5 uppercase'
                                     }`}
                             >
-                                <div className="absolute inset-0 bg-primary/5 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                                <Settings className={`mr-3 h-5 w-5 ${!hasCompletedOnboarding ? 'text-orange-400' : 'text-gray-500 dark:text-gray-400'}`} />
-                                <div className="flex flex-col items-start relative z-10">
-                                    <span className="font-medium tracking-wide">
-                                        {!hasCompletedOnboarding ? 'Configurar IA ⚡' : 'Configurações'}
-                                    </span>
-                                    <span className="text-xs text-muted-foreground font-normal">
-                                        {!hasCompletedOnboarding ? 'Ação Necessária' : 'Ajustar Regras'}
-                                    </span>
-                                </div>
-                                <ArrowRight className={`ml-auto h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all relative z-10 ${!hasCompletedOnboarding ? 'text-orange-400' : 'text-gray-500'}`} />
+                                <Settings className={`mr-3 h-4 w-4 ${!hasCompletedOnboarding ? 'text-orange-400' : 'text-muted-foreground group-hover:text-primary'} transition-colors`} />
+                                <span className="text-xs font-semibold tracking-tighter">
+                                    {!hasCompletedOnboarding ? 'Completar Setup ⚡' : 'Configurações'}
+                                </span>
                             </Button>
                         </Link>
                     </CardContent>
