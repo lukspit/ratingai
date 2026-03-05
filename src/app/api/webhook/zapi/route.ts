@@ -4,6 +4,9 @@ import OpenAI from "openai";
 import fs from "fs";
 import { google } from "googleapis";
 
+export const maxDuration = 60; // Timeout de 60s para Vercel
+
+
 // Cliente Supabase com permissões básicas (Anon Key)
 // O RPC 'get_webhook_context' foi criado como SECURITY DEFINER no banco para contornar o RLS de forma isolada e segura.
 const supabase = createClient(

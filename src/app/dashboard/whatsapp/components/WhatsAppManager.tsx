@@ -28,6 +28,7 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
     const [smartphoneConnected, setSmartphoneConnected] = useState(true)
     const [statusError, setStatusError] = useState<string | null>(null)
     const [lastChecked, setLastChecked] = useState<Date | null>(null)
+    const [isDisconnecting, setIsDisconnecting] = useState(false)
 
     const checkRealStatus = async () => {
         setIsChecking(true)
@@ -97,10 +98,29 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
         }
     }
 
-    const handleDisconnect = () => {
-        setIsConnected(false)
-        setShowQR(false)
-        setQrCodeImage(null)
+    const handleDisconnect = async () => {
+        if (!confirm('Tem certeza que deseja desconectar o WhatsApp? O atendimento por IA será interrompido.')) return;
+
+        setIsDisconnecting(true)
+        setStatusError(null)
+
+        try {
+            const res = await fetch('/api/whatsapp/disconnect', { method: 'POST' })
+            const data = await res.json()
+
+            if (res.ok && data.success) {
+                setIsConnected(false)
+                setShowQR(false)
+                setQrCodeImage(null)
+            } else {
+                setStatusError(data.error || 'Não foi possível desconectar no momento.')
+            }
+        } catch (err) {
+            console.error('Erro ao desconectar:', err)
+            setStatusError('Erro interno ao tentar desconectar.')
+        } finally {
+            setIsDisconnecting(false)
+        }
     }
 
     return (
@@ -180,7 +200,21 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
                                 </p>
                             )}
 
-                            {/* Desabilitado o botão visualmente para simulação, já que é manual */}
+                            <Button
+                                variant="destructive"
+                                onClick={handleDisconnect}
+                                disabled={isDisconnecting}
+                                className="mt-4 w-full sm:w-auto"
+                            >
+                                {isDisconnecting ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        Desconectando...
+                                    </>
+                                ) : (
+                                    'Desconectar Z-API'
+                                )}
+                            </Button>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-6 space-y-4">
