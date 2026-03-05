@@ -476,6 +476,5 @@ function DashboardContent({
                 </Card>
             </div>
         </div>
-        </div >
     )
 }
