@@ -155,43 +155,200 @@ export function OnboardingWizard({ initialData, hasCompleted, onSave }: { initia
 
     if (!isEditing) {
         return (
-            <Card className="border-none shadow-xl bg-primary/5">
-                <CardHeader>
-                    <div className="flex items-center gap-3">
-                        <div className="p-3 bg-primary/10 rounded-xl shadow-sm">
-                            <CheckCircle2 className="w-6 h-6 text-primary" />
+            <div className="space-y-6 animate-in fade-in duration-500">
+                {/* Header de Status */}
+                <Card className="border-none shadow-lg bg-gradient-to-r from-primary/10 via-primary/5 to-background border-l-4 border-l-primary overflow-hidden relative">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-3xl" />
+                    <CardHeader className="py-6 relative z-10">
+                        <div className="flex items-center justify-between flex-wrap gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3.5 bg-primary text-primary-foreground rounded-2xl shadow-lg shadow-primary/20">
+                                    <Activity className="w-6 h-6 animate-pulse" />
+                                </div>
+                                <div>
+                                    <CardTitle className="text-2xl font-bold tracking-tight">Operação IA Ativa</CardTitle>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" title="Online" />
+                                        <CardDescription className="text-base font-medium text-foreground/70">
+                                            Cérebro da <span className="text-primary font-bold">{formData.name}</span> está online
+                                        </CardDescription>
+                                    </div>
+                                </div>
+                            </div>
+                            <Button onClick={() => setIsEditing(true)} variant="outline" className="shadow-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300 font-semibold h-11 px-6 border-primary/20 bg-background/50 backdrop-blur-sm">
+                                <Activity className="w-4 h-4 mr-2" />
+                                Ajustar Cérebro da IA
+                            </Button>
                         </div>
-                        <div>
-                            <CardTitle className="text-2xl">Inteligência Configurada</CardTitle>
-                            <CardDescription className="text-base">Sua clínica já possui diretrizes personalizadas ativas na IA.</CardDescription>
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-background rounded-xl border border-border/50">
-                            <p className="text-sm text-muted-foreground font-medium mb-1">Assistente</p>
-                            <p className="font-semibold">{formData.assistant_name} ({TONES.find(t => t.id === formData.tone)?.label || formData.tone})</p>
-                        </div>
-                        <div className="p-4 bg-background rounded-xl border border-border/50">
-                            <p className="text-sm text-muted-foreground font-medium mb-1">Valor Particular</p>
-                            <p className="font-semibold">R$ {formData.consultation_fee}</p>
-                        </div>
-                        <div className="p-4 bg-background rounded-xl border border-border/50 col-span-1 md:col-span-2">
-                            <p className="text-sm text-muted-foreground font-medium mb-1">Restrições Padrão (Anti-Alucinação)</p>
-                            <p className="font-semibold text-rose-600 dark:text-rose-400">{formData.restrictions || 'Nenhuma restrição informada'}</p>
-                        </div>
-                    </div>
+                    </CardHeader>
+                </Card>
 
-                    <div className="flex justify-end pt-4">
-                        <Button onClick={() => setIsEditing(true)} className="shadow-md">
-                            Editar Configurações da IA
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+                {/* Grid de Configurações */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {/* Card 1: Identidade */}
+                    <Card className="border-none shadow-md bg-background/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 group ring-1 ring-border/50">
+                        <CardHeader className="pb-3 pt-5">
+                            <div className="flex items-center gap-2 text-primary">
+                                <div className="p-1.5 bg-primary/10 rounded-lg">
+                                    <Heart className="w-4 h-4" />
+                                </div>
+                                <h3 className="font-bold text-lg">Identidade</h3>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Assistente</p>
+                                <p className="font-bold text-foreground">{formData.assistant_name}</p>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Tom de Voz</p>
+                                <Badge variant="secondary" className="font-bold bg-primary/10 text-primary border-none">
+                                    {TONES.find(t => t.id === formData.tone)?.label || formData.tone}
+                                </Badge>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Profissional</p>
+                                <p className="font-bold text-foreground line-clamp-1">{formData.professional_name}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Card 2: Localização & Atendimento */}
+                    <Card className="border-none shadow-md bg-background/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 ring-1 ring-border/50">
+                        <CardHeader className="pb-3 pt-5">
+                            <div className="flex items-center gap-2 text-blue-500">
+                                <div className="p-1.5 bg-blue-500/10 rounded-lg">
+                                    <MapPin className="w-4 h-4" />
+                                </div>
+                                <h3 className="font-bold text-lg">Atendimento</h3>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Endereço</p>
+                                <p className="font-bold text-foreground line-clamp-2 text-sm leading-relaxed">{formData.address}</p>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Modalidades</p>
+                                <div className="flex gap-2 mt-1.5 flex-wrap">
+                                    {formData.service_modes.presencial && <Badge variant="outline" className="bg-blue-50 border-blue-200 text-blue-700 font-bold">Presencial</Badge>}
+                                    {formData.service_modes.online && <Badge variant="outline" className="bg-emerald-50 border-emerald-200 text-emerald-700 font-bold">Telemedicina</Badge>}
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Card 3: Operação */}
+                    <Card className="border-none shadow-md bg-background/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 ring-1 ring-border/50">
+                        <CardHeader className="pb-3 pt-5">
+                            <div className="flex items-center gap-2 text-amber-500">
+                                <div className="p-1.5 bg-amber-500/10 rounded-lg">
+                                    <Building className="w-4 h-4" />
+                                </div>
+                                <h3 className="font-bold text-lg">Operação</h3>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Horários</p>
+                                <p className="font-bold text-foreground text-sm line-clamp-2 leading-relaxed">{formData.hours}</p>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Duração Média</p>
+                                <p className="font-bold text-foreground">{formData.consultation_duration}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Card 4: Financeiro */}
+                    <Card className="border-none shadow-md bg-background/60 backdrop-blur-md hover:shadow-lg transition-all duration-300 ring-1 ring-border/50">
+                        <CardHeader className="pb-3 pt-5">
+                            <div className="flex items-center gap-2 text-emerald-500">
+                                <div className="p-1.5 bg-emerald-500/10 rounded-lg">
+                                    <Calculator className="w-4 h-4" />
+                                </div>
+                                <h3 className="font-bold text-lg">Financeiro</h3>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="flex justify-between items-start">
+                                <div className="space-y-1">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Consulta</p>
+                                    <p className="text-xl font-black text-foreground">R$ {formData.consultation_fee}</p>
+                                </div>
+                                <div className="text-right space-y-1">
+                                    <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Parcelas</p>
+                                    <p className="font-bold text-foreground">{formData.installments === 'nao_parcela' ? 'Não' : formData.installments.replace('ate_', '').replace('x', 'x')}</p>
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">Convênios</p>
+                                <p className="text-xs font-bold text-foreground line-clamp-2 leading-tight">{formData.insurance || 'Apenas Particular'}</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+
+                    {/* Card 5: Regras de Ouro (Anti-Alucinação) */}
+                    <Card className="border-none shadow-lg bg-rose-50/70 dark:bg-rose-950/20 md:col-span-2 lg:col-span-2 border-l-4 border-l-rose-500 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-4 text-rose-500/20 group-hover:scale-110 transition-transform duration-500">
+                            <ShieldAlert className="w-24 h-24" />
+                        </div>
+                        <CardHeader className="pb-3 pt-5 relative z-10">
+                            <div className="flex items-center gap-2 text-rose-600">
+                                <div className="p-1.5 bg-rose-600/10 rounded-lg">
+                                    <ShieldAlert className="w-4 h-4" />
+                                </div>
+                                <h3 className="font-bold text-lg tracking-tight">Regras de Segurança (Anti-Alucinação)</h3>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+                            <div className="space-y-2">
+                                <p className="text-[10px] text-rose-600 uppercase tracking-widest font-black mb-1">Bloqueios Críticos</p>
+                                <p className="text-sm font-bold text-rose-900 dark:text-rose-100 leading-relaxed italic pr-4 border-l-2 border-rose-200 pl-3">"{formData.restrictions}"</p>
+                            </div>
+                            <div className="space-y-2">
+                                <p className="text-[10px] text-rose-600 uppercase tracking-widest font-black mb-1">Urgência & Emergência</p>
+                                <p className="text-sm font-bold text-rose-900 dark:text-rose-100 leading-relaxed italic pr-4 border-l-2 border-rose-200 pl-3">"{formData.emergency_rules}"</p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Seção de Links e Mídias */}
+                {(formData.instagram || formData.website || formData.google_my_business || formData.doctoralia_url) && (
+                    <Card className="border-none shadow-md bg-background/40 backdrop-blur-sm ring-1 ring-border/50">
+                        <CardHeader className="py-4 border-b border-border/50">
+                            <div className="flex items-center gap-2 text-foreground/70">
+                                <Globe className="w-5 h-5" />
+                                <h3 className="font-bold text-sm uppercase tracking-widest">Canais Digitais Autorizados</h3>
+                            </div>
+                        </CardHeader>
+                        <CardContent className="flex flex-wrap gap-4 py-4">
+                            {formData.instagram && (
+                                <div className="flex items-center gap-2 px-4 py-2 bg-background/80 rounded-xl border border-border shadow-sm text-sm font-bold transition-all hover:border-primary/30">
+                                    <div className="w-2 h-2 rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-purple-500" />
+                                    <span className="text-rose-600">Instagram:</span> {formData.instagram}
+                                </div>
+                            )}
+                            {formData.website && (
+                                <div className="flex items-center gap-2 px-4 py-2 bg-background/80 rounded-xl border border-border shadow-sm text-sm font-bold transition-all hover:border-blue-500/30">
+                                    <div className="w-2 h-2 rounded-full bg-blue-500" />
+                                    <span className="text-blue-600">Site:</span> {formData.website}
+                                </div>
+                            )}
+                            {formData.google_my_business && (
+                                <div className="flex items-center gap-2 px-4 py-2 bg-background/80 rounded-xl border border-border shadow-sm text-sm font-bold transition-all hover:border-amber-500/30">
+                                    <div className="w-2 h-2 rounded-full bg-amber-400" />
+                                    <span className="text-amber-600">Google:</span> Link Ativo
+                                </div>
+                            )}
+                        </CardContent>
+                    </Card>
+                )}
+            </div>
         )
     }
+
 
     return (
         <div className="space-y-6 max-w-4xl mx-auto">
