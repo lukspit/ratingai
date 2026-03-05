@@ -14,8 +14,9 @@ export async function registerWithSubscription(formData: FormData) {
     const password = formData.get('password') as string
     const clinicName = formData.get('clinicName') as string
     const sessionId = formData.get('sessionId') as string
+    const nome = formData.get('nome') as string
 
-    if (!email || !password || !clinicName) {
+    if (!email || !password || !clinicName || !nome) {
         return redirect(`/register?session_id=${sessionId}&error=Preencha todos os campos`)
     }
 
@@ -74,6 +75,7 @@ export async function registerWithSubscription(formData: FormData) {
         email,
         password,
         email_confirm: true,
+        user_metadata: { full_name: nome },
     })
 
     if (createError) {
@@ -99,8 +101,11 @@ export async function registerWithSubscription(formData: FormData) {
 
             userId = existingUser.id
 
-            // Atualiza a senha do usuário existente
-            const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, { password })
+            // Atualiza a senha e o nome do usuário existente
+            const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+                password,
+                user_metadata: { full_name: nome },
+            })
 
             if (updateError) {
                 console.error('Password update error:', updateError)

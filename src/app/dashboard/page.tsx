@@ -463,15 +463,16 @@ function DashboardContent({
                         <Link href="/dashboard/settings" legacyBehavior passHref>
                             <Button
                                 variant="outline"
-                                className={`w-full justify-start h-12 relative group transition-all ${!hasCompletedOnboarding
+                                className={`w-full justify-start h-12 relative group overflow-hidden transition-all ${!hasCompletedOnboarding
                                     ? 'border-orange-500/40 bg-orange-500/5 hover:border-orange-500'
                                     : 'border-border/50 hover:border-primary/50 hover:bg-primary/5 uppercase'
                                     }`}
                             >
-                                <Settings className={`mr-3 h-4 w-4 ${!hasCompletedOnboarding ? 'text-orange-400' : 'text-muted-foreground group-hover:text-primary'} transition-colors`} />
+                                <Settings className={`mr-3 h-4 w-4 group-hover:scale-110 transition-transform ${!hasCompletedOnboarding ? 'text-orange-400' : 'text-muted-foreground group-hover:text-primary'} transition-colors`} />
                                 <span className="text-xs font-semibold tracking-tighter">
                                     {!hasCompletedOnboarding ? 'Completar Setup ⚡' : 'Configurações'}
                                 </span>
+                                <ArrowRight className="ml-auto h-3 w-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                             </Button>
                         </Link>
                     </CardContent>
