@@ -207,10 +207,13 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                 } : null)
                 setMessageText('')
             } else {
-                console.error('Erro ao enviar mensagem')
+                const errorData = await response.json().catch(() => ({}))
+                console.error('Erro ao enviar mensagem:', errorData)
+                alert(`Erro ao enviar: ${errorData.error || 'Erro desconhecido'}`)
             }
         } catch (err) {
             console.error('Erro na requisição de envio:', err)
+            alert('Erro de conexão ao enviar mensagem.')
         } finally {
             setIsSending(false)
         }

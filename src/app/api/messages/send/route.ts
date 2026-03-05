@@ -1,23 +1,33 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+import { createClient } from "@/utils/supabase/server";
 
 export async function POST(req: Request) {
-    try {
-        const { phoneNumber, message, instanceId } = await req.json();
+    console.log("[API/messages/send] Recebendo solicitação de envio");
+    const supabase = await createClient();
 
-        if (!phoneNumber || !message || !instanceId) {
-            return NextResponse.json(
-                { error: "Campos obrigatórios ausentes (phoneNumber, message, instanceId)" },
-                { status: 400 }
-            );
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        console.error("[API/messages/send] Usuário não autorizado");
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const body = await req.json();
+        const { instanceId, phoneNumber, message } = body;
+
+        console.log("[API/messages/send] Payload recebido:", {
+            instanceId,
+            phoneNumber,
+            messageLength: message?.length
+        });
+
+        if (!instanceId || !phoneNumber || !message) {
+            console.error("[API/messages/send] Campos obrigatórios ausentes:", { instanceId, phoneNumber, hasMessage: !!message });
+            return NextResponse.json({ error: "Campos obrigatórios ausentes (instanceId, phoneNumber, message)" }, { status: 400 });
         }
 
-        // 1. Buscar credenciais da Z-API no banco
+        // 1. Buscar credenciais da Z-API
+        console.log("[API/messages/send] Buscando instância:", instanceId);
         const { data: instance, error: instanceError } = await supabase
             .from("instances")
             .select("zapi_instance_id, zapi_token, client_token")
@@ -25,38 +35,41 @@ export async function POST(req: Request) {
             .single();
 
         if (instanceError || !instance) {
-            console.error("Erro ao buscar instância:", instanceError);
-            return NextResponse.json({ error: "Instância não encontrada" }, { status: 404 });
+            console.error("[API/messages/send] Erro ao buscar instância:", instanceError);
+            return NextResponse.json({ error: "Instance not found" }, { status: 404 });
         }
 
-        // 2. Enviar para a Z-API
+        console.log("[API/messages/send] Instância encontrada. Enviando para Z-API...");
+
+        // 2. Enviar mensagem via Z-API
         const zapiUrl = `https://api.z-api.io/instances/${instance.zapi_instance_id}/token/${instance.zapi_token}/send-text`;
-
-        const fetchHeaders: any = { "Content-Type": "application/json" };
-        if (instance.client_token) {
-            fetchHeaders["Client-Token"] = instance.client_token;
-        }
 
         const zapiResponse = await fetch(zapiUrl, {
             method: "POST",
-            headers: fetchHeaders,
+            headers: {
+                "Content-Type": "application/json",
+                "Client-Token": instance.client_token || "",
+            },
             body: JSON.stringify({
                 phone: phoneNumber,
                 message: message,
             }),
         });
 
+        const zapiData = await zapiResponse.json();
+        console.log("[API/messages/send] Resposta Z-API:", zapiData);
+
         if (!zapiResponse.ok) {
-            const zapiError = await zapiResponse.text();
-            console.error("Erro na Z-API:", zapiError);
-            return NextResponse.json({ error: "Falha ao enviar mensagem via Z-API" }, { status: 500 });
+            console.error("[API/messages/send] Erro na Z-API:", zapiData);
+            throw new Error(zapiData.message || "Failed to send message via Z-API");
         }
 
-        // 3. Salvar no histórico de mensagens (tabela messages)
+        // 3. Salvar no histórico de mensagens (opcional, mas recomendado para o dashboard atualizar)
+        console.log("[API/messages/send] Salvando no banco de dados...");
         const { error: dbError } = await supabase.from("messages").insert({
             instance_id: instanceId,
             phone_number: phoneNumber,
-            role: "assistant", // Tratamos como assistant para uniformidade no UI
+            role: "assistant",
             content: message,
         });
 
