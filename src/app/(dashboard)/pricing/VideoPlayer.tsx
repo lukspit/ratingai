@@ -27,6 +27,7 @@ export function VideoPlayer() {
     const [visualProgress, setVisualProgress] = useState(0)
     const [isPaused, setIsPaused] = useState(true)
     const [isReady, setIsReady] = useState(false)
+    const [hasStarted, setHasStarted] = useState(false)
 
     const startTracking = useCallback(() => {
         if (intervalRef.current) clearInterval(intervalRef.current)
@@ -63,6 +64,7 @@ export function VideoPlayer() {
                         const { PlayerState } = window.YT
                         if (e.data === PlayerState.PLAYING) {
                             setIsPaused(false)
+                            setHasStarted(true)
                             startTracking()
                         } else if (e.data === PlayerState.PAUSED || e.data === PlayerState.ENDED) {
                             setIsPaused(true)
@@ -117,15 +119,26 @@ export function VideoPlayer() {
                             <div className="w-[72px] h-[72px] rounded-full bg-white/95 flex items-center justify-center shadow-2xl hover:scale-105 transition-transform duration-200">
                                 <Play className="w-8 h-8 text-[#4A90E2] ml-1" fill="#4A90E2" />
                             </div>
-                            <div className="text-center px-6">
-                                <p className="text-white font-semibold text-lg">
-                                    Não feche ainda.
-                                </p>
-                                <p className="text-white/55 text-sm mt-1.5">
-                                    O trecho que muda a decisão da maioria das clínicas{' '}
-                                    <span className="text-white/85 font-medium">está logo à frente.</span>
-                                </p>
-                            </div>
+                            {!hasStarted ? (
+                                <div className="text-center px-6">
+                                    <p className="text-white font-semibold text-xl">
+                                        6 minutos que podem mudar sua clínica.
+                                    </p>
+                                    <p className="text-white/55 text-sm mt-1.5">
+                                        Assista antes de escolher seu plano.
+                                    </p>
+                                </div>
+                            ) : (
+                                <div className="text-center px-6">
+                                    <p className="text-white font-semibold text-lg">
+                                        Não feche ainda.
+                                    </p>
+                                    <p className="text-white/55 text-sm mt-1.5">
+                                        O trecho que muda a decisão da maioria das clínicas{' '}
+                                        <span className="text-white/85 font-medium">está logo à frente.</span>
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
