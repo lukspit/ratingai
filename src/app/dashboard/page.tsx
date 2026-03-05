@@ -30,12 +30,47 @@ export default async function DashboardPage() {
     let estimatedConversion = '0%'
 
     if (clinic) {
-        // 2. Status da Z-API na tabela instances
-        const { data: instance } = await supabase
-            .from('instances')
-            .select('status')
-            .eq('clinic_id', clinic.id)
-            .single()
+        const startOfDay = new Date()
+        startOfDay.setHours(0, 0, 0, 0)
+        const now = new Date()
+
+        // 2-6. Queries em paralelo
+        const [
+            { data: instance },
+            { count: newPatientsCount },
+            { count: appointmentsTodayCount },
+            { data: appointments }
+        ] = await Promise.all([
+            // Instância (Z-API)
+            supabase
+                .from('instances')
+                .select('status')
+                .eq('clinic_id', clinic.id)
+                .single(),
+
+            // Pacientes novos hoje
+            supabase
+                .from('patients')
+                .select('*', { count: 'exact', head: true })
+                .eq('clinic_id', clinic.id)
+                .gte('created_at', startOfDay.toISOString()),
+
+            // Agendamentos hoje (criados hoje)
+            supabase
+                .from('appointments')
+                .select('*', { count: 'exact', head: true })
+                .eq('clinic_id', clinic.id)
+                .gte('created_at', startOfDay.toISOString()),
+
+            // Próximos agendamentos
+            supabase
+                .from('appointments')
+                .select('id, scheduled_at, status, patients(name)')
+                .eq('clinic_id', clinic.id)
+                .gte('scheduled_at', now.toISOString())
+                .order('scheduled_at', { ascending: true })
+                .limit(5)
+        ])
 
         if (instance) {
             hasInstance = true
@@ -45,40 +80,12 @@ export default async function DashboardPage() {
             }
         }
 
-        // 3. Pacientes Novos Hoje
-        const startOfDay = new Date()
-        startOfDay.setHours(0, 0, 0, 0)
-
-        const { count: newPatientsCount } = await supabase
-            .from('patients')
-            .select('*', { count: 'exact', head: true })
-            .eq('clinic_id', clinic.id)
-            .gte('created_at', startOfDay.toISOString())
-
         patientsTodayCount = newPatientsCount || 0
 
-        // 4. Agendamentos Hoje (criados hoje) - Usado para calcular a conversão diária
-        const { count: appointmentsTodayCount } = await supabase
-            .from('appointments')
-            .select('*', { count: 'exact', head: true })
-            .eq('clinic_id', clinic.id)
-            .gte('created_at', startOfDay.toISOString())
-
-        // 5. Conversão Estimada (agendamentos hoje / pacientes novos hoje)
         if (patientsTodayCount > 0 && appointmentsTodayCount !== null) {
             const conversionRate = Math.round((appointmentsTodayCount / patientsTodayCount) * 100)
             estimatedConversion = `${conversionRate}%`
         }
-
-        // 6. Próximos Agendamentos (do momento atual para frente)
-        const now = new Date()
-        const { data: appointments } = await supabase
-            .from('appointments')
-            .select('id, scheduled_at, status, patients(name)')
-            .eq('clinic_id', clinic.id)
-            .gte('scheduled_at', now.toISOString())
-            .order('scheduled_at', { ascending: true })
-            .limit(5)
 
         upcomingAppointments = appointments || []
     }

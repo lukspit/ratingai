@@ -2,11 +2,6 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import nodemailer from "nodemailer";
 
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 // Configuração do Nodemailer com o Gmail (Google)
 // Será necessário criar uma 'App Password' no Google e colocar no .env
 const transporter = nodemailer.createTransport({
@@ -19,6 +14,10 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(req: Request) {
     try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+        const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
         const body = await req.json();
         console.log("[Z-API STATUS WEBHOOK] Recebido:", JSON.stringify(body, null, 2));
 

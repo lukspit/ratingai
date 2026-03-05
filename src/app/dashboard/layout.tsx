@@ -16,19 +16,10 @@ export default async function DashboardLayout({
         redirect('/login')
     }
 
-    // Verificar se o onboarding foi concluído (campo rules preenchido)
-    const { data: clinic } = await supabase
-        .from('clinics')
-        .select('rules')
-        .eq('owner_id', user.id)
-        .single()
-
-    const hasCompletedOnboarding = !!(clinic?.rules)
-
     return (
         <div className="flex min-h-screen bg-background text-foreground">
             {/* Sidebar (Client Component com Active State Tracking) */}
-            <DashboardSidebar email={user.email} hasCompletedOnboarding={hasCompletedOnboarding} />
+            <DashboardSidebar email={user.email} hasCompletedOnboarding={undefined} />
 
             {/* Main Content */}
             <main className="flex-1 flex flex-col h-screen overflow-y-auto">
