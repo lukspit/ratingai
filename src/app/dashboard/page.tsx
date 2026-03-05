@@ -146,6 +146,7 @@ export default async function DashboardPage() {
         return (
             <DashboardContent
                 clinic={clinic}
+                user={user}
                 greeting={greeting}
                 hasCompletedOnboarding={hasCompletedOnboarding}
                 newPatients7Days={newPatients7Days}
@@ -176,6 +177,7 @@ export default async function DashboardPage() {
 
 function DashboardContent({
     clinic,
+    user,
     greeting,
     hasCompletedOnboarding,
     newPatients7Days,

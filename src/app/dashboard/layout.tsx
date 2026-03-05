@@ -17,11 +17,23 @@ export default async function DashboardLayout({
         redirect('/login')
     }
 
+    // Check onboarding status for sidebar badge
+    const { data: clinic } = await supabase
+        .from('clinics')
+        .select('rules')
+        .eq('owner_id', user.id)
+        .single()
+
+    const hasCompletedOnboarding = !!(clinic?.rules)
+
     return (
         <SidebarProvider>
             <div className="flex min-h-screen bg-background text-foreground overflow-hidden">
                 {/* Sidebar (Client Component com Active State Tracking) */}
-                <DashboardSidebar email={user.email || undefined} hasCompletedOnboarding={undefined} />
+                <DashboardSidebar
+                    email={user.email || undefined}
+                    hasCompletedOnboarding={hasCompletedOnboarding}
+                />
 
                 {/* Main Content */}
                 <main className="flex-1 flex flex-col h-screen overflow-y-auto">
