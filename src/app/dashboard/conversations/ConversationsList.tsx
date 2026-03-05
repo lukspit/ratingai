@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
-import { Phone, Clock, User, X, Inbox, MousePointerClick, Bot, UserRound, Loader2, ChevronLeft } from 'lucide-react'
+import { Phone, Clock, User, X, Inbox, MousePointerClick, Bot, UserRound, Loader2, ChevronLeft, Send } from 'lucide-react'
 
 export interface Message {
     id?: string;
@@ -119,6 +119,8 @@ function AiToggleButton({ phoneNumber, isPaused, onToggle }: {
 export function ConversationsList({ leads }: { leads: Lead[] }) {
     const [leadsState, setLeadsState] = useState<Lead[]>(leads)
     const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
+    const [messageText, setMessageText] = useState('')
+    const [isSending, setIsSending] = useState(false)
     const scrollRef = useRef<HTMLDivElement>(null)
 
     // Auto-scroll ao abrir conversa ou receber novas mensagens
@@ -145,6 +147,72 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
         ))
         if (selectedLead?.phoneNumber === phoneNumber) {
             setSelectedLead(prev => prev ? { ...prev, aiPaused: newPaused } : null)
+        }
+    }
+
+    const handleSendMessage = async (e?: React.FormEvent) => {
+        if (e) e.preventDefault()
+        if (!selectedLead || !messageText.trim() || isSending || !selectedLead.aiPaused) return
+
+        setIsSending(true)
+        try {
+            // Pegamos o instance_id da primeira mensagem disponível como referência
+            // Na nossa interface idealmente o Lead já deveria ter o instance_id direto,
+            // mas como as mensagens têm, pegamos de lá.
+            const instanceId = selectedLead.messages[0]?.instance_id
+
+            if (!instanceId) {
+                console.error('Instance ID não encontrado para o lead')
+                return
+            }
+
+            const response = await fetch('/api/messages/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    phoneNumber: selectedLead.phoneNumber,
+                    message: messageText,
+                    instanceId: instanceId
+                })
+            })
+
+            if (response.ok) {
+                // Adicionamos a mensagem localmente para feedback instantâneo
+                const newMsg: Message = {
+                    instance_id: instanceId,
+                    phone_number: selectedLead.phoneNumber,
+                    role: 'assistant',
+                    content: messageText,
+                    created_at: new Date().toISOString()
+                }
+
+                const updatedLeads = leadsState.map(l => {
+                    if (l.phoneNumber === selectedLead.phoneNumber) {
+                        return {
+                            ...l,
+                            lastMessage: messageText,
+                            lastMessageTime: newMsg.created_at,
+                            messages: [...l.messages, newMsg]
+                        }
+                    }
+                    return l
+                })
+
+                setLeadsState(updatedLeads)
+                setSelectedLead(prev => prev ? {
+                    ...prev,
+                    lastMessage: messageText,
+                    lastMessageTime: newMsg.created_at,
+                    messages: [...prev.messages, newMsg]
+                } : null)
+                setMessageText('')
+            } else {
+                console.error('Erro ao enviar mensagem')
+            }
+        } catch (err) {
+            console.error('Erro na requisição de envio:', err)
+        } finally {
+            setIsSending(false)
         }
     }
 
@@ -269,6 +337,52 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                                     </div>
                                 )
                             })}
+                        </div>
+
+                        {/* Message Input Section */}
+                        <div className="p-3 md:p-4 bg-muted/30 border-t border-border z-10 shrink-0">
+                            {!selectedLead.aiPaused ? (
+                                <div className="flex flex-col items-center justify-center py-2 bg-amber-500/5 rounded-lg border border-amber-500/10 mb-2">
+                                    <p className="text-[11px] md:text-xs text-amber-600 font-medium flex items-center gap-1.5">
+                                        <Bot className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                                        Inteligência Artificial Ativa
+                                    </p>
+                                    <p className="text-[9px] md:text-[10px] text-amber-500/80">
+                                        Pause a IA no topo para assumir o controle e responder manualmente.
+                                    </p>
+                                </div>
+                            ) : null}
+
+                            <form
+                                onSubmit={handleSendMessage}
+                                className={`flex items-center gap-2 p-1.5 rounded-xl border transition-all ${selectedLead.aiPaused
+                                    ? 'bg-background border-primary/20 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 shadow-sm'
+                                    : 'bg-muted/50 border-border/50 opacity-60'
+                                    }`}
+                            >
+                                <input
+                                    type="text"
+                                    value={messageText}
+                                    onChange={(e) => setMessageText(e.target.value)}
+                                    placeholder={selectedLead.aiPaused ? "Digite sua resposta..." : "IA em controle..."}
+                                    disabled={!selectedLead.aiPaused || isSending}
+                                    className="flex-1 bg-transparent border-none focus:ring-0 text-sm py-1.5 md:py-2 px-2 text-foreground placeholder:text-muted-foreground disabled:cursor-not-allowed"
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!selectedLead.aiPaused || !messageText.trim() || isSending}
+                                    className={`p-2 rounded-lg transition-all ${selectedLead.aiPaused && messageText.trim() && !isSending
+                                        ? 'bg-primary text-primary-foreground hover:scale-105 active:scale-95 shadow-md hover:shadow-primary/20'
+                                        : 'bg-muted text-muted-foreground cursor-not-allowed'
+                                        }`}
+                                >
+                                    {isSending ? (
+                                        <Loader2 className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+                                    ) : (
+                                        <Send className="w-4 h-4 md:w-5 md:h-5" />
+                                    )}
+                                </button>
+                            </form>
                         </div>
                     </Card>
                 ) : (
