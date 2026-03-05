@@ -2,6 +2,7 @@ import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { WhatsAppManager } from './components/WhatsAppManager'
 import { Smartphone } from 'lucide-react'
+import Image from 'next/image'
 
 export default async function WhatsAppConnectionPage() {
     const supabase = await createClient()
