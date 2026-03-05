@@ -45,7 +45,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         <SidebarContext.Provider value={{
             isCollapsed,
             toggleSidebar,
-            setCollapsed,
+            setCollapsed: setIsCollapsed,
             isMobileMenuOpen,
             toggleMobileMenu,
             setMobileMenuOpen
