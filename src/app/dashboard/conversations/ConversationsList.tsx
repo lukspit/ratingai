@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Card } from '@/components/ui/card'
-import { Phone, Clock, User, X, Inbox, MousePointerClick, Bot, UserRound, Loader2 } from 'lucide-react'
+import { Phone, Clock, User, X, Inbox, MousePointerClick, Bot, UserRound, Loader2, ChevronLeft } from 'lucide-react'
 
 export interface Message {
     id?: string;
@@ -51,11 +51,10 @@ function AiToggleBadge({ phoneNumber, isPaused, onToggle }: {
         <button
             onClick={handleClick}
             disabled={loading}
-            className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium transition-all shrink-0 ${
-                isPaused
-                    ? 'bg-amber-500/15 text-amber-600 hover:bg-amber-500/25'
-                    : 'bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25'
-            }`}
+            className={`flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium transition-all shrink-0 ${isPaused
+                ? 'bg-amber-500/15 text-amber-600 hover:bg-amber-500/25'
+                : 'bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/25'
+                }`}
             title={isPaused ? 'Secretária no controle. Clique para devolver à IA.' : 'IA ativa. Clique para assumir.'}
         >
             {loading ? (
@@ -99,11 +98,10 @@ function AiToggleButton({ phoneNumber, isPaused, onToggle }: {
         <button
             onClick={handleClick}
             disabled={loading}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                isPaused
-                    ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 hover:bg-amber-500/20'
-                    : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/20'
-            }`}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${isPaused
+                ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 hover:bg-amber-500/20'
+                : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 hover:bg-emerald-500/20'
+                }`}
         >
             {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -141,9 +139,9 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[calc(100vh-200px)] min-h-[500px]">
+        <div className="flex flex-col md:grid md:grid-cols-3 gap-6 h-[calc(100vh-180px)] md:h-[calc(100vh-200px)] min-h-[500px]">
             {/* Leads List */}
-            <div className="md:col-span-1 space-y-3 overflow-y-auto pr-2 custom-scrollbar">
+            <div className={`md:col-span-1 space-y-3 overflow-y-auto pr-2 custom-scrollbar ${selectedLead ? 'hidden md:block' : 'block'}`}>
                 {leadsState.map(lead => (
                     <Card
                         key={lead.phoneNumber}
@@ -178,18 +176,24 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
             </div>
 
             {/* Simulated WhatsApp Interface */}
-            <div className="md:col-span-2 h-full flex flex-col min-h-0">
+            <div className={`md:col-span-2 h-full flex flex-col min-h-0 ${selectedLead ? 'block' : 'hidden md:flex'}`}>
                 {selectedLead ? (
                     <Card className="flex flex-col h-full bg-card border-border shadow-sm relative overflow-hidden rounded-xl">
                         {/* Header */}
-                        <div className="flex items-center justify-between p-4 bg-muted/50 border-b border-border shadow-sm z-10 shrink-0">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                                    <User className="w-5 h-5" />
+                        <div className="flex items-center justify-between p-3 md:p-4 bg-muted/50 border-b border-border shadow-sm z-10 shrink-0">
+                            <div className="flex items-center gap-2 md:gap-3">
+                                <button
+                                    onClick={() => setSelectedLead(null)}
+                                    className="md:hidden p-1 -ml-1 text-muted-foreground hover:text-foreground"
+                                >
+                                    <ChevronLeft className="w-6 h-6" />
+                                </button>
+                                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                                    <User className="w-4 h-4 md:w-5 md:h-5" />
                                 </div>
-                                <div>
-                                    <h4 className="font-semibold text-foreground tracking-wide">{selectedLead.phoneNumber}</h4>
-                                    <p className="text-xs text-muted-foreground">Paciente ativo</p>
+                                <div className="min-w-0">
+                                    <h4 className="font-semibold text-foreground tracking-wide text-sm md:text-base truncate">{selectedLead.phoneNumber}</h4>
+                                    <p className="text-[10px] md:text-xs text-muted-foreground">Paciente ativo</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -199,7 +203,7 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                                     isPaused={selectedLead.aiPaused}
                                     onToggle={(newState) => handleToggle(selectedLead.phoneNumber, newState)}
                                 />
-                                <button onClick={() => setSelectedLead(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                                <button onClick={() => setSelectedLead(null)} className="hidden md:block text-muted-foreground hover:text-foreground transition-colors">
                                     <X className="w-6 h-6" />
                                 </button>
                             </div>

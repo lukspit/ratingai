@@ -15,6 +15,22 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Nexus | Clínicas",
   description: "A inteligência artificial que atende seus pacientes",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Nexus",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1, // Previne zoom indesejado em inputs no iOS
+  userScalable: false,
 };
 
 export default function RootLayout({

@@ -84,12 +84,14 @@ export default async function ConversationsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-                    <MessageCircle className="w-8 h-8 text-primary" />
-                    Histórico de Conversas
+            <div className="px-1 md:px-0">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                    <MessageCircle className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                    Conversas
                 </h1>
-                <p className="text-muted-foreground mt-2">Acompanhe e analise os atendimentos e vendas realizadas pela IA da sua clínica.</p>
+                <p className="text-muted-foreground text-sm md:text-base mt-1 md:mt-2">
+                    Acompanhe os atendimentos realizados pela IA.
+                </p>
             </div>
 
             <ConversationsList leads={leads} />

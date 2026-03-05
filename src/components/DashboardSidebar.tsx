@@ -13,7 +13,7 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ email, hasCompletedOnboarding = true }: DashboardSidebarProps) {
     const pathname = usePathname()
-    const { isCollapsed, toggleSidebar } = useSidebar()
+    const { isCollapsed, toggleSidebar, isMobileMenuOpen, toggleMobileMenu } = useSidebar()
 
     const navItems = [
         {
@@ -61,20 +61,8 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
         }
     ]
 
-    return (
-        <aside
-            className={`border-r border-border bg-card hidden md:flex flex-col transition-all duration-300 ease-in-out relative ${isCollapsed ? 'w-20' : 'w-64'
-                }`}
-        >
-            {/* Toggle Button */}
-            <button
-                onClick={toggleSidebar}
-                className="absolute -right-3 top-10 z-20 bg-card border border-border rounded-full p-1.5 hover:bg-secondary transition-colors text-muted-foreground shadow-sm"
-                title={isCollapsed ? "Expandir" : "Recolher"}
-            >
-                {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-            </button>
-
+    const SidebarContent = (
+        <>
             <div className={`p-6 flex items-center justify-center min-h-[6rem] transition-all duration-300 ${isCollapsed ? 'px-2' : 'px-6'}`}>
                 <div className="relative w-full h-10 flex items-center justify-center">
                     {isCollapsed ? (
@@ -98,6 +86,7 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
                         <Link
                             key={item.href}
                             href={item.href}
+                            onClick={() => isMobileMenuOpen && toggleMobileMenu()}
                             className={`flex items-center gap-3 px-3 py-2 rounded-md font-medium transition-all relative ${isActive
                                 ? 'bg-primary/10 text-primary border border-primary/20'
                                 : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'
@@ -137,6 +126,7 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
                             </p>
                             <Link
                                 href="/dashboard/settings"
+                                onClick={() => isMobileMenuOpen && toggleMobileMenu()}
                                 className="mt-2 text-xs text-orange-400 underline underline-offset-2 hover:text-orange-300 transition-colors block"
                             >
                                 Configurar agora →
@@ -170,6 +160,44 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
                     </div>
                 )}
             </div>
-        </aside>
+        </>
+    )
+
+    return (
+        <>
+            {/* Desktop Sidebar */}
+            <aside
+                className={`border-r border-border bg-card hidden md:flex flex-col transition-all duration-300 ease-in-out relative ${isCollapsed ? 'w-20' : 'w-64'
+                    }`}
+            >
+                {/* Toggle Button */}
+                <button
+                    onClick={toggleSidebar}
+                    className="absolute -right-3 top-10 z-20 bg-card border border-border rounded-full p-1.5 hover:bg-secondary transition-colors text-muted-foreground shadow-sm"
+                    title={isCollapsed ? "Expandir" : "Recolher"}
+                >
+                    {isCollapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+                </button>
+                {SidebarContent}
+            </aside>
+
+            {/* Mobile Sidebar (Drawer) */}
+            <div
+                className={`fixed inset-0 z-50 bg-background/80 backdrop-blur-sm transition-opacity duration-300 md:hidden ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                    }`}
+                onClick={toggleMobileMenu}
+            />
+            <aside
+                className={`fixed inset-y-0 left-0 z-50 w-64 bg-card border-r border-border flex flex-col transition-transform duration-300 transform md:hidden ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                    }`}
+            >
+                <div className="p-4 flex justify-end md:hidden">
+                    <button onClick={toggleMobileMenu} className="p-2 text-muted-foreground hover:text-foreground">
+                        <PanelLeftClose className="w-6 h-6" />
+                    </button>
+                </div>
+                {SidebarContent}
+            </aside>
+        </>
     )
 }

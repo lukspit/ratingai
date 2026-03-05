@@ -6,12 +6,16 @@ interface SidebarContextType {
     isCollapsed: boolean;
     toggleSidebar: () => void;
     setCollapsed: (collapsed: boolean) => void;
+    isMobileMenuOpen: boolean;
+    toggleMobileMenu: () => void;
+    setMobileMenuOpen: (open: boolean) => void;
 }
 
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined)
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
     const [isCollapsed, setIsCollapsed] = useState(false)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     // Opcional: Persistir o estado no localStorage
     useEffect(() => {
@@ -29,13 +33,23 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         })
     }
 
-    const setCollapsed = (collapsed: boolean) => {
-        setIsCollapsed(collapsed)
-        localStorage.setItem('sidebar-collapsed', String(collapsed))
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(prev => !prev)
+    }
+
+    const setMobileMenuOpen = (open: boolean) => {
+        setIsMobileMenuOpen(open)
     }
 
     return (
-        <SidebarContext.Provider value={{ isCollapsed, toggleSidebar, setCollapsed }}>
+        <SidebarContext.Provider value={{
+            isCollapsed,
+            toggleSidebar,
+            setCollapsed,
+            isMobileMenuOpen,
+            toggleMobileMenu,
+            setMobileMenuOpen
+        }}>
             {children}
         </SidebarContext.Provider>
     )

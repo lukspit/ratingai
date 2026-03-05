@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { User, CreditCard, LifeBuoy, LogOut, ExternalLink, Mail, Building, Calendar, Globe } from 'lucide-react'
+import { User, CreditCard, LifeBuoy, LogOut, ExternalLink, Mail, Building, Calendar, Globe, MessageCircle } from 'lucide-react'
 
 interface AccountSettingsProps {
     user: {
@@ -26,7 +26,6 @@ export function AccountSettings({ user, clinic, subscription }: AccountSettingsP
     const handleManageSubscription = async () => {
         setIsLoading(true)
         try {
-            // Aqui chamaremos uma API para criar o link do Customer Portal do Stripe
             const response = await fetch('/api/stripe/portal', { method: 'POST' })
             const data = await response.json()
             if (data.url) {
@@ -57,131 +56,135 @@ export function AccountSettings({ user, clinic, subscription }: AccountSettingsP
     return (
         <div className="grid gap-6">
             {/* Perfil e Dados Básicos */}
-            <Card className="border-none shadow-md overflow-hidden">
-                <div className="h-2 bg-primary/20" />
-                <CardHeader>
+            <Card className="border-none shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
+                <div className="h-1.5 bg-primary/30" />
+                <CardHeader className="pb-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg">
+                        <div className="p-2.5 bg-primary/10 rounded-xl">
                             <User className="w-5 h-5 text-primary" />
                         </div>
                         <div>
-                            <CardTitle>Dados do Perfil</CardTitle>
-                            <CardDescription>Informações básicas da sua conta no Nexus.</CardDescription>
+                            <CardTitle className="text-xl">Dados do Perfil</CardTitle>
+                            <CardDescription>Informações básicas da sua conta.</CardDescription>
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-secondary/30 rounded-xl border border-border/50">
-                            <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
-                                <Mail className="w-4 h-4" />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                        <div className="p-4 bg-secondary/20 rounded-2xl border border-border/40 transition-colors hover:bg-secondary/30">
+                            <div className="flex items-center gap-2 text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-1.5">
+                                <Mail className="w-3.5 h-3.5" />
                                 <span>E-mail de Acesso</span>
                             </div>
-                            <p className="font-medium text-foreground">{user.email || 'Não informado'}</p>
+                            <p className="font-medium text-foreground truncate">{user.email || 'Não informado'}</p>
                         </div>
-                        <div className="p-4 bg-secondary/30 rounded-xl border border-border/50">
-                            <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">
-                                <Building className="w-4 h-4" />
+                        <div className="p-4 bg-secondary/20 rounded-2xl border border-border/40 transition-colors hover:bg-secondary/30">
+                            <div className="flex items-center gap-2 text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-1.5">
+                                <Building className="w-3.5 h-3.5" />
                                 <span>Clínica</span>
                             </div>
-                            <p className="font-medium text-foreground">{clinic.name || 'Não configurada'}</p>
+                            <p className="font-medium text-foreground truncate">{clinic.name || 'Não configurada'}</p>
                         </div>
                     </div>
                 </CardContent>
             </Card>
 
             {/* Assinatura e Billing */}
-            <Card className="border-none shadow-md overflow-hidden">
-                <div className="h-2 bg-blue-500/20" />
-                <CardHeader>
+            <Card className="border-none shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
+                <div className="h-1.5 bg-blue-500/30" />
+                <CardHeader className="pb-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-500/10 rounded-lg">
-                            <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                        <div className="p-2.5 bg-blue-500/10 rounded-xl">
+                            <CreditCard className="w-5 h-5 text-blue-600" />
                         </div>
                         <div>
-                            <CardTitle>Assinatura e Faturamento</CardTitle>
-                            <CardDescription>Gerencie seu plano, pagamentos e renovações.</CardDescription>
+                            <CardTitle className="text-xl">Assinatura</CardTitle>
+                            <CardDescription>Plano e faturamento.</CardDescription>
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="flex flex-col md:flex-row items-start md:items-center justify-between p-6 bg-blue-500/5 rounded-2xl border border-blue-500/10 gap-4">
-                        <div className="space-y-1">
+                    <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between p-5 md:p-6 bg-blue-500/5 rounded-3xl border border-blue-500/10 gap-6">
+                        <div className="space-y-2">
                             <div className="flex items-center gap-2">
-                                <span className="font-bold text-lg">Plano Nexus SaaS</span>
+                                <span className="font-bold text-xl">Plano Nexus SaaS</span>
                                 {getStatusBadge(subscription?.status || 'inactive')}
                             </div>
                             {subscription?.current_period_end && (
                                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                    <Calendar className="w-4 h-4" />
-                                    <span>Renova em: {new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' }).format(new Date(subscription.current_period_end))}</span>
+                                    <Calendar className="w-4 h-4 text-blue-500/70" />
+                                    <span>Renovação: {new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short', year: '2-digit' }).format(new Date(subscription.current_period_end))}</span>
                                 </div>
                             )}
                         </div>
                         <Button
-                            variant="outline"
-                            className="bg-background border-blue-200 hover:bg-blue-50 text-blue-700 hover:text-blue-800"
+                            variant="default"
+                            className="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl h-12 md:h-11 shadow-lg shadow-blue-500/20 px-6 font-semibold"
                             onClick={handleManageSubscription}
                             disabled={isLoading}
                         >
                             {isLoading ? 'Carregando...' : (
                                 <>
-                                    Gerenciar Assinatura
-                                    <ExternalLink className="w-4 h-4 ml-2" />
+                                    Gerenciar Pagamento
+                                    <ExternalLink className="w-4 h-4 ml-2 opacity-70" />
                                 </>
                             )}
                         </Button>
                     </div>
 
-                    <div className="text-xs text-muted-foreground bg-secondary/20 p-3 rounded-lg flex items-start gap-2 italic">
-                        <span className="text-blue-500 font-bold">INFO:</span>
-                        O gerenciamento do cartão, cancelamento e histórico de faturas é feito de forma segura através do Portal do Cliente Stripe.
+                    <div className="text-xs text-muted-foreground bg-blue-500/5 p-4 rounded-2xl flex items-start gap-3 border border-blue-500/5">
+                        <div className="w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center shrink-0">
+                            <Globe className="w-3 h-3 text-blue-500" />
+                        </div>
+                        <p className="leading-relaxed">
+                            O gerenciamento do cartão, cancelamento e histórico de faturas é feito de forma segura através do <span className="font-semibold text-blue-600 dark:text-blue-400">Portal do Cliente Stripe</span>.
+                        </p>
                     </div>
                 </CardContent>
             </Card>
 
             {/* Suporte e Ajuda */}
-            <Card className="border-none shadow-md overflow-hidden">
-                <div className="h-2 bg-emerald-500/20" />
-                <CardHeader>
+            <Card className="border-none shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
+                <div className="h-1.5 bg-emerald-500/30" />
+                <CardHeader className="pb-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                            <LifeBuoy className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                        <div className="p-2.5 bg-emerald-500/10 rounded-xl">
+                            <LifeBuoy className="w-5 h-5 text-emerald-600" />
                         </div>
                         <div>
-                            <CardTitle>Suporte e Ajuda</CardTitle>
-                            <CardDescription>Precisa de auxílio técnico ou tem alguma dúvida?</CardDescription>
+                            <CardTitle className="text-xl">Suporte</CardTitle>
+                            <CardDescription>Precisa de auxílio?</CardDescription>
                         </div>
                     </div>
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <a
-                            href="https://wa.me/5511999999999" // TODO: Confirmar número de suporte
+                            href="https://wa.me/5511999999999"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-between p-4 bg-emerald-500/5 hover:bg-emerald-500/10 rounded-xl border border-emerald-500/10 transition-all group"
+                            className="flex items-center justify-between p-5 bg-emerald-500/5 hover:bg-emerald-500/10 rounded-2xl border border-emerald-500/10 transition-all group shadow-sm active:scale-[0.98]"
                         >
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-600">
-                                    <MessageCircleIcon className="w-5 h-5" />
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                    <MessageCircle className="w-6 h-6" />
                                 </div>
                                 <div className="text-left">
-                                    <p className="font-bold text-foreground group-hover:text-emerald-700 transition-colors">Suporte via WhatsApp</p>
-                                    <p className="text-xs text-muted-foreground whitespace-nowrap">Seg a Sex, 09h às 18h</p>
+                                    <p className="font-bold text-foreground">WhatsApp</p>
+                                    <p className="text-xs text-muted-foreground">Seg a Sex, 09h às 18h</p>
                                 </div>
                             </div>
-                            <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-emerald-500 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                            <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-emerald-500 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
                         </a>
 
-                        <div className="flex items-center justify-between p-4 bg-secondary/30 rounded-xl border border-border/50 opacity-60">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-muted-foreground">
-                                    <Globe className="w-5 h-5" />
+                        <div className="flex items-center justify-between p-5 bg-secondary/20 rounded-2xl border border-border/40 opacity-50 grayscale">
+                            <div className="flex items-center gap-4">
+                                <div className="w-12 h-12 bg-secondary rounded-2xl flex items-center justify-center text-muted-foreground">
+                                    <Globe className="w-6 h-6" />
                                 </div>
                                 <div className="text-left">
                                     <p className="font-bold text-foreground">Central de Ajuda</p>
-                                    <p className="text-xs text-muted-foreground">Em breve</p>
+                                    <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold opacity-50">Em breve</p>
                                 </div>
                             </div>
                         </div>
@@ -190,34 +193,15 @@ export function AccountSettings({ user, clinic, subscription }: AccountSettingsP
             </Card>
 
             {/* Logout (Mobile focus) */}
-            <div className="md:hidden pt-4">
+            <div className="md:hidden pt-4 pb-6">
                 <form action="/auth/signout" method="post">
-                    <Button variant="destructive" className="w-full h-12 rounded-xl flex items-center gap-3">
+                    <Button variant="ghost" className="w-full h-14 rounded-2xl flex items-center justify-center gap-3 text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-500/10 border border-red-500/10 font-bold transition-all active:scale-[0.98]">
                         <LogOut className="w-5 h-5" />
-                        Sair da Conta
+                        Finalizar Sessão
                     </Button>
                 </form>
             </div>
         </div>
-    )
-}
-
-function MessageCircleIcon(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" />
-        </svg>
     )
 }
 

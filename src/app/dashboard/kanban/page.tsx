@@ -85,13 +85,13 @@ export default async function KanbanPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground flex items-center gap-3">
-                    <SquareKanban className="w-8 h-8 text-primary" />
-                    Kanban de Leads
+            <div className="px-1 md:px-0">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                    <SquareKanban className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                    Pipeline
                 </h1>
-                <p className="text-muted-foreground mt-2">
-                    Visualize e gerencie o pipeline de atendimento da sua clínica. Arraste os cards entre as colunas.
+                <p className="text-muted-foreground text-sm md:text-base mt-1 md:mt-2">
+                    Gerencie seus leads e agendamentos.
                 </p>
             </div>
 

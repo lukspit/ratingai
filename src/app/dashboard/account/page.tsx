@@ -26,13 +26,13 @@ export default async function AccountPage() {
 
     return (
         <div className="space-y-8 animate-in fade-in zoom-in duration-500 pb-12">
-            <div>
-                <h1 className="text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
-                    <SettingsIcon className="w-8 h-8 text-primary" />
-                    Configurações da Conta
+            <div className="px-1 md:px-0">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight text-foreground flex items-center gap-3">
+                    <SettingsIcon className="w-6 h-6 md:w-8 md:h-8 text-primary" />
+                    Configurações
                 </h1>
-                <p className="text-muted-foreground text-lg mt-2">
-                    Gerencie seus dados de acesso, plano de assinatura e suporte técnico.
+                <p className="text-muted-foreground text-base md:text-lg mt-1 md:mt-2">
+                    Gerencie seus dados de acesso, plano e suporte.
                 </p>
             </div>
 
