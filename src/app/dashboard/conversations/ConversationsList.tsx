@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Phone, Clock, User, X, Inbox, MousePointerClick, Bot, UserRound, Loader2, ChevronLeft } from 'lucide-react'
 
@@ -15,6 +15,7 @@ export interface Message {
 
 export interface Lead {
     phoneNumber: string;
+    name?: string | null;
     lastMessage: string;
     lastMessageTime: string;
     messages: Message[];
@@ -118,6 +119,25 @@ function AiToggleButton({ phoneNumber, isPaused, onToggle }: {
 export function ConversationsList({ leads }: { leads: Lead[] }) {
     const [leadsState, setLeadsState] = useState<Lead[]>(leads)
     const [selectedLead, setSelectedLead] = useState<Lead | null>(null)
+    const scrollRef = useRef<HTMLDivElement>(null)
+
+    // Auto-scroll ao abrir conversa ou receber novas mensagens
+    useEffect(() => {
+        if (scrollRef.current) {
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+        }
+    }, [selectedLead, selectedLead?.messages.length])
+
+    const formatPhone = (phone: string) => {
+        const cleaned = phone.replace(/\D/g, '')
+        if (cleaned.length === 13 && cleaned.startsWith('55')) {
+            const ddd = cleaned.slice(2, 4)
+            const part1 = cleaned.slice(4, 9)
+            const part2 = cleaned.slice(9, 13)
+            return `(${ddd}) ${part1}-${part2}`
+        }
+        return phone
+    }
 
     const handleToggle = (phoneNumber: string, newPaused: boolean) => {
         setLeadsState(prev => prev.map(l =>
@@ -154,7 +174,9 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
-                                    <h4 className="font-semibold text-foreground tracking-wide truncate">{lead.phoneNumber}</h4>
+                                    <h4 className="font-semibold text-foreground tracking-wide truncate">
+                                        {lead.name || formatPhone(lead.phoneNumber)}
+                                    </h4>
                                     {/* Lugar 2: Badge compacto na lista de leads */}
                                     <AiToggleBadge
                                         phoneNumber={lead.phoneNumber}
@@ -162,6 +184,11 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                                         onToggle={(newState) => handleToggle(lead.phoneNumber, newState)}
                                     />
                                 </div>
+                                {lead.name && (
+                                    <div className="text-[11px] text-muted-foreground -mt-0.5 mb-0.5">
+                                        {formatPhone(lead.phoneNumber)}
+                                    </div>
+                                )}
                                 <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                                     <Clock className="w-3 h-3" />
                                     {new Date(lead.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -192,8 +219,12 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                                     <User className="w-4 h-4 md:w-5 md:h-5" />
                                 </div>
                                 <div className="min-w-0">
-                                    <h4 className="font-semibold text-foreground tracking-wide text-sm md:text-base truncate">{selectedLead.phoneNumber}</h4>
-                                    <p className="text-[10px] md:text-xs text-muted-foreground">Paciente ativo</p>
+                                    <h4 className="font-semibold text-foreground tracking-wide text-sm md:text-base truncate">
+                                        {selectedLead.name || formatPhone(selectedLead.phoneNumber)}
+                                    </h4>
+                                    <p className="text-[10px] md:text-xs text-muted-foreground">
+                                        {selectedLead.name ? formatPhone(selectedLead.phoneNumber) : 'Paciente ativo'}
+                                    </p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -213,7 +244,10 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                         <div className="absolute inset-0 top-[73px] z-0 bg-secondary/5"></div>
 
                         {/* Chat Body */}
-                        <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 z-10 flex flex-col custom-scrollbar">
+                        <div
+                            ref={scrollRef}
+                            className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 z-10 flex flex-col custom-scrollbar scroll-smooth"
+                        >
                             <div className="text-center my-4 shrink-0">
                                 <span className="px-3 py-1 bg-muted/80 text-muted-foreground text-xs rounded-lg uppercase tracking-wider font-semibold shadow-sm">
                                     Início da Conversa Ativa

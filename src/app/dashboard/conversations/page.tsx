@@ -58,26 +58,31 @@ export default async function ConversationsPage() {
 
     // Buscar status ai_paused dos pacientes desta clínica
     const phoneNumbers = Array.from(leadsMap.keys())
-    const patientsMap = new Map<string, boolean>()
+    const patientsMap = new Map<string, { paused: boolean, name: string | null }>()
 
     if (phoneNumbers.length > 0 && clinics && clinics.length > 0) {
         const clinicIds = clinics.map(c => c.id)
         const { data: patients } = await supabase
             .from('patients')
-            .select('phone_number, ai_paused')
+            .select('phone_number, name, ai_paused')
             .in('clinic_id', clinicIds)
             .in('phone_number', phoneNumbers)
 
         if (patients) {
             for (const p of patients) {
-                patientsMap.set(p.phone_number, p.ai_paused ?? false)
+                patientsMap.set(p.phone_number, {
+                    paused: p.ai_paused ?? false,
+                    name: p.name
+                })
             }
         }
     }
 
-    // Injetar ai_paused em cada lead
+    // Injetar dados do paciente (nome e ai_paused) em cada lead
     for (const lead of leadsMap.values()) {
-        lead.aiPaused = patientsMap.get(lead.phoneNumber) ?? false
+        const patientData = patientsMap.get(lead.phoneNumber)
+        lead.aiPaused = patientData?.paused ?? false
+        lead.name = patientData?.name ?? null
     }
 
     const leads = Array.from(leadsMap.values())
