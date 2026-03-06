@@ -117,7 +117,7 @@ export default async function DashboardPage() {
         for (let i = 6; i >= 0; i--) {
             const d = new Date()
             d.setDate(d.getDate() - i)
-            days.push(d.toLocaleDateString('pt-BR', { weekday: 'short' }))
+            days.push(d.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'America/Sao_Paulo' }))
         }
 
         // Simulação de distribuição diária (em um cenário real, faríamos group by no DB)
@@ -130,7 +130,7 @@ export default async function DashboardPage() {
 
         const leadsByDay = days.map(dayName => {
             const count = allPatients7Days?.filter(p => {
-                const pDate = new Date(p.created_at).toLocaleDateString('pt-BR', { weekday: 'short' })
+                const pDate = new Date(p.created_at).toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'America/Sao_Paulo' })
                 return pDate === dayName
             }).length || 0
             return { day: dayName, count }
@@ -352,7 +352,7 @@ function DashboardContent({
                                                 {msg.role === 'assistant' ? 'Assistente IA' : `Paciente (${msg.phone_number?.slice(-4)})`}
                                             </span>
                                             <span className="text-[10px] text-muted-foreground italic">
-                                                {new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                                {new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
                                             </span>
                                         </div>
                                         <p className="text-xs line-clamp-2 leading-relaxed">
@@ -396,8 +396,8 @@ function DashboardContent({
                             <div className="space-y-3">
                                 {upcomingAppointments.map((apt: any) => {
                                     const aptDate = new Date(apt.scheduled_at)
-                                    const dateFormatted = aptDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
-                                    const timeFormatted = aptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+                                    const dateFormatted = aptDate.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' })
+                                    const timeFormatted = aptDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })
 
                                     return (
                                         <div key={apt.id} className="group flex items-center justify-between p-3 rounded-xl bg-background/40 border border-border/50 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all duration-300">

@@ -224,7 +224,7 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
 
                             {lastChecked && (
                                 <p className="text-[11px] text-muted-foreground">
-                                    Verificado às {lastChecked.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    Verificado às {lastChecked.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
                                 </p>
                             )}
 
@@ -264,7 +264,7 @@ export function WhatsAppManager({ initialIsProvisioning, initialIsConnected, ins
 
                             {lastChecked && (
                                 <p className="text-[11px] text-muted-foreground">
-                                    Verificado às {lastChecked.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    Verificado às {lastChecked.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
                                 </p>
                             )}
                         </div>

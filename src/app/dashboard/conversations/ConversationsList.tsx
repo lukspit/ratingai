@@ -262,7 +262,7 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                                 )}
                                 <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                                     <Clock className="w-3 h-3" />
-                                    {new Date(lead.lastMessageTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                    {new Date(lead.lastMessageTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
                                 </div>
                             </div>
                         </div>
@@ -333,7 +333,7 @@ export function ConversationsList({ leads }: { leads: Lead[] }) {
                                             <p className="text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                                             <div className="flex justify-end gap-1 mt-1.5 opacity-80">
                                                 <span className={`text-[10px] ${isUser ? 'text-muted-foreground' : 'text-primary-foreground/80'}`}>
-                                                    {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                    {new Date(msg.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
                                                 </span>
                                             </div>
                                         </div>
