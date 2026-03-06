@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { Play } from 'lucide-react'
 
-const VIDEO_ID = 'F2WbStaDy8Q'
+const VIDEO_ID = 'JbCuAb1gh3c'
 const TOTAL_MINUTES = 6
 
 // Ilusão psicológica: início parece mais rápido, fim mais lento
