@@ -600,29 +600,40 @@ async function runAIPipeline(
     console.log(`[FOLLOW-UP] Agendados para ${followUpTime2h} (2h) e ${followUpTime24h} (24h)`);
   }
 
-  // Envio da resposta via Z-API com efeito de digitação
+  // Envio da resposta via Z-API sequencial com delay
   const zapiUrl = `https://api.z-api.io/instances/${instanceId}/token/${contextData.zapi_token}/send-text`;
   const chunks = chunkMessage(aiResponse);
   let accumulatedDelayMessage = 0;
 
-  const dispatchPromises = chunks.map((chunk) => {
+  for (let i = 0; i < chunks.length; i++) {
+    const chunk = chunks[i];
     const typingDelay = Math.max(2, Math.min(15, Math.ceil(chunk.length / 15)));
+
     const zapiPayload = {
       phone: phone,
       message: chunk,
       delayMessage: accumulatedDelayMessage,
       delayTyping: typingDelay,
     };
+
     accumulatedDelayMessage += typingDelay + 1;
 
-    return fetch(zapiUrl, {
-      method: "POST",
-      headers: fetchHeaders,
-      body: JSON.stringify(zapiPayload),
-    });
-  });
+    try {
+      await fetch(zapiUrl, {
+        method: "POST",
+        headers: fetchHeaders,
+        body: JSON.stringify(zapiPayload),
+      });
+      console.log(`[Z-API] Parte ${i + 1}/${chunks.length} enviada.`);
+    } catch (e) {
+      console.error(`[Z-API] Erro ao enviar a parte ${i + 1}/${chunks.length}:`, e);
+    }
 
-  await Promise.all(dispatchPromises);
+    // Delay de segurança entre a requisição de cada chunk se houver mais partes a seguir
+    if (i < chunks.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+    }
+  }
 }
 
 // =============================================================================
