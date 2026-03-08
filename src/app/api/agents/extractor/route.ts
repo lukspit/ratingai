@@ -5,20 +5,25 @@ import { callAI } from '@/utils/ai';
 
 const SYSTEM_PROMPT = `
 Você é um Auditor Contábil I.A. (Extractor).
-Mapeie e extraia os dados abaixo a partir do texto das demonstrações contábeis.
+Leia atentamente o texto das demonstrações contábeis e extraia EXATAMENTE os valores que aparecem nos documentos.
 
-Output OBRIGATÓRIO (JSON estrito):
+REGRAS CRÍTICAS:
+- NUNCA invente ou assuma valores. Use apenas os números presentes no texto.
+- Se um valor não estiver presente no texto, use null (não use 0).
+- Os valores devem ser numéricos (sem R$, sem pontos de milhar, sem vírgulas — use ponto decimal).
+- Exemplo: "R$ 2.450.000,00" deve virar 2450000.
+
+Output OBRIGATÓRIO (JSON estrito, sem texto fora do JSON):
 {
-  "period": 2024,
-  "ativo_circulante": 0,
-  "passivo_circulante": 0,
-  "passivo_nao_circulante": 0,
-  "disponibilidades": 0,
-  "receita_bruta": 0,
-  "ebitda": 0,
-  "potential_adjustments": [
-    { "account": "Receitas Diversas", "value": 50000, "justification": "Receita não recorrente" }
-  ]
+  "period": <ano do exercício>,
+  "ativo_circulante": <Total Ativo Circulante extraído do BP>,
+  "passivo_circulante": <Total Passivo Circulante extraído do BP>,
+  "passivo_nao_circulante": <Total Passivo Não Circulante extraído do BP>,
+  "patrimonio_liquido": <Total Patrimônio Líquido extraído do BP>,
+  "disponibilidades": <Caixa e Equivalentes extraído do BP>,
+  "receita_bruta": <Receita Bruta/Líquida extraída da DRE>,
+  "ebitda": <EBITDA ou Lucro Operacional extraído da DRE>,
+  "potential_adjustments": []
 }
 `;
 
