@@ -3,8 +3,9 @@ import { createClient } from '@/utils/supabase/server'
 import { DashboardSidebar } from '@/components/DashboardSidebar'
 import { SidebarProvider } from '@/contexts/SidebarContext'
 import Image from 'next/image'
-import { Menu } from 'lucide-react'
 import { MobileMenuButton } from '@/app/dashboard/MobileMenuButton'
+import { Activity } from 'lucide-react'
+
 export default async function DashboardLayout({
     children,
 }: {
@@ -13,19 +14,14 @@ export default async function DashboardLayout({
     const supabase = await createClient()
 
     // Verify auth
+    /* 
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
         redirect('/login')
     }
+    */
+    const user = { email: 'mock@rating.ai', id: 'mock-user-id' } // Mock user for development
 
-    // Check onboarding status for sidebar badge
-    const { data: clinic } = await supabase
-        .from('clinics')
-        .select('rules')
-        .eq('owner_id', user.id)
-        .single()
-
-    const hasCompletedOnboarding = !!(clinic?.rules)
 
     return (
         <SidebarProvider>
@@ -33,14 +29,17 @@ export default async function DashboardLayout({
                 {/* Sidebar (Client Component com Active State Tracking) */}
                 <DashboardSidebar
                     email={user.email || undefined}
-                    hasCompletedOnboarding={hasCompletedOnboarding}
+                    hasCompletedOnboarding={true} // Por hora assumimos true, dps faremos a verif se tem nome
                 />
 
                 {/* Main Content */}
                 <main className="flex-1 flex flex-col h-screen overflow-y-auto">
                     <header className="h-16 border-b border-border bg-card flex items-center justify-between px-6 md:hidden shrink-0 sticky top-0 z-30">
-                        <div className="relative w-10 h-10">
-                            <Image src="/logos/nexus_logo_symbol.png" alt="Nexus Clínicas Symbol" fill className="object-contain" priority />
+                        <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
+                                <Activity className="w-5 h-5" />
+                            </div>
+                            <span className="font-bold tracking-tighter text-lg">Rating<span className="text-primary">.ai</span></span>
                         </div>
 
                         <MobileMenuButton />

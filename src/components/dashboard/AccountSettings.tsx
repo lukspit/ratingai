@@ -4,15 +4,17 @@ import { useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { User, CreditCard, LifeBuoy, LogOut, ExternalLink, Mail, Building, Calendar, Globe, MessageCircle } from 'lucide-react'
+import { User, CreditCard, LifeBuoy, LogOut, ExternalLink, Mail, Building, Calendar, Globe, MessageCircle, Briefcase } from 'lucide-react'
 
 interface AccountSettingsProps {
     user: {
         email?: string
     }
-    clinic: {
-        name?: string
-    }
+    profile: {
+        full_name?: string
+        oab?: string
+        onboarding_completed?: boolean
+    } | null
     subscription: {
         status: string
         current_period_end?: string
@@ -20,7 +22,7 @@ interface AccountSettingsProps {
     } | null
 }
 
-export function AccountSettings({ user, clinic, subscription }: AccountSettingsProps) {
+export function AccountSettings({ user, profile, subscription }: AccountSettingsProps) {
     const [isLoading, setIsLoading] = useState(false)
 
     const handleManageSubscription = async () => {
@@ -73,17 +75,24 @@ export function AccountSettings({ user, clinic, subscription }: AccountSettingsP
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                         <div className="p-4 bg-secondary/20 rounded-2xl border border-border/40 transition-colors hover:bg-secondary/30">
                             <div className="flex items-center gap-2 text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-1.5">
+                                <User className="w-3.5 h-3.5" />
+                                <span>Nome Completo</span>
+                            </div>
+                            <p className="font-medium text-foreground truncate">{profile?.full_name || 'Não informado'}</p>
+                        </div>
+                        <div className="p-4 bg-secondary/20 rounded-2xl border border-border/40 transition-colors hover:bg-secondary/30">
+                            <div className="flex items-center gap-2 text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-1.5">
+                                <Briefcase className="w-3.5 h-3.5" />
+                                <span>OAB</span>
+                            </div>
+                            <p className="font-medium text-foreground truncate">{profile?.oab || 'Não informado'}</p>
+                        </div>
+                        <div className="p-4 bg-secondary/20 rounded-2xl border border-border/40 transition-colors hover:bg-secondary/30 md:col-span-2">
+                            <div className="flex items-center gap-2 text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-1.5">
                                 <Mail className="w-3.5 h-3.5" />
                                 <span>E-mail de Acesso</span>
                             </div>
                             <p className="font-medium text-foreground truncate">{user.email || 'Não informado'}</p>
-                        </div>
-                        <div className="p-4 bg-secondary/20 rounded-2xl border border-border/40 transition-colors hover:bg-secondary/30">
-                            <div className="flex items-center gap-2 text-muted-foreground text-xs font-semibold uppercase tracking-wider mb-1.5">
-                                <Building className="w-3.5 h-3.5" />
-                                <span>Clínica</span>
-                            </div>
-                            <p className="font-medium text-foreground truncate">{clinic.name || 'Não configurada'}</p>
                         </div>
                     </div>
                 </CardContent>
@@ -107,7 +116,7 @@ export function AccountSettings({ user, clinic, subscription }: AccountSettingsP
                     <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between p-5 md:p-6 bg-blue-500/5 rounded-3xl border border-blue-500/10 gap-6">
                         <div className="space-y-2">
                             <div className="flex items-center gap-2">
-                                <span className="font-bold text-xl">Plano Nexus SaaS</span>
+                                <span className="font-bold text-xl">Plano TributaReview</span>
                                 {getStatusBadge(subscription?.status || 'inactive')}
                             </div>
                             {subscription?.current_period_end && (
@@ -143,55 +152,6 @@ export function AccountSettings({ user, clinic, subscription }: AccountSettingsP
                 </CardContent>
             </Card>
 
-            {/* Suporte e Ajuda */}
-            <Card className="border-none shadow-md overflow-hidden bg-card/50 backdrop-blur-sm">
-                <div className="h-1.5 bg-emerald-500/30" />
-                <CardHeader className="pb-4">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2.5 bg-emerald-500/10 rounded-xl">
-                            <LifeBuoy className="w-5 h-5 text-emerald-600" />
-                        </div>
-                        <div>
-                            <CardTitle className="text-xl">Suporte</CardTitle>
-                            <CardDescription>Precisa de auxílio?</CardDescription>
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <a
-                            href="https://wa.me/5511999999999"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-between p-5 bg-emerald-500/5 hover:bg-emerald-500/10 rounded-2xl border border-emerald-500/10 transition-all group shadow-sm active:scale-[0.98]"
-                        >
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-emerald-500/20 rounded-2xl flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-all">
-                                    <MessageCircle className="w-6 h-6" />
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-bold text-foreground">WhatsApp</p>
-                                    <p className="text-xs text-muted-foreground">Seg a Sex, 09h às 18h</p>
-                                </div>
-                            </div>
-                            <ArrowUpRight className="w-5 h-5 text-muted-foreground group-hover:text-emerald-500 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
-                        </a>
-
-                        <div className="flex items-center justify-between p-5 bg-secondary/20 rounded-2xl border border-border/40 opacity-50 grayscale">
-                            <div className="flex items-center gap-4">
-                                <div className="w-12 h-12 bg-secondary rounded-2xl flex items-center justify-center text-muted-foreground">
-                                    <Globe className="w-6 h-6" />
-                                </div>
-                                <div className="text-left">
-                                    <p className="font-bold text-foreground">Central de Ajuda</p>
-                                    <p className="text-xs text-muted-foreground uppercase tracking-widest font-bold opacity-50">Em breve</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-
             {/* Logout (Mobile focus) */}
             <div className="md:hidden pt-4 pb-6">
                 <form action="/auth/signout" method="post">
@@ -202,25 +162,5 @@ export function AccountSettings({ user, clinic, subscription }: AccountSettingsP
                 </form>
             </div>
         </div>
-    )
-}
-
-function ArrowUpRight(props: any) {
-    return (
-        <svg
-            {...props}
-            xmlns="http://www.w3.org/2000/svg"
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        >
-            <path d="M7 7h10v10" />
-            <path d="M7 17 17 7" />
-        </svg>
     )
 }

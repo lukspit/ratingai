@@ -1,9 +1,18 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { Activity, MessageCircle, SquareKanban, Smartphone, Network, Building2, LogOut, ChevronLeft, PanelLeftClose, PanelLeftOpen, Settings } from 'lucide-react'
+import {
+    BarChart,
+    FileText,
+    Settings,
+    LogOut,
+    PanelLeftClose,
+    PanelLeftOpen,
+    LayoutDashboard,
+    ShieldCheck,
+    Activity
+} from 'lucide-react'
 import { useSidebar } from '@/contexts/SidebarContext'
 
 interface DashboardSidebarProps {
@@ -19,42 +28,29 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
         {
             name: 'Dashboard',
             href: '/dashboard',
-            icon: Activity,
+            icon: LayoutDashboard,
             exact: true
         },
         {
-            name: 'Conversas',
-            href: '/dashboard/conversations',
-            icon: MessageCircle,
+            name: 'Simular CAPAG',
+            href: '/dashboard/analyses/new',
+            icon: Activity,
             exact: false
         },
         {
-            name: 'Kanban',
-            href: '/dashboard/kanban',
-            icon: SquareKanban,
+            name: 'Meus Relatórios',
+            href: '/dashboard/analyses',
+            icon: BarChart,
             exact: false
         },
         {
-            name: 'Conexão WhatsApp',
-            href: '/dashboard/whatsapp',
-            icon: Smartphone,
+            name: 'Base de Documentos',
+            href: '/dashboard/documents',
+            icon: FileText,
             exact: false
         },
         {
-            name: 'Integrações',
-            href: '/dashboard/integrations',
-            icon: Network,
-            exact: false
-        },
-        {
-            name: 'Minha Clínica',
-            href: '/dashboard/settings',
-            icon: Building2,
-            exact: false,
-            requiresOnboarding: true
-        },
-        {
-            name: 'Configurações',
+            name: 'Minha Conta',
             href: '/dashboard/account',
             icon: Settings,
             exact: false
@@ -64,14 +60,17 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
     const SidebarContent = (
         <>
             <div className={`p-6 flex items-center justify-center min-h-[6rem] transition-all duration-300 ${isCollapsed ? 'px-2' : 'px-6'}`}>
-                <div className="relative w-full h-10 flex items-center justify-center">
-                    {isCollapsed ? (
-                        <div className="relative w-10 h-10">
-                            <Image src="/logos/nexus_logo_symbol.png" alt="Nexus Clínicas Symbol" fill className="object-contain" priority />
+                <div className="relative w-full flex items-center justify-center">
+                    {!isCollapsed ? (
+                        <div className="text-2xl font-black tracking-tighter text-primary flex items-center gap-2">
+                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
+                                <Activity className="w-5 h-5" />
+                            </div>
+                            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Rating<span className="text-primary/50">.ai</span></span>
                         </div>
                     ) : (
-                        <div className="relative w-48 h-10">
-                            <Image src="/logos/nexus_logo_equalized.png" alt="Nexus Clínicas Logo" fill className="object-contain" priority />
+                        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
+                            <Activity className="w-6 h-6" />
                         </div>
                     )}
                 </div>
@@ -80,7 +79,6 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
             <nav className={`flex-1 space-y-2 mt-4 transition-all duration-300 ${isCollapsed ? 'px-2' : 'px-4'}`}>
                 {navItems.map((item) => {
                     const isActive = item.exact ? pathname === item.href : pathname?.startsWith(item.href)
-                    const needsBadge = item.requiresOnboarding && !hasCompletedOnboarding
 
                     return (
                         <Link
@@ -95,51 +93,15 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
                         >
                             <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-primary' : ''}`} />
                             {!isCollapsed && <span className="truncate">{item.name}</span>}
-
-                            {needsBadge && (
-                                <span className={`${isCollapsed ? 'absolute top-1 right-1' : 'ml-auto'} flex items-center gap-1`}>
-                                    <span className="relative flex h-2.5 w-2.5">
-                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
-                                        <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500" />
-                                    </span>
-                                </span>
-                            )}
                         </Link>
                     )
                 })}
             </nav>
 
-            {/* Aviso de setup pendente no rodapé da sidebar */}
-            {!hasCompletedOnboarding && (
-                <div className={`mx-4 mb-4 p-3 rounded-lg bg-orange-500/10 border border-orange-500/20 transition-all duration-300 ${isCollapsed ? 'mx-2 p-2' : 'mx-4'}`}>
-                    {isCollapsed ? (
-                        <div className="flex justify-center text-orange-500" title="Setup pendente">
-                            <div className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75" />
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-orange-500" />
-                            </div>
-                        </div>
-                    ) : (
-                        <>
-                            <p className="text-xs text-orange-400 font-medium leading-relaxed">
-                                ⚡ Configure sua clínica para a IA começar a atender seus pacientes.
-                            </p>
-                            <Link
-                                href="/dashboard/settings"
-                                onClick={() => isMobileMenuOpen && toggleMobileMenu()}
-                                className="mt-2 text-xs text-orange-400 underline underline-offset-2 hover:text-orange-300 transition-colors block"
-                            >
-                                Configurar agora →
-                            </Link>
-                        </>
-                    )}
-                </div>
-            )}
-
             <div className={`p-4 border-t border-border/40 transition-all duration-300 ${isCollapsed ? 'p-2' : 'p-4'}`}>
                 {!isCollapsed && (
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/20">
-                        <div className="text-sm truncate pr-2 text-muted-foreground">
+                        <div className="text-xs truncate pr-2 text-muted-foreground">
                             {email}
                         </div>
                     </div>
@@ -153,12 +115,6 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
                         {!isCollapsed && <span>Sair</span>}
                     </button>
                 </form>
-                {!isCollapsed && (
-                    <div className="flex items-center justify-between px-3 mt-4 text-[10px] text-muted-foreground/60">
-                        <Link href="/termos" target="_blank" className="hover:text-primary hover:underline transition-colors">Termos</Link>
-                        <Link href="/privacidade" target="_blank" className="hover:text-primary hover:underline transition-colors">Privacidade</Link>
-                    </div>
-                )}
             </div>
         </>
     )

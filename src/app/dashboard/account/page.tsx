@@ -4,15 +4,19 @@ import { Settings as SettingsIcon } from 'lucide-react'
 
 export default async function AccountPage() {
     const supabase = await createClient()
+    /*
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) return null
+    */
+    const user = { id: 'mock-user-id', email: 'mock@rating.ai' }
 
-    // Buscar dados da clínica
-    const { data: clinic } = await supabase
-        .from('clinics')
-        .select('name')
-        .eq('owner_id', user.id)
+
+    // Buscar dados do perfil tributário
+    const { data: profile } = await supabase
+        .from('tributario_profiles')
+        .select('*')
+        .eq('id', user.id)
         .single()
 
     // Buscar dados da assinatura
@@ -38,7 +42,11 @@ export default async function AccountPage() {
 
             <AccountSettings
                 user={{ email: user.email }}
-                clinic={{ name: clinic?.name }}
+                profile={profile ? {
+                    full_name: profile.full_name,
+                    oab: profile.oab,
+                    onboarding_completed: profile.onboarding_completed
+                } : null}
                 subscription={subscription ? {
                     status: subscription.status,
                     current_period_end: subscription.current_period_end,

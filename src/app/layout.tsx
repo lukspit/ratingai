@@ -13,12 +13,16 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nexus | Clínicas",
-  description: "A inteligência artificial que atende seus pacientes",
+  title: "Rating.ai | Inteligência Tributária",
+  description: "Revisão de capacidade de pagamento e redução de passivo tributário com IA",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Nexus",
+    title: "Rating.ai",
   },
   formatDetection: {
     telephone: false,

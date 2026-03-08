@@ -12,11 +12,10 @@ export async function registerWithSubscription(formData: FormData) {
 
     const email = formData.get('email') as string
     const password = formData.get('password') as string
-    const clinicName = formData.get('clinicName') as string
     const sessionId = formData.get('sessionId') as string
     const nome = formData.get('nome') as string
 
-    if (!email || !password || !clinicName || !nome) {
+    if (!email || !password || !nome) {
         return redirect(`/register?session_id=${sessionId}&error=Preencha todos os campos`)
     }
 
@@ -125,55 +124,17 @@ export async function registerWithSubscription(formData: FormData) {
         return redirect(`/login?error=${encodeURIComponent('Conta criada! Faça login para continuar.')}`)
     }
 
-    // 4. Verificar se já existe uma clínica para esse usuário
-    const { data: existingClinic } = await supabaseAdmin
-        .from('clinics')
-        .select('id')
-        .eq('owner_id', userId)
-        .single()
+    // 4. Criar ou atualizar perfil tributário
+    const { error: profileError } = await supabaseAdmin
+        .from('tributario_profiles')
+        .upsert({
+            id: userId,
+            full_name: nome
+        }, { onConflict: 'id' })
 
-    let clinicId = existingClinic?.id
-
-    // Se não tem clínica, cria uma nova
-    if (!clinicId) {
-        const { data: clinicData, error: clinicError } = await supabaseAdmin
-            .from('clinics')
-            .insert({
-                name: clinicName,
-                owner_id: userId,
-                assistant_name: 'Liz',
-            })
-            .select()
-            .single()
-
-        if (clinicError || !clinicData) {
-            console.error('Clinic Error:', JSON.stringify(clinicError))
-            const errorMsg = clinicError?.message || 'Erro ao criar clínica'
-            return redirect(`/register?session_id=${sessionId}&error=${encodeURIComponent(errorMsg)}`)
-        }
-
-        clinicId = clinicData.id
-
-        // Criar instância em branco associada a clínica
-        const { error: instanceError } = await supabaseAdmin
-            .from('instances')
-            .insert({
-                clinic_id: clinicId,
-                status: 'PROVISIONING'
-            })
-
-        if (instanceError) {
-            console.error('Instance Error:', instanceError)
-            // Não bloqueamos o registro, a clínica já foi criada.
-        }
+    if (profileError) {
+        console.error('Profile Error:', profileError)
     }
-
-    // 5. Vincular a subscription à clínica (pelo email do Stripe)
-    await supabaseAdmin
-        .from('subscriptions')
-        .update({ clinic_id: clinicId })
-        .eq('customer_email', stripeCustomerEmail)
-        .is('clinic_id', null)
 
     revalidatePath('/', 'layout')
     redirect('/dashboard')

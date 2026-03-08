@@ -1,95 +1,92 @@
-import { Check, X, LogIn, Zap, CalendarCheck, RefreshCw } from "lucide-react"
+import { Check, X, LogIn, FileText, Search, Download, ShieldCheck, Activity } from "lucide-react"
 import Link from "next/link"
-import Image from "next/image"
 import { VideoPlayer } from "./VideoPlayer"
 
 const plans = [
     {
-        name: "Plano Base",
-        price: "R$ 797",
+        name: "Plano Individual",
+        price: "R$ 497",
         period: "/mês",
-        description: "Profissionais em consultório particular que precisam automatizar o atendimento receptivo.",
+        description: "Ideal para advogados autônomos que estão começando a fazer transações tributárias.",
         features: [
-            "Atendimento IA agendador",
-            "Integração WhatsApp",
-            "Gestão de 1 agenda",
-            "Até 300 atendimentos/mês",
+            "Até 10 análises CAPAG/mês",
+            "Upload de Balanços e DREs",
+            "Identificação Automática de Débitos",
+            "Relatórios de Viabilidade (Texto)",
             "Suporte via e-mail",
         ],
         notIncluded: [
-            "Gestão de múltiplas agendas",
-            "IA Ativa (Follow-up de pacientes perdidos)",
-            "Disparo lógico de lembretes",
-            "Dashboard analítico completo",
-            "Suporte prioritário via WhatsApp",
+            "Relatórios em PDF Customizados",
+            "Análise de Grupo Econômico",
+            "Histórico Ilimitado",
+            "IA de Fundamentação Jurídica",
         ],
-        priceId: "price_1T6dZgJWP2qoq4Oj7KoZvogo",
-        cta: "Assinar o Base",
+        priceId: "price_basic_tributario", // Placeholder
+        cta: "Começar Agora",
         popular: false,
     },
     {
-        name: "Plano Pro",
+        name: "Plano Profissional",
         price: "R$ 997",
         period: "/mês",
-        description: "Clínicas que precisam de uma IA inteligente para recuperar leads e gerir múltiplos médicos.",
+        description: "Perfeito para escritórios que buscam escala e precisão em grandes transações.",
         features: [
-            "Tudo do plano Base",
-            "Até 1.500 atendimentos/mês",
-            "Gestão de até 3 agendas",
-            "IA Ativa: Follow-up de recuperação",
-            "Disparo automático de lembretes",
-            "Dashboard analítico avançado",
-            "Suporte prioritário via WhatsApp",
+            "Análises CAPAG Ilimitadas",
+            "Relatórios PDF com sua logo",
+            "IA de Fundamentação Jurídica",
+            "Análise de Grupo Econômico",
+            "Histórico de Análises Completo",
+            "Suporte prioritário",
         ],
         notIncluded: [
-            "SLA de Resposta Garantido",
+            "Consultoria Tributária via API",
             "Gerente de Sucesso dedicado",
         ],
-        priceId: "price_1T6dZmJWP2qoq4Oj5DvYRwYr",
+        priceId: "price_pro_tributario", // Placeholder
         cta: "Assinar o Pro",
         popular: true,
     },
     {
         name: "Enterprise",
-        price: "Custom",
+        price: "Sob Consulta",
         period: "",
-        description: "Redes de clínicas ou alto volume de consultas com necessidades personalizadas.",
+        description: "Escritórios full-service e redes de contabilidade com alto volume.",
         features: [
-            "Tudo do plano Pro",
-            "5.000+ atendimentos/mês",
-            "Agendas Ilimitadas (custom)",
-            "Treinamento de IA com dados internos",
-            "SLA de Tempo de Resposta",
-            "Customer Success Dedicado",
+            "Tudo do plano Profissional",
+            "Integração via API",
+            "Treinamento com dados específicos",
+            "Multi-usuários ilimitados",
+            "SLA de Suporte Garantido",
+            "Gerente de Sucesso Dedicado",
         ],
         notIncluded: [],
         priceId: "contact",
-        cta: "Falar com Vendas",
+        cta: "Falar com Consultor",
         popular: false,
     },
 ]
 
 const stats = [
     {
-        Icon: Zap,
-        title: "Resposta em segundos",
-        description: "A IA atende seus pacientes no WhatsApp a qualquer hora, inclusive de madrugada.",
-        color: "text-[#4A90E2]",
-        bg: "bg-[#4A90E2]/10",
+        Icon: Search,
+        title: "Análise em Segundos",
+        description: "Cruze balanços, DREs e débitos da PGFN instantaneamente com IA.",
+        color: "text-primary",
+        bg: "bg-primary/10",
     },
     {
-        Icon: CalendarCheck,
-        title: "Zero vagas perdidas",
-        description: "Agendamentos confirmados automaticamente, sem precisar de intervenção humana.",
-        color: "text-[#6DA08D]",
-        bg: "bg-[#6DA08D]/10",
+        Icon: Download,
+        title: "Relatórios de Especialista",
+        description: "Gere pareceres técnicos e pedidos de transação prontos para protocolar.",
+        color: "text-green-600",
+        bg: "bg-green-600/10",
     },
     {
-        Icon: RefreshCw,
-        title: "Pacientes recuperados",
-        description: "Follow-up automático para quem não respondeu ou estava prestes a desistir.",
-        color: "text-[#F59E0B]",
-        bg: "bg-[#F59E0B]/10",
+        Icon: ShieldCheck,
+        title: "Precisão Jurídica",
+        description: "IA treinada nas portarias da PGFN e critérios oficiais de rating CAPAG.",
+        color: "text-amber-600",
+        bg: "bg-amber-600/10",
     },
 ]
 
@@ -100,21 +97,18 @@ export default function PricingPage() {
             {/* Navbar */}
             <nav className="bg-white border-b border-[#E5E7EB] px-6 py-4">
                 <div className="mx-auto max-w-7xl flex items-center justify-between">
-                    <div className="relative h-9 w-40">
-                        <Image
-                            src="/logos/nexus_logo_equalized.png"
-                            alt="Nexus Clínicas"
-                            fill
-                            className="object-contain object-left"
-                            priority
-                        />
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+                            <Activity className="w-5 h-5" />
+                        </div>
+                        <span className="text-xl font-bold tracking-tight text-primary">Rating.ai</span>
                     </div>
                     <Link
                         href="/login"
-                        className="inline-flex items-center gap-2 rounded-lg border border-[#4A90E2] px-4 py-2 text-sm font-medium text-[#4A90E2] transition-colors hover:bg-[#4A90E2] hover:text-white"
+                        className="inline-flex items-center gap-2 rounded-lg border border-primary px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-white"
                     >
                         <LogIn className="h-4 w-4" />
-                        Já sou cliente
+                        Acessar Painel
                     </Link>
                 </div>
             </nav>
@@ -122,16 +116,16 @@ export default function PricingPage() {
             {/* Hero + Vídeo */}
             <div className="bg-[#0A0F1E] px-6 pt-16 pb-24">
                 <div className="mx-auto max-w-3xl text-center">
-                    <span className="inline-block rounded-full bg-[#4A90E2]/15 border border-[#4A90E2]/30 px-4 py-1.5 text-sm font-semibold text-[#4A90E2] mb-6">
-                        Como funciona na prática
+                    <span className="inline-block rounded-full bg-primary/15 border border-primary/30 px-4 py-1.5 text-sm font-semibold text-primary mb-6 text-indigo-400">
+                        Inteligência Artificial Tributária
                     </span>
                     <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-[56px] lg:leading-tight">
-                        Pare de perder consultas.{' '}
-                        <span className="text-[#4A90E2]">Sua clínica no piloto automático,</span>{' '}
-                        24h por dia.
+                        Reduza dívidas tributárias em até{' '}
+                        <span className="text-primary italic text-indigo-400">70%</span>{' '}
+                        com análises CAPAG precisas.
                     </h1>
                     <p className="mx-auto mt-6 max-w-2xl text-lg text-white/55 leading-relaxed">
-                        Veja como a Nexus responde seus pacientes no WhatsApp, agenda consultas e recupera quem quase desistiu, enquanto você trabalha ou descansa.
+                        Pare de perder dias cruzando planilhas. Nossa IA analisa balanços e débitos automaticamente, gerando relatórios de transação prontos para uso.
                     </p>
                 </div>
 
@@ -166,14 +160,14 @@ export default function PricingPage() {
 
             {/* Header dos planos */}
             <div className="mx-auto max-w-7xl px-6 pt-14 pb-4 text-center">
-                <span className="inline-block rounded-full bg-[#4A90E2]/10 px-4 py-1.5 text-sm font-semibold text-[#4A90E2] mb-4">
-                    Planos e Assinaturas
+                <span className="inline-block rounded-full bg-primary/10 px-4 py-1.5 text-sm font-semibold text-primary mb-4">
+                    Assinaturas
                 </span>
                 <h2 className="text-4xl font-bold tracking-tight text-[#111827] sm:text-5xl">
-                    Escolha o plano ideal para a sua clínica
+                    O plano certo para o seu escritório
                 </h2>
                 <p className="mx-auto mt-4 max-w-2xl text-lg text-[#6B7280]">
-                    Automatize seus agendamentos 24/7 com IA e libere sua equipe para focar no que realmente importa: atender bem.
+                    Ganhe escala na recuperação de créditos e transações tributárias com tecnologia de ponta.
                 </p>
             </div>
 
@@ -184,14 +178,14 @@ export default function PricingPage() {
                         <div
                             key={plan.name}
                             className={`relative flex flex-col rounded-2xl border p-8 transition-shadow hover:shadow-lg ${plan.popular
-                                ? "border-[#4A90E2] bg-white shadow-md ring-2 ring-[#4A90E2]/20"
+                                ? "border-primary bg-white shadow-md ring-2 ring-primary/20"
                                 : "border-[#E5E7EB] bg-white shadow-sm"
                                 }`}
                         >
                             {plan.popular && (
                                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                                    <span className="inline-flex items-center rounded-full bg-[#4A90E2] px-4 py-1 text-xs font-semibold text-white shadow-sm">
-                                        ⭐ Mais Assinado
+                                    <span className="inline-flex items-center rounded-full bg-primary px-4 py-1 text-xs font-semibold text-white shadow-sm">
+                                        ⭐ Mais Escolhido
                                     </span>
                                 </div>
                             )}
@@ -205,7 +199,7 @@ export default function PricingPage() {
                                 </p>
 
                                 <div className="mt-6 flex items-baseline gap-1">
-                                    <span className={`text-4xl font-bold tracking-tight ${plan.popular ? "text-[#4A90E2]" : "text-[#111827]"}`}>
+                                    <span className={`text-4xl font-bold tracking-tight ${plan.popular ? "text-primary" : "text-[#111827]"}`}>
                                         {plan.price}
                                     </span>
                                     {plan.period && (
@@ -220,7 +214,7 @@ export default function PricingPage() {
                                 <ul className="space-y-3">
                                     {plan.features.map((feature) => (
                                         <li key={feature} className="flex items-start gap-3 text-sm text-[#374151]">
-                                            <Check className="mt-0.5 h-4 w-4 flex-none text-[#6DA08D]" />
+                                            <Check className="mt-0.5 h-4 w-4 flex-none text-green-600" />
                                             {feature}
                                         </li>
                                     ))}
@@ -235,11 +229,11 @@ export default function PricingPage() {
 
                             <Link
                                 href={plan.priceId === "contact"
-                                    ? "https://wa.me/seunumerodevendas"
+                                    ? "https://wa.me/5511999999999"
                                     : `/api/stripe/checkout?priceId=${plan.priceId}`}
                                 className={`mt-8 block w-full rounded-xl py-3 text-center text-sm font-semibold transition-all ${plan.popular
-                                    ? "bg-[#4A90E2] text-white hover:bg-[#3a7acc] shadow-sm hover:shadow-md"
-                                    : "border border-[#4A90E2] text-[#4A90E2] hover:bg-[#4A90E2] hover:text-white"
+                                    ? "bg-primary text-white hover:bg-primary/90 shadow-sm hover:shadow-md"
+                                    : "border border-primary text-primary hover:bg-primary hover:text-white"
                                     }`}
                             >
                                 {plan.cta}
@@ -249,7 +243,7 @@ export default function PricingPage() {
                 </div>
 
                 <p className="mt-10 text-center text-sm text-[#9CA3AF]">
-                    Todos os planos incluem 7 dias de teste grátis. Cancele quando quiser.
+                    Faturamento via Boleto ou Cartão. Upgrade ou downgrade a qualquer momento.
                 </p>
             </div>
         </div>
