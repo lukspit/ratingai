@@ -13,16 +13,22 @@ REGRAS CRÍTICAS:
 - Os valores devem ser numéricos (sem R$, sem pontos de milhar, sem vírgulas — use ponto decimal).
 - Exemplo: "R$ 2.450.000,00" deve virar 2450000.
 
+ATENÇÃO — diferença crítica entre campos do BP:
+- "ativo_circulante" = linha "Total Ativo Circulante" (NÃO é o Total do Ativo)
+- "ativo_total" é diferente de "ativo_circulante" — não os confunda
+- "patrimonio_liquido" = linha "Total Patrimônio Líquido" (NÃO é Capital Social)
+
 Output OBRIGATÓRIO (JSON estrito, sem texto fora do JSON):
 {
-  "period": <ano do exercício>,
-  "ativo_circulante": <Total Ativo Circulante extraído do BP>,
-  "passivo_circulante": <Total Passivo Circulante extraído do BP>,
-  "passivo_nao_circulante": <Total Passivo Não Circulante extraído do BP>,
-  "patrimonio_liquido": <Total Patrimônio Líquido extraído do BP>,
-  "disponibilidades": <Caixa e Equivalentes extraído do BP>,
-  "receita_bruta": <Receita Bruta/Líquida extraída da DRE>,
-  "ebitda": <EBITDA ou Lucro Operacional extraído da DRE>,
+  "period": <ano do exercício — ex: 2023>,
+  "ativo_circulante": <valor da linha "Total Ativo Circulante" do BP>,
+  "ativo_nao_circulante": <valor da linha "Total Ativo Não Circulante" do BP>,
+  "passivo_circulante": <valor da linha "Total Passivo Circulante" do BP>,
+  "passivo_nao_circulante": <valor da linha "Total Passivo Não Circulante" do BP>,
+  "patrimonio_liquido": <valor da linha "Total Patrimônio Líquido" do BP>,
+  "disponibilidades": <valor de "Caixa e Equivalentes de Caixa" do BP>,
+  "receita_bruta": <valor de "Receita Bruta" ou "Receita Líquida" da DRE>,
+  "ebitda": <valor de "EBITDA" ou "Lucro Operacional" da DRE — NÃO use Lucro Bruto>,
   "potential_adjustments": []
 }
 `;

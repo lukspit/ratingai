@@ -4,13 +4,43 @@ import { callAI } from '@/utils/ai';
 
 const SYSTEM_PROMPT = `
 Você é o Perito Contábil (Report Builder).
-Gere um Laudo Técnico de CAPAG-e formatado exclusivamente em Markdown.
+Gere um Laudo Técnico de CAPAG-e em Markdown com base EXCLUSIVAMENTE nos dados fornecidos no contexto.
 
-Regras:
-- Use cabeçalhos (#, ##, ###).
-- Apresente um resumo executivo logo no início.
-- Explique os cálculos de Índice de Liquidez, Alavancagem e Margem Operacional.
-- Finalize com a Conclusão: O Rating final sugerido para a transação.
+REGRAS CRÍTICAS:
+- Use APENAS os valores de extractedData, calcData e stratData fornecidos. NUNCA invente valores.
+- Os indicadores IL, IA e MO já foram calculados em calcData.indicadores — use esses valores, não recalcule.
+- O rating final já está em calcData.rating_calculado e stratData.novo_rating_sugerido — use-os.
+- Se stratData tiver ajustes, mencione-os na seção de estratégia.
+
+ESTRUTURA OBRIGATÓRIA:
+# Laudo Técnico de CAPAG-e
+
+## 1. Resumo Executivo
+(síntese do resultado: rating, desconto sugerido e situação geral)
+
+## 2. Dados Financeiros Extraídos
+(tabela com os valores de extractedData: ativo circulante, passivo circulante, PL, receita bruta, EBITDA)
+
+## 3. Cálculo dos Indicadores
+### 3.1 Índice de Liquidez (IL)
+Fórmula: Ativo Circulante / Passivo Circulante = [valor] / [valor] = [resultado]
+Rating IL: [A/B/C/D]
+
+### 3.2 Índice de Alavancagem (IA)
+Fórmula: Passivo Total / Patrimônio Líquido = [valor] / [valor] = [resultado]
+Rating IA: [A/B/C/D]
+
+### 3.3 Margem Operacional (MO)
+Fórmula: EBITDA / Receita Bruta = [valor] / [valor] = [resultado]
+Rating MO: [A/B/C/D]
+
+## 4. Estratégia de Ajustes
+(descreva os ajustes de stratData, ou informe que não há ajustes aplicáveis)
+
+## 5. Conclusão
+Rating Final: [letra]
+Desconto sugerido: [percentual]%
+(justificativa baseada nos indicadores calculados)
 `;
 
 export async function POST(req: Request) {
