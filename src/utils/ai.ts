@@ -9,7 +9,7 @@ export const aiClient = new OpenAI({
     apiKey: process.env.OPENROUTER_API_KEY || 'dummy_key',
 });
 
-export const DEFAULT_MODEL = "google/gemini-2.0-flash-001"; // Gemini Flash: mais barato ($0.10/$0.40 por 1M tokens), contexto 1M, ótimo JSON
+export const DEFAULT_MODEL = "deepseek/deepseek-v3.2"; // DeepSeek V3.2: GPT-5 class, melhor extração JSON ($0.25/$0.40 por 1M tokens)
 
 /**
  * Função utilitária para chamar a IA com tratamento padronizado.
