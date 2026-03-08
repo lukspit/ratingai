@@ -72,19 +72,24 @@ export async function POST(req: Request) {
         const rFinal = worstRating([rIL, rIA, rMO]);
         const desconto = DESCONTO[rFinal];
 
-        console.log(`[CALCULATOR] IL=${il.toFixed(4)}(${rIL}) IA=${ia.toFixed(4)}(${rIA}) MO=${(mo*100).toFixed(2)}%(${rMO}) → Rating ${rFinal}`);
+        // Cálculo de economia estimada
+        const economia_estimada = passivo_total * (desconto / 100);
+
+        console.log(`[CALCULATOR] IL=${il.toFixed(4)}(${rIL}) IA=${ia.toFixed(4)}(${rIA}) MO=${(mo * 100).toFixed(2)}%(${rMO}) → Rating ${rFinal}`);
 
         // ── IA apenas para gerar texto de justificativa ──────────────────
         const messages = [
             { role: 'user', content: JUSTIFICATIVA_PROMPT(il, ia, mo, rIL, rIA, rMO, rFinal) }
         ];
-        const justificativa = await callAI(messages, false) || `Rating ${rFinal}: IL=${il.toFixed(2)}, IA=${ia.toFixed(2)}, MO=${(mo*100).toFixed(1)}%.`;
+        const justificativa = await callAI(messages, false) || `Rating ${rFinal}: IL=${il.toFixed(2)}, IA=${ia.toFixed(2)}, MO=${(mo * 100).toFixed(1)}%.`;
 
         const calcData = {
             indicadores: { il, ia, mo, rating_il: rIL, rating_ia: rIA, rating_mo: rMO },
             rating_calculado: rFinal,
             rating_justificativa: justificativa,
-            desconto_sugerido_percentual: desconto
+            desconto_sugerido_percentual: desconto,
+            passivo_total: passivo_total,
+            economia_estimada: economia_estimada
         };
 
         // Salvar resultado

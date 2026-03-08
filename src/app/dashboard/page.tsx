@@ -23,19 +23,40 @@ export default async function DashboardPage() {
         .eq('id', user.id)
         .single()
 
+    // Buscar todas as análises do usuário para calcular métricas
+    const { data: allAnalyses } = await supabase
+        .from('tributario_analyses')
+        .select('*')
+        .eq('user_id', user.id)
+
     // Saudação baseada no horário
     const hour = new Date().getHours()
     let greeting = 'Boa noite'
     if (hour >= 5 && hour < 12) greeting = 'Bom dia'
     else if (hour >= 12 && hour < 18) greeting = 'Boa tarde'
 
-    // Métricas básicas (Placeholder por enquanto, depois buscaremos do banco real)
-    const totalAnalyses = 0
-    const pendingAnalyses = 0
-    const completedAnalyses = 0
+    // Métricas reais
+    const completedAnalysesList = allAnalyses?.filter(a => a.status === 'completed') || []
+    const totalAnalyses = allAnalyses?.length || 0
+    const completedAnalyses = completedAnalysesList.length
 
-    // Lista de Análises Recentes (vazia por enquanto)
-    const recentAnalyses: any[] = []
+    // Agregação de valores monetários a partir do calc_json
+    const metrics = completedAnalysesList.reduce((acc, curr) => {
+        const calc = curr.calc_json || {}
+        return {
+            passivo: acc.passivo + (Number(calc.passivo_total) || 0),
+            economia: acc.economia + (Number(calc.economia_estimada) || 0)
+        }
+    }, { passivo: 0, economia: 0 })
+
+    // Lista de Análises Recentes (últimas 5)
+    const recentAnalyses = allAnalyses
+        ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+        .slice(0, 5) || []
+
+    const formatCurrency = (value: number) => {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
+    }
 
     return (
         <div className="space-y-8 animate-in fade-in zoom-in duration-500 pb-12">
@@ -63,7 +84,7 @@ export default async function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-baseline gap-2">
-                            <div className="text-3xl font-bold tracking-tighter">R$ 0,00</div>
+                            <div className="text-3xl font-bold tracking-tighter">{formatCurrency(metrics.passivo)}</div>
                         </div>
                         <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
                             <TrendingUp className="h-3 w-3 text-primary" />
@@ -82,7 +103,7 @@ export default async function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-baseline gap-2">
-                            <div className="text-3xl font-bold tracking-tighter text-secondary">R$ 0,00</div>
+                            <div className="text-3xl font-bold tracking-tighter text-secondary">{formatCurrency(metrics.economia)}</div>
                         </div>
                         <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
                             <CheckCircle2 className="h-3 w-3 text-secondary" />
@@ -101,7 +122,7 @@ export default async function DashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <div className="flex items-baseline gap-2">
-                            <div className="text-3xl font-bold tracking-tighter text-accent">0</div>
+                            <div className="text-3xl font-bold tracking-tighter text-accent">{completedAnalyses}</div>
                         </div>
                         <p className="text-[11px] text-muted-foreground mt-2 flex items-center gap-1">
                             <Activity className="h-3 w-3 text-accent" />
@@ -132,7 +153,31 @@ export default async function DashboardPage() {
                             </div>
                         ) : (
                             <div className="space-y-4">
-                                {/* Aqui mapearemos as análises recentes */}
+                                {recentAnalyses.map((analysis) => (
+                                    <Link key={analysis.id} href={`/dashboard/analyses/${analysis.id}`}>
+                                        <div className="flex items-center justify-between p-3 rounded-lg border border-border/40 hover:bg-accent/5 hover:border-primary/30 transition-all cursor-pointer group">
+                                            <div className="flex items-center gap-3">
+                                                <div className="p-2 bg-primary/5 rounded-md group-hover:bg-primary/10 transition-colors">
+                                                    <FileText className="h-4 w-4 text-primary" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-sm font-semibold">{analysis.company_name}</p>
+                                                    <p className="text-[10px] text-muted-foreground">
+                                                        {new Date(analysis.created_at).toLocaleDateString('pt-BR')}
+                                                        {analysis.status === 'completed' ? ' · Concluído' : ' · ' + analysis.status}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {analysis.original_rating && (
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded border border-primary/20 bg-primary/5 text-primary">
+                                                        Rating {analysis.original_rating}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </Link>
+                                ))}
                             </div>
                         )}
                     </CardContent>
