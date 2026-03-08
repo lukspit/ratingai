@@ -41,7 +41,7 @@ export async function POST(req: Request) {
                     const isDespacho = file.name.toLowerCase().includes('despacho') || file.name.toLowerCase().includes('passivo');
 
                     let mockContent = "[Erro de Extração PDF - Usando Fallback de Dados Simulado]\n";
-                    if (isDre) mockContent += "Receita Bruta: R$ 5.000.000,00\nLucro Bruto: R$ 2.300.000,00\nLucro Operacional: R$ 1.000.000,00\n";
+                    if (isDre) mockContent += "Receita Bruta de Vendas: R$ 5.000.000,00\nReceita Liquida de Vendas: R$ 4.800.000,00\nLucro Bruto: R$ 2.300.000,00\nLucro Operacional (EBITDA): R$ 1.000.000,00\n";
                     if (isBp) mockContent += "Ativo Circulante: R$ 2.450.000,00\nAtivo Nao Circulante: R$ 1.650.000,00\nAtivo Total: R$ 4.100.000,00\nPassivo Circulante: R$ 2.050.000,00\nPassivo Nao Circulante: R$ 800.000,00\nPatrimônio Líquido: R$ 1.250.000,00\n";
                     if (isDespacho) mockContent += "TOTAL DA DÍVIDA TRIBUTÁRIA ATIVA: R$ 1.000.000,00\nO cenário indica que a empresa apresenta capacidade de pagamento grau C/D.\n";
                     if (!isDre && !isBp && !isDespacho) mockContent += "Valores genéricos inseridos para manter consistência da POC.";

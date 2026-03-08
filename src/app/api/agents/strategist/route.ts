@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
         const messages = [
             { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: `Dados Atuais:\nExtrato: ${JSON.stringify(extractedData)}\nCálculo: ${JSON.stringify(calcData)}` }
+            { role: 'user', content: `Analise os ajustes e retorne em JSON.\n\nExtrato: ${JSON.stringify(extractedData)}\nCálculo: ${JSON.stringify(calcData)}` }
         ];
 
         const stratData = await callAI(messages, true);

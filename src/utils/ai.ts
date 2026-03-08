@@ -9,7 +9,7 @@ export const aiClient = new OpenAI({
     apiKey: process.env.OPENROUTER_API_KEY || 'dummy_key',
 });
 
-export const DEFAULT_MODEL = "openai/gpt-4o-mini"; // Usando gpt-4o-mini via OpenRouter como fallback rápido, ou pode ser "deepseek/deepseek-chat"
+export const DEFAULT_MODEL = "google/gemini-2.0-flash-001"; // Gemini Flash: mais barato ($0.10/$0.40 por 1M tokens), contexto 1M, ótimo JSON
 
 /**
  * Função utilitária para chamar a IA com tratamento padronizado.

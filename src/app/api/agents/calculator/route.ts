@@ -53,7 +53,7 @@ export async function POST(req: Request) {
         // Call AI 2: Calculator
         const messages = [
             { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: `Dados extraídos:\n${JSON.stringify(extractedData, null, 2)}` }
+            { role: 'user', content: `Calcule os indicadores CAPAG-e e retorne em JSON.\n\nDados extraídos:\n${JSON.stringify(extractedData, null, 2)}` }
         ];
 
         const calcData = await callAI(messages, true);

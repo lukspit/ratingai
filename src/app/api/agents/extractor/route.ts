@@ -57,7 +57,7 @@ export async function POST(req: Request) {
         // Call AI 1: Extractor
         const messages = [
             { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: `Texto extraído dos documentos:\n\n${documentsText.substring(0, 15000)}` }
+            { role: 'user', content: `Extraia os dados financeiros e retorne em JSON.\n\nTexto dos documentos:\n\n${documentsText.substring(0, 15000)}` }
         ];
 
         const extractedData = await callAI(messages, true);
