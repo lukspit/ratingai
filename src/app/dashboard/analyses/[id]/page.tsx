@@ -1,5 +1,4 @@
 import { createClient } from '@/utils/supabase/server'
-import { createAdminClient } from '@/utils/supabase/admin'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -71,31 +70,26 @@ function StatusBadge({ status }: { status: string }) {
 export default async function AnalysisDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params
 
-    // Usa admin client para leitura — bypassa RLS e garante acesso aos dados
-    const admin = createAdminClient()
     const supabase = await createClient()
 
     // Verifica autenticação
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) notFound()
 
-    // Busca todos os dados em paralelo
-    const [analysisRes, docsRes, adjRes] = await Promise.all([
-        admin.from('tributario_analyses').select('*').eq('id', id).eq('user_id', user.id).single(),
-        admin.from('tributario_documents').select('*').eq('analysis_id', id),
-        admin.from('tributario_adjustments').select('*').eq('analysis_id', id),
+    // Busca análise + ajustes em paralelo — tudo via supabase regular (RLS garante acesso próprio)
+    const [analysisRes, adjRes] = await Promise.all([
+        supabase.from('tributario_analyses').select('*').eq('id', id).eq('user_id', user.id).single(),
+        supabase.from('tributario_adjustments').select('*').eq('analysis_id', id),
     ])
 
     if (!analysisRes.data) notFound()
 
     const analysis = analysisRes.data
-    const docs = docsRes.data || []
     const adjustments = adjRes.data || []
 
-    const calcDoc = docs.find((d: any) => d.document_type === 'CALC_DATA')
-    const reportDoc = docs.find((d: any) => d.document_type === 'REPORT_MARKDOWN')
-    const calcData = calcDoc?.extracted_data || null
-    const reportMarkdown: string = reportDoc?.extracted_data?.markdown || ''
+    // Dados agora salvos diretamente em tributario_analyses
+    const calcData = analysis.calc_json || null
+    const reportMarkdown: string = analysis.report_markdown || ''
 
     const ind = calcData?.indicadores || {}
     const hasData = calcData || reportMarkdown

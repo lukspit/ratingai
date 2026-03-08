@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { createAdminClient } from '@/utils/supabase/admin';
 import { callAI } from '@/utils/ai';
 
 const SYSTEM_PROMPT = `
@@ -21,39 +20,28 @@ export async function POST(req: Request) {
         if (!analysisId) return NextResponse.json({ error: 'Missing analysisId' }, { status: 400 });
 
         const supabase = await createClient();
-        const admin = createAdminClient();
 
         const messages = [
             { role: 'system', content: SYSTEM_PROMPT },
             { role: 'user', content: `Contexto do Cliente:\nExtrato: ${JSON.stringify(extractedData)}\nCálculo: ${JSON.stringify(calcData)}\nEstratégia: ${JSON.stringify(stratData)}` }
         ];
 
-        // Call AI 4: Builder (Output is Markdown Text)
         const markdownReport = await callAI(messages, false);
 
         if (!markdownReport) throw new Error("Failed to generate report.");
 
-        // Finaliza análise com status completed
+        // Salva laudo markdown + status diretamente em tributario_analyses (sem depender de tabela separada)
         const { error: updateError } = await supabase
             .from('tributario_analyses')
-            .update({ status: 'completed' })
+            .update({
+                status: 'completed',
+                report_markdown: markdownReport
+            })
             .eq('id', analysisId);
 
         if (updateError) {
-            console.error('Builder: failed to update status', updateError);
-        }
-
-        // Salva laudo como documento — admin bypassa RLS
-        const { error: docError } = await admin
-            .from('tributario_documents')
-            .insert([{
-                analysis_id: analysisId,
-                document_type: 'REPORT_MARKDOWN',
-                extracted_data: { markdown: markdownReport }
-            }]);
-
-        if (docError) {
-            console.error('Builder: failed to save report document', docError);
+            console.error('Builder: failed to save report', updateError);
+            throw new Error(`Erro ao salvar laudo: ${updateError.message}`);
         }
 
         return NextResponse.json({ success: true, markdownReport });

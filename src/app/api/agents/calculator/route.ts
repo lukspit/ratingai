@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { createAdminClient } from '@/utils/supabase/admin';
 import { callAI } from '@/utils/ai';
 
 const SYSTEM_PROMPT = `
@@ -29,7 +28,6 @@ export async function POST(req: Request) {
         }
 
         const supabase = await createClient();
-        const admin = createAdminClient();
 
         // Call AI 2: Calculator
         const messages = [
@@ -43,31 +41,19 @@ export async function POST(req: Request) {
             throw new Error("Failed to parse AI 2 response.");
         }
 
-        // Salvar rating na tabela de análises
+        // Salvar rating + calcData completo diretamente na tabela de análises
         const { error: updateError } = await supabase
             .from('tributario_analyses')
             .update({
                 original_rating: calcData.rating_calculado,
                 simulated_rating: calcData.rating_calculado,
-                potential_discount_percentage: calcData.desconto_sugerido_percentual || 0
+                potential_discount_percentage: calcData.desconto_sugerido_percentual || 0,
+                calc_json: calcData
             })
             .eq('id', analysisId);
 
         if (updateError) {
             console.error('Calculator: failed to update analysis', updateError);
-        }
-
-        // Salvar calcData completo (indicadores) como documento — admin bypassa RLS
-        const { error: docError } = await admin
-            .from('tributario_documents')
-            .insert([{
-                analysis_id: analysisId,
-                document_type: 'CALC_DATA',
-                extracted_data: calcData
-            }]);
-
-        if (docError) {
-            console.error('Calculator: failed to save calc document', docError);
         }
 
         return NextResponse.json({ success: true, calcData });
