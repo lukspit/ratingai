@@ -31,9 +31,10 @@ export async function POST(req: Request) {
                 const buffer = Buffer.from(arrayBuffer);
                 try {
                     const data = await pdfParse(buffer);
+                    console.log(`[PDF-PARSE OK] ${file.name} — ${data.text.length} caracteres extraídos`);
                     combinedText += `\n--- ARQUIVO: ${file.name} ---\n${data.text}\n`;
                 } catch (pdfError) {
-                    console.error('Erro ao ler PDF:', pdfError);
+                    console.error(`[PDF-PARSE FALHOU] ${file.name}:`, pdfError);
                     // MOCK FALLBACK GIVEN PARSE ERROR TO ENSURE AI CONTINUES
                     const isDre = file.name.toLowerCase().includes('dre');
                     const isBp = file.name.toLowerCase().includes('bp') || file.name.toLowerCase().includes('balanço');
