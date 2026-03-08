@@ -14,14 +14,14 @@ interface SidebarContextType {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined)
 
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
-    const [isCollapsed, setIsCollapsed] = useState(false)
+    const [isCollapsed, setIsCollapsed] = useState(true)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     // Opcional: Persistir o estado no localStorage
     useEffect(() => {
         const saved = localStorage.getItem('sidebar-collapsed')
-        if (saved === 'true') {
-            setIsCollapsed(true)
+        if (saved !== null) {
+            setIsCollapsed(saved === 'true')
         }
     }, [])
 
