@@ -2,42 +2,45 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { callAI } from '@/utils/ai';
 
-const SYSTEM_PROMPT = `
-Você é o Atuário de Riscos (Calculator) PGFN.
-Calcule os indicadores de CAPAG-e com base nos dados fornecidos, usando EXATAMENTE os valores recebidos.
-
-FÓRMULAS OBRIGATÓRIAS:
-1. IL (Índice de Liquidez) = ativo_circulante / passivo_circulante
-2. IA (Índice de Alavancagem) = passivo_total / patrimonio_liquido
-   - passivo_total = passivo_circulante + passivo_nao_circulante
-   - Se patrimonio_liquido for 0 ou null, use 9999 (alavancagem máxima)
-3. MO (Margem Operacional) = ebitda / receita_bruta
-   - Se receita_bruta for 0 ou null, use 0
-
-TABELA DE RATING POR INDICADOR:
-- IL: A(>1.5) | B(1.0-1.5) | C(0.5-1.0) | D(<0.5)
-- IA: A(<1.0) | B(1.0-2.0) | C(2.0-4.0) | D(>4.0)
-- MO: A(>0.15) | B(0.05-0.15) | C(0-0.05) | D(<0)
-
-RATING FINAL = o pior rating individual entre IL, IA e MO.
-
-DESCONTOS SUGERIDOS (Portaria 6.757/2022):
-- A: 0% | B: 30% | C: 50% | D: 70%
-
-Output OBRIGATÓRIO (JSON estrito, sem texto fora do JSON):
-{
-  "indicadores": {
-    "il": <valor calculado, 4 casas decimais>,
-    "ia": <valor calculado, 4 casas decimais>,
-    "mo": <valor calculado, 4 casas decimais>,
-    "rating_il": "<A|B|C|D>",
-    "rating_ia": "<A|B|C|D>",
-    "rating_mo": "<A|B|C|D>"
-  },
-  "rating_calculado": "<A|B|C|D>",
-  "rating_justificativa": "<explicação dos indicadores e por que o rating final é esse>",
-  "desconto_sugerido_percentual": <número inteiro>
+// Funções de rating por indicador (Portaria PGFN 6.757/2022)
+function ratingIL(il: number): string {
+    if (il > 1.5) return 'A';
+    if (il >= 1.0) return 'B';
+    if (il >= 0.5) return 'C';
+    return 'D';
 }
+
+function ratingIA(ia: number): string {
+    if (ia < 1.0) return 'A';
+    if (ia < 2.0) return 'B';
+    if (ia < 4.0) return 'C';
+    return 'D';
+}
+
+function ratingMO(mo: number): string {
+    if (mo > 0.15) return 'A';
+    if (mo >= 0.05) return 'B';
+    if (mo >= 0) return 'C';
+    return 'D';
+}
+
+function worstRating(ratings: string[]): string {
+    const order = ['A', 'B', 'C', 'D'];
+    return ratings.reduce((worst, r) => order.indexOf(r) > order.indexOf(worst) ? r : worst, 'A');
+}
+
+const DESCONTO: Record<string, number> = { A: 0, B: 30, C: 50, D: 70 };
+
+const JUSTIFICATIVA_PROMPT = (il: number, ia: number, mo: number, rIL: string, rIA: string, rMO: string, rFinal: string) => `
+Você é um perito contábil tributário. Escreva em 2-3 frases uma justificativa técnica para o rating CAPAG-e calculado.
+
+Dados calculados:
+- IL (Índice de Liquidez) = ${il.toFixed(4)} → Rating ${rIL}
+- IA (Índice de Alavancagem) = ${ia.toFixed(4)} → Rating ${rIA}
+- MO (Margem Operacional) = ${(mo * 100).toFixed(2)}% → Rating ${rMO}
+- Rating Final: ${rFinal} (pior entre os três indicadores)
+
+Responda apenas com o texto da justificativa, sem introdução.
 `;
 
 export async function POST(req: Request) {
@@ -50,25 +53,47 @@ export async function POST(req: Request) {
 
         const supabase = await createClient();
 
-        // Call AI 2: Calculator
+        // ── CÁLCULOS EM CÓDIGO (não em IA) ──────────────────────────────
+        const ac = Number(extractedData.ativo_circulante) || 0;
+        const pc = Number(extractedData.passivo_circulante) || 0;
+        const pcnc = Number(extractedData.passivo_nao_circulante) || 0;
+        const pl = Number(extractedData.patrimonio_liquido) || 0;
+        const ebitda = Number(extractedData.ebitda) || 0;
+        const rb = Number(extractedData.receita_bruta) || 0;
+
+        const il = pc > 0 ? ac / pc : 0;
+        const passivo_total = pc + pcnc;
+        const ia = pl > 0 ? passivo_total / pl : 9999;
+        const mo = rb > 0 ? ebitda / rb : 0;
+
+        const rIL = ratingIL(il);
+        const rIA = ratingIA(ia);
+        const rMO = ratingMO(mo);
+        const rFinal = worstRating([rIL, rIA, rMO]);
+        const desconto = DESCONTO[rFinal];
+
+        console.log(`[CALCULATOR] IL=${il.toFixed(4)}(${rIL}) IA=${ia.toFixed(4)}(${rIA}) MO=${(mo*100).toFixed(2)}%(${rMO}) → Rating ${rFinal}`);
+
+        // ── IA apenas para gerar texto de justificativa ──────────────────
         const messages = [
-            { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: `Calcule os indicadores CAPAG-e e retorne em JSON.\n\nDados extraídos:\n${JSON.stringify(extractedData, null, 2)}` }
+            { role: 'user', content: JUSTIFICATIVA_PROMPT(il, ia, mo, rIL, rIA, rMO, rFinal) }
         ];
+        const justificativa = await callAI(messages, false) || `Rating ${rFinal}: IL=${il.toFixed(2)}, IA=${ia.toFixed(2)}, MO=${(mo*100).toFixed(1)}%.`;
 
-        const calcData = await callAI(messages, true);
+        const calcData = {
+            indicadores: { il, ia, mo, rating_il: rIL, rating_ia: rIA, rating_mo: rMO },
+            rating_calculado: rFinal,
+            rating_justificativa: justificativa,
+            desconto_sugerido_percentual: desconto
+        };
 
-        if (!calcData || !calcData.rating_calculado) {
-            throw new Error("Failed to parse AI 2 response.");
-        }
-
-        // Salvar rating + calcData completo diretamente na tabela de análises
+        // Salvar resultado
         const { error: updateError } = await supabase
             .from('tributario_analyses')
             .update({
-                original_rating: calcData.rating_calculado,
-                simulated_rating: calcData.rating_calculado,
-                potential_discount_percentage: calcData.desconto_sugerido_percentual || 0,
+                original_rating: rFinal,
+                simulated_rating: rFinal,
+                potential_discount_percentage: desconto,
                 calc_json: calcData
             })
             .eq('id', analysisId);
