@@ -3,79 +3,88 @@ import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { callAI } from '@/utils/ai';
 
-const SYSTEM_PROMPT = `
-Você é o Advogado Tributarista (Strategist).
-Com base nos dados extraídos e nos indicadores calculados, identifique ajustes contábeis legítimos que possam melhorar as condições de negociação do contribuinte em uma Transação Tributária com a PGFN.
+const TIPO_LABEL: Record<string, string> = {
+    receita_nao_recorrente: 'Receita Não Recorrente',
+    despesa_nao_recorrente: 'Despesa Não Recorrente',
+    depreciacao: 'Depreciação / Amortização',
+    doacao_patrocinio: 'Doação / Patrocínio',
+    emprestimo_socio: 'Empréstimo de Sócio (Mútuo)',
+    passivo_tributario_contestado: 'Passivo Tributário Contestado',
+};
 
-REGRAS:
-- Somente proponha ajustes fundamentados na Portaria PGFN 6.757/2022 ou legislação vigente.
-- Ajustes típicos: exclusão de receitas não recorrentes, reclassificação de passivos tributários contestados judicialmente, ajuste de EBITDA por itens extraordinários.
-- Se não houver ajustes aplicáveis, retorne ajustes_aplicados como lista vazia.
-- O novo_rating_sugerido deve ser o rating que resultaria APÓS os ajustes. Se não há ajustes, mantenha o rating calculado.
+const SYSTEM_PROMPT = `
+Você é um Advogado Tributarista sênior especialista em Transação Tributária com a PGFN (Portaria 6.757/2022).
+
+Sua função é VALIDAR JURIDICAMENTE os ajustes contábeis já identificados e calculados pelo sistema.
+NÃO invente novos ajustes. Forneça fundamentação legal precisa para cada ajuste recebido.
+
+Para cada ajuste, indique:
+1. O artigo específico da Portaria PGFN nº 6.757/2022 (ou outra norma aplicável) que o autoriza
+2. Uma descrição técnica explicando por que é excluível
+3. Qual indicador melhora (IL, IA, MO ou combinação)
 
 Output OBRIGATÓRIO (JSON estrito, sem texto fora do JSON):
 {
-  "tese_principal": "<descrição da tese jurídica ou 'Sem ajustes aplicáveis' se não houver>",
-  "fundamentacao_legal": "<artigos relevantes da Portaria 6.757/2022 ou legislação aplicável>",
-  "ajustes_aplicados": [
+  "tese_principal": "<argumento central do laudo em 2-3 frases>",
+  "ajustes_validados": [
     {
-      "description": "<descrição do ajuste>",
-      "original_value": <valor original>,
-      "adjusted_value": <valor ajustado>,
-      "category": "<DRE|BP|GERAL>"
+      "item": "<nome do item>",
+      "tipo": "<tipo do ajuste>",
+      "valor": <valor numérico>,
+      "impacto_indicador": "<IL|IA|MO|IA+PL>",
+      "fundamento_legal": "<Artigo X, §Y, da Portaria PGFN nº 6.757/2022>",
+      "descricao_tecnica": "<explicação técnica em 1-2 frases>"
     }
   ],
-  "novo_rating_sugerido": "<A|B|C|D — baseado nos dados reais após ajustes>"
+  "proximo_passo": "<ação concreta recomendada ao contribuinte>",
+  "rating_contestado": "<A|B|C|D>"
 }
 `;
 
 export async function POST(req: Request) {
     try {
-        const { analysisId, extractedData, calcData } = await req.json();
+        const { analysisId, calcData } = await req.json();
 
         if (!analysisId) return NextResponse.json({ error: 'Missing analysisId' }, { status: 400 });
 
         const supabase = await createClient();
         const admin = createAdminClient();
 
+        const ajustesAplicados = calcData?.ajustes_aplicados || [];
+        const ratingBase = calcData?.cenario_base?.rating || 'N/A';
+        const ratingAjustado = calcData?.cenario_ajustado?.rating || 'N/A';
+        const ganho = calcData?.ganho_do_laudo || 0;
+
+        const userContent = ajustesAplicados.length > 0
+            ? `Valide juridicamente os ajustes abaixo.\n\nRating PGFN Presumido: ${ratingBase}\nRating Após Ajustes: ${ratingAjustado}\nGanho estimado: R$ ${ganho.toLocaleString('pt-BR')}\n\nAjustes aplicados:\n${JSON.stringify(ajustesAplicados, null, 2)}`
+            : `Nenhum ajuste foi identificado nos documentos. Rating PGFN: ${ratingBase}. Redija a tese explicando que o rating presumido reflete a real capacidade de pagamento e recomende próximos passos para o contribuinte buscar dados adicionais.`;
+
         const messages = [
             { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: `Analise os ajustes e retorne em JSON.\n\nExtrato: ${JSON.stringify(extractedData)}\nCálculo: ${JSON.stringify(calcData)}` }
+            { role: 'user', content: userContent }
         ];
 
         const stratData = await callAI(messages, true);
 
-        if (!stratData) throw new Error("Failed to parse AI 3 response.");
+        if (!stratData) throw new Error("Falha ao parsear resposta da IA.");
 
-        // Atualizar simulated rating
-        if (stratData.novo_rating_sugerido) {
-            const { error: updateError } = await supabase
+        if (stratData.rating_contestado) {
+            await supabase
                 .from('tributario_analyses')
-                .update({ simulated_rating: stratData.novo_rating_sugerido })
+                .update({ simulated_rating: stratData.rating_contestado })
                 .eq('id', analysisId);
-
-            if (updateError) {
-                console.error('Strategist: failed to update simulated rating', updateError);
-            }
         }
 
-        // Inserir ajustes usando admin — bypassa RLS
-        if (stratData.ajustes_aplicados?.length > 0) {
-            const inserts = stratData.ajustes_aplicados.map((a: any) => ({
+        if (stratData.ajustes_validados?.length > 0) {
+            const inserts = stratData.ajustes_validados.map((a: any) => ({
                 analysis_id: analysisId,
-                description: a.description,
-                original_value: a.original_value,
-                adjusted_value: a.adjusted_value,
-                category: a.category || 'GERAL'
+                description: `[${TIPO_LABEL[a.tipo] || a.tipo}] ${a.item} — ${a.fundamento_legal}`,
+                original_value: a.valor,
+                adjusted_value: 0,
+                category: (a.impacto_indicador?.includes('IA') || a.impacto_indicador?.includes('PL')) ? 'BALANÇO' : 'DRE'
             }));
 
-            const { error: adjError } = await admin
-                .from('tributario_adjustments')
-                .insert(inserts);
-
-            if (adjError) {
-                console.error('Strategist: failed to save adjustments', adjError);
-            }
+            await admin.from('tributario_adjustments').insert(inserts);
         }
 
         return NextResponse.json({ success: true, stratData });

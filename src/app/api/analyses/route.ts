@@ -9,6 +9,8 @@ export async function POST(req: Request) {
         const files = formData.getAll('files') as File[];
         const companyName = formData.get('companyName') as string;
         const cnpj = formData.get('cnpj') as string;
+        const valorDivida = formData.get('valorDivida') as string;
+        const modalidade = formData.get('modalidade') as string;
 
         if (!files || files.length === 0) {
             return NextResponse.json({ error: 'Nenhum arquivo enviado.' }, { status: 400 });
@@ -61,7 +63,9 @@ export async function POST(req: Request) {
                     user_id: userId,
                     company_name: companyName || 'Empresa Em Análise',
                     cnpj_target: cnpj || '',
-                    status: 'pending'
+                    status: 'pending',
+                    valor_divida_tributaria: valorDivida ? parseFloat(valorDivida) : null,
+                    modalidade_transacao: modalidade || null
                 }
             ])
             .select()
