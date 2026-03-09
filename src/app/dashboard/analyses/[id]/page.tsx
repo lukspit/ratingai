@@ -372,12 +372,12 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
                                 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:text-slate-800 [&_h2]:uppercase [&_h2]:tracking-wider
                                 [&_h3]:text-base [&_h3]:font-bold [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-slate-700
                                 [&_p]:text-sm [&_p]:text-slate-600 [&_p]:leading-relaxed [&_p]:mb-4
-                                [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-8 [&_ol]:mb-8
-                                [&_ol>li]:font-semibold [&_ol>li]:text-slate-900 [&_ol>li]:text-lg [&_ol>li]:border-b [&_ol>li]:border-slate-200/60 [&_ol>li]:pb-2
-                                [&_ol>li::marker]:text-primary [&_ol>li::marker]:font-bold
-                                [&_ul]:list-none [&_ul]:pl-2 [&_ul]:space-y-3 [&_ul]:mt-4
-                                [&_ul>li]:relative [&_ul>li]:pl-5 [&_ul>li]:text-sm [&_ul>li]:text-slate-600 [&_ul>li]:leading-relaxed [&_ul>li]:font-normal
-                                [&_ul>li::before]:content-[''] [&_ul>li::before]:absolute [&_ul>li::before]:left-0 [&_ul>li::before]:top-[10px] [&_ul>li::before]:w-1.5 [&_ul>li::before]:h-1.5 [&_ul>li::before]:bg-primary/60 [&_ul>li::before]:rounded-full
+                                [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-2 [&_ol]:mb-6
+                                [&_ol>li]:text-sm [&_ol>li]:text-slate-600 [&_ol>li]:leading-relaxed
+                                [&_ol>li::marker]:text-slate-400 [&_ol>li::marker]:font-semibold
+                                [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-2 [&_ul]:mb-6
+                                [&_ul>li]:text-sm [&_ul>li]:text-slate-600 [&_ul>li]:leading-relaxed
+                                [&_ul>li::marker]:text-slate-400
                                 [&_strong]:text-slate-900 [&_strong]:font-bold
                                 [&_em]:text-slate-500 [&_em]:italic
                                 [&_hr]:border-slate-200 [&_hr]:my-10
