@@ -65,7 +65,7 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
             <div className={`p-6 flex items-center justify-center min-h-[6rem] transition-all duration-300 ${isCollapsed ? 'px-2' : 'px-6'}`}>
                 <div className="relative w-full flex items-center justify-center">
                     {!isCollapsed ? (
-                        <div className="relative h-12 w-full">
+                        <div className="relative h-20 w-full scale-150 overflow-visible">
                             <Image
                                 src="/logos/logo_horizontal.png"
                                 alt="Rating.ai Logo"
@@ -75,7 +75,7 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
                             />
                         </div>
                     ) : (
-                        <div className="relative h-10 w-10">
+                        <div className="relative h-14 w-14 scale-150 overflow-visible">
                             <Image
                                 src="/logos/logo_symbol.png"
                                 alt="Rating.ai Logo"
