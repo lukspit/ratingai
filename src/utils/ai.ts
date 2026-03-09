@@ -9,7 +9,7 @@ export const aiClient = new OpenAI({
     apiKey: process.env.OPENROUTER_API_KEY || 'dummy_key',
 });
 
-export const DEFAULT_MODEL = "google/gemini-3.1-flash-lite-preview"; // Gemini 3.1 Flash Lite: raciocínio forte (GPQA 86.9%), mais rápido e barato ($0.25/$1.50 por 1M tokens)
+export const DEFAULT_MODEL = "deepseek/deepseek-chat"; // DeepSeek V3: melhor raciocínio lógico-contábil para identificar ajustes ocultos e cruzar dados.
 
 /**
  * Função utilitária para chamar a IA com tratamento padronizado.
