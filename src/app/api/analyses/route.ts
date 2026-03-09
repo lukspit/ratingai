@@ -16,13 +16,14 @@ export async function POST(req: Request) {
     }
 
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: authData, error: authError } = await supabase.auth.getUser();
 
-    if (!user) {
-      return NextResponse.json({ error: 'Não autenticado.' }, { status: 401 });
+    if (authError || !authData?.user) {
+      console.error('[AUTH ERROR] User not found or session expired:', authError);
+      return NextResponse.json({ error: 'Sessão expirada ou usuário não autenticado.' }, { status: 401 });
     }
 
-    const userId = user.id;
+    const userId = authData.user.id;
 
     // 1. CRIAR REGISTRO DA ANÁLISE PRIMEIRO (para ter o ID para os documentos)
     const { data: analysis, error: analysisError } = await supabase
@@ -33,7 +34,7 @@ export async function POST(req: Request) {
           company_name: companyName || 'Empresa Em Análise',
           cnpj_target: cnpj || '',
           status: 'pending',
-          valor_divida_tributaria: valorDivida ? parseFloat(valorDivida) : null,
+          valor_divida_tributaria: valorDivida && !isNaN(parseFloat(valorDivida)) ? parseFloat(valorDivida) : null,
           modalidade_transacao: modalidade || null
         }
       ])
@@ -41,7 +42,8 @@ export async function POST(req: Request) {
       .single();
 
     if (analysisError) {
-      throw analysisError;
+      console.error('[DB ERROR] Criando análise:', analysisError);
+      return NextResponse.json({ error: `Erro ao criar análise no banco de dados: ${analysisError.message}` }, { status: 500 });
     }
 
     const analysisId = analysis.id;
@@ -57,21 +59,22 @@ export async function POST(req: Request) {
 
         // a. Extrair texto para a IA
         try {
+          console.log(`[PDF-PARSE] Iniciando extração de ${file.name} (${file.size} bytes)`);
           const parser = new PDFParse({ data: buffer });
           const data = await parser.getText();
           await parser.destroy();
           const extractedText = data.text || '';
 
           if (extractedText.trim().length < 50) {
-            console.warn(`[PDF-PARSE AVISO] ${file.name} — Texto insuficiente (${extractedText.length} chars). Pode ser imagem ou protegido.`);
-            combinedText += `\n--- ARQUIVO: ${file.name} (Texto Insuficiente/Imagem) ---\n[O PDF parece ser uma imagem ou está protegido. Os dados podem não ser extraídos corretamente.]\n`;
+            console.warn(`[PDF-PARSE AVISO] ${file.name} — Texto insuficiente (${extractedText.length} chars).`);
+            combinedText += `\n--- ARQUIVO: ${file.name} (Texto Insuficiente/Imagem) ---\n[O PDF parece ser uma imagem ou está protegido.]\n`;
           } else {
             console.log(`[PDF-PARSE OK] ${file.name} — ${extractedText.length} caracteres extraídos`);
             combinedText += `\n--- ARQUIVO: ${file.name} ---\n${extractedText}\n`;
           }
-        } catch (pdfError) {
+        } catch (pdfError: any) {
           console.error(`[PDF-PARSE FALHOU] ${file.name}:`, pdfError);
-          combinedText += `\n--- ARQUIVO: ${file.name} (Erro na Extração) ---\n[Falha técnica ao extrair texto deste documento.]\n`;
+          combinedText += `\n--- ARQUIVO: ${file.name} (Erro na Extração: ${pdfError.message}) ---\n`;
         }
 
         // b. Salvar arquivo no Storage
@@ -116,12 +119,15 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      analysisId: analysis.id,
+      analysisId: analysisId,
       documentsText: combinedText
     });
 
   } catch (error: any) {
-    console.error('API Error /analyses:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('API Error /analyses (Unexpected):', error);
+    return NextResponse.json({
+      error: `Erro inesperado no servidor: ${error.message}`,
+      details: error.stack
+    }, { status: 500 });
   }
 }
