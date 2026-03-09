@@ -11,7 +11,9 @@ import {
     PanelLeftOpen,
     LayoutDashboard,
     ShieldCheck,
-    Activity
+    Activity,
+    Sparkles,
+    History
 } from 'lucide-react'
 import { useSidebar } from '@/contexts/SidebarContext'
 
@@ -34,13 +36,13 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
         {
             name: 'Simular CAPAG',
             href: '/dashboard/analyses/new',
-            icon: Activity,
+            icon: Sparkles,
             exact: false
         },
         {
             name: 'Meus Relatórios',
             href: '/dashboard/analyses',
-            icon: BarChart,
+            icon: History,
             exact: false
         },
         {
