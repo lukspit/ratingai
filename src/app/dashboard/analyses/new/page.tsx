@@ -99,10 +99,18 @@ export default function NewAnalysisPage() {
 
             const uploadRes = await fetch('/api/analyses', { method: 'POST', body: formData })
             if (!uploadRes.ok) {
-                const errData = await uploadRes.json().catch(() => ({}))
-                throw new Error(`[Upload] ${errData.error || uploadRes.statusText}`)
+                const errText = await uploadRes.text().catch(() => "Não foi possível ler o corpo da resposta")
+                let serverError = uploadRes.statusText
+                try {
+                    const errData = JSON.parse(errText)
+                    serverError = errData.error || serverError
+                } catch (e) {
+                    serverError = errText.substring(0, 150)
+                }
+                throw new Error(`[Upload ${uploadRes.status}] ${serverError}`)
             }
-            const { analysisId, documentsText } = await uploadRes.json()
+            const resBody = await uploadRes.json().catch(() => ({}))
+            const { analysisId, documentsText } = resBody
 
             // STEP 1: Extractor
             setPipelineStep(0)

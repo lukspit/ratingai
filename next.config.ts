@@ -8,7 +8,7 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  serverExternalPackages: ['pdf-parse-debugging-disabled'],
+  serverExternalPackages: ['pdf-parse'],
 };
 
 export default nextConfig;
