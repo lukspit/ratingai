@@ -1,0 +1,98 @@
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+import fs from 'fs';
+
+async function testExtractor() {
+    try {
+        const { callAI } = await import('./src/utils/ai.ts');
+        const pdfText = `
+Balanco Patrimonial 2023
+Empresa: Saas Tributario LTDA
+CNPJ: 12.345.678/0001-90
+
+ATIVO CIRCULANTE:
+Caixa e Equivalentes de Caixa: 450.000,00
+Total Ativo Circulante: 1.200.000,00
+
+PASSIVO CIRCULANTE
+Total Passivo Circulante: 800.000,00
+
+Patrimonio Liquido
+Total Patrimonio Liquido: 400.000,00
+
+DRE 2023
+Receita Bruta: 5.000.000,00
+EBITDA: 1.000.000,00
+Outras Receitas (Venda de Imovel): 200.000,00
+Depreciacao: 50.000,00
+        `;
+
+        const SYSTEM_PROMPT = `
+Você é um Auditor Contábil especialista em CAPAG-e e Transação Tributária com a PGFN.
+Leia os documentos contábeis (DRE, Balanço Patrimonial e DFC) e extraia DOIS conjuntos de dados:
+
+1. DADOS BASE: os valores principais dos demonstrativos
+2. ITENS AJUSTÁVEIS: linhas que podem ser excluídas ou ajustadas legalmente para reduzir o CAPAG-e
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REGRAS CRÍTICAS DE EXTRAÇÃO:
+- NUNCA invente valores. Use apenas os números presentes no texto.
+- Se um valor não estiver no texto, use null.
+- Valores numéricos sem R$, pontos ou vírgulas (ex: "R$ 2.450.000,00" → 2450000).
+- "ativo_circulante" = linha "Total Ativo Circulante" (NÃO é o Total do Ativo)
+- "patrimonio_liquido" = linha "Total Patrimônio Líquido" (NÃO é Capital Social)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ITENS AJUSTÁVEIS — o que procurar (Portaria PGFN 6.757/2022):
+
+- RECEITAS NÃO RECORRENTES (DRE): venda de imóvel/ativo fixo, indenizações, reversão de provisões, dividendos atípicos
+- DESPESAS NÃO RECORRENTES (DRE): multas judiciais, perdas por roubo/sinistro, provisões para contingências de baixa probabilidade
+- DEPRECIAÇÃO/AMORTIZAÇÃO (DRE): de ativos essenciais para operação (é lançamento não-caixa)
+- DOAÇÕES/PATROCÍNIOS/MARKETING INSTITUCIONAL (DRE): despesas não essenciais para continuidade
+- EMPRÉSTIMOS DE SÓCIOS (BP - Passivo): mútuos de sócios que podem ser capitalizados
+- PASSIVOS TRIBUTÁRIOS CONTESTADOS (BP - Passivo): tributos com impugnação, recurso ou garantia judicial
+
+Para cada item, descreva com precisão. Se NÃO encontrar itens ajustáveis, retorne lista vazia.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Output OBRIGATÓRIO (JSON estrito, sem texto fora do JSON):
+{
+  "period": <ano do exercício>,
+  "ativo_circulante": <Total Ativo Circulante do BP>,
+  "ativo_nao_circulante": <Total Ativo Não Circulante do BP>,
+  "passivo_circulante": <Total Passivo Circulante do BP>,
+  "passivo_nao_circulante": <Total Passivo Não Circulante do BP>,
+  "patrimonio_liquido": <Total Patrimônio Líquido do BP>,
+  "disponibilidades": <Caixa e Equivalentes de Caixa do BP>,
+  "receita_bruta": <Receita Bruta ou Receita Líquida da DRE>,
+  "ebitda": <EBITDA ou Lucro Operacional da DRE — NÃO use Lucro Bruto>,
+  "depreciacao_amortizacao": <D&A da DRE, se houver>,
+  "fco_operacional": <Fluxo de Caixa Operacional do DFC método direto, se disponível>,
+  "itens_ajustaveis": [
+    {
+      "item": "<nome exato da linha contábil>",
+      "descricao": "<o que é e por que pode ser ajustado>",
+      "valor": <valor numérico>,
+      "origem": "<DRE|BP_PASSIVO|BP_ATIVO|DFC>",
+      "tipo": "<receita_nao_recorrente|despesa_nao_recorrente|depreciacao|doacao_patrocinio|emprestimo_socio|passivo_tributario_contestado>"
+    }
+  ]
+}
+`;
+
+        const messages = [
+            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'user', content: `Extraia os dados financeiros e os itens ajustáveis. Retorne em JSON.\n\nDocumentos:\n\n${pdfText}` }
+        ];
+
+        console.log("Chamando a IA (Extractor)...");
+        const extractedData = await callAI(messages, true);
+
+        console.log("\n--- RESULTADO (Extracted Data) ---");
+        console.log(JSON.stringify(extractedData, null, 2));
+    } catch (e) {
+        console.error("Error calling AI:", e);
+    }
+}
+
+testExtractor();

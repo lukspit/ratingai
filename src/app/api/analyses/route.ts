@@ -53,6 +53,7 @@ export async function POST(req: Request) {
 
     // 2. LER OS ARQUIVOS PDF E SALVAR NO STORAGE + DB
     let combinedText = '';
+    let totalExtractedLength = 0;
     const documentRecords = [];
 
     for (const file of files) {
@@ -63,10 +64,9 @@ export async function POST(req: Request) {
         // a. Extrair texto para a IA
         try {
           console.log(`[PDF-PARSE] Iniciando extração de ${file.name} (${file.size} bytes)`);
-          const { PDFParse } = await import('pdf-parse');
-          const parser = new PDFParse({ data: buffer });
-          const data = await parser.getText();
-          await parser.destroy();
+          // @ts-ignore
+          const pdfParse = (await import('pdf-parse-debugging-disabled')).default;
+          const data = await pdfParse(buffer);
           const extractedText = data.text || '';
 
           if (extractedText.trim().length < 50) {
@@ -75,10 +75,11 @@ export async function POST(req: Request) {
           } else {
             console.log(`[PDF-PARSE OK] ${file.name} — ${extractedText.length} caracteres extraídos`);
             combinedText += `\n--- ARQUIVO: ${file.name} ---\n${extractedText}\n`;
+            totalExtractedLength += extractedText.trim().length;
           }
         } catch (pdfError: any) {
           console.error(`[PDF-PARSE FALHOU] ${file.name}:`, pdfError);
-          combinedText += `\n--- ARQUIVO: ${file.name} (Erro na Extração: ${pdfError.message}) ---\n`;
+          combinedText += `\n--- ARQUIVO: ${file.name} (Erro na Extração: O PDF não pôde ser lido.) ---\n`;
         }
 
         // b. Salvar arquivo no Storage
@@ -119,6 +120,12 @@ export async function POST(req: Request) {
         console.error('[DB ERROR] Salvando documentos:', docError);
         // Se der erro de coluna, pelo menos a análise foi criada.
       }
+    }
+
+    if (totalExtractedLength < 100) {
+      return NextResponse.json({
+        error: 'Nenhum texto contábil pôde ser extraído dos documentos enviados. Verifique se os PDFs não estão protegidos por senha e se não são apenas imagens digitalizadas.'
+      }, { status: 400 });
     }
 
     return NextResponse.json({
