@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
 import { callAI } from '@/utils/ai';
+import { searchKnowledge } from '@/utils/knowledge';
 
 const TIPO_LABEL: Record<string, string> = {
     receita_nao_recorrente: 'Receita Não Recorrente',
@@ -55,12 +56,22 @@ export async function POST(req: Request) {
         const ratingAjustado = calcData?.cenario_ajustado?.rating || 'N/A';
         const ganho = calcData?.ganho_do_laudo || 0;
 
+        // Busca chunks relevantes da base de conhecimento para fundamentar as citações legais
+        const knowledgeChunks = await searchKnowledge(
+            'ajuste EBITDA receita não recorrente Portaria 6757 artigos fundamento legal CAPAG transação tributária',
+            5
+        );
+
+        const systemWithKnowledge = knowledgeChunks
+            ? `${SYSTEM_PROMPT}\n\n## BASE DE CONHECIMENTO (use para citar artigos corretos)\n\n${knowledgeChunks}`
+            : SYSTEM_PROMPT;
+
         const userContent = ajustesAplicados.length > 0
             ? `Valide juridicamente os ajustes abaixo.\n\nRating PGFN Presumido: ${ratingBase}\nRating Após Ajustes: ${ratingAjustado}\nGanho estimado: R$ ${ganho.toLocaleString('pt-BR')}\n\nAjustes aplicados:\n${JSON.stringify(ajustesAplicados, null, 2)}`
             : `Nenhum ajuste foi identificado nos documentos. Rating PGFN: ${ratingBase}. Redija a tese explicando que o rating presumido reflete a real capacidade de pagamento e recomende próximos passos para o contribuinte buscar dados adicionais.`;
 
         const messages = [
-            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'system', content: systemWithKnowledge },
             { role: 'user', content: userContent }
         ];
 

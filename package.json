@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:knowledge": "curl -X POST http://localhost:3000/api/admin/seed-knowledge -H 'Content-Type: application/json' -d '{\"secret\":\"'$SEED_SECRET'\"}'"
   },
   "dependencies": {
     "@supabase/ssr": "^0.8.0",

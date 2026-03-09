@@ -112,7 +112,6 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
                         </div>
                     </div>
                 </div>
-                <PrintButton />
             </div>
 
             {/* Print header */}
@@ -333,31 +332,69 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
                 </div>
             )}
 
-            {/* ── Laudo Técnico ─────────────────────────────────────────────── */}
+            {/* ── Laudo Técnico Formal ──────────────────────────────────────── */}
             {reportMarkdown && (
-                <div className="rounded-2xl bg-card border border-border/50 shadow-lg p-6 md:p-8 space-y-4">
-                    <div className="flex items-center gap-2 pb-3 border-b border-border/50">
-                        <FileText className="w-5 h-5 text-primary" />
-                        <h2 className="font-bold text-base">Laudo Técnico Completo</h2>
-                        <span className="ml-auto text-xs text-muted-foreground">Portaria PGFN 6.757/2022 · Rating.ai</span>
+                <div className="space-y-4">
+                    {/* Header externo com botão de exportar */}
+                    <div className="flex items-center justify-between print:hidden">
+                        <div className="flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-primary" />
+                            <h2 className="font-bold text-base">Laudo Pericial Formal</h2>
+                        </div>
+                        <PrintButton />
                     </div>
-                    <div className="
-                        [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mt-8 [&_h1]:mb-3 [&_h1]:text-foreground [&_h1]:border-b [&_h1]:border-border/50 [&_h1]:pb-2
-                        [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-2 [&_h2]:text-foreground
-                        [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-1.5 [&_h3]:text-foreground
-                        [&_p]:text-sm [&_p]:text-muted-foreground [&_p]:leading-relaxed [&_p]:mb-3
-                        [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_ul]:mb-3
-                        [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-1 [&_ol]:mb-3
-                        [&_li]:text-sm [&_li]:text-muted-foreground
-                        [&_strong]:text-foreground [&_strong]:font-semibold
-                        [&_hr]:border-border/50 [&_hr]:my-6
-                        [&_blockquote]:border-l-4 [&_blockquote]:border-primary/50 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-muted-foreground [&_blockquote]:bg-primary/5 [&_blockquote]:py-2 [&_blockquote]:rounded-r-lg [&_blockquote]:mb-3
-                        [&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono
-                        [&_table]:w-full [&_table]:text-sm [&_table]:border-collapse [&_table]:mb-4
-                        [&_th]:border [&_th]:border-border/50 [&_th]:p-2 [&_th]:text-left [&_th]:bg-muted/50 [&_th]:font-semibold [&_th]:text-xs
-                        [&_td]:border [&_td]:border-border/50 [&_td]:p-2 [&_td]:text-muted-foreground [&_td]:text-xs
-                    ">
-                        <ReactMarkdown>{reportMarkdown}</ReactMarkdown>
+
+                    {/* Documento formal */}
+                    <div className="rounded-2xl border border-border/60 shadow-xl overflow-hidden">
+                        {/* Topo do documento — header oficial */}
+                        <div className="bg-slate-900 border-b border-slate-700 px-8 py-5 flex items-center justify-between print:bg-white print:border-slate-300">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                                    <Scale className="w-4 h-4 text-primary" />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-primary/80">Rating.ai</p>
+                                    <p className="text-[10px] text-muted-foreground">Sistema Especialista em CAPAG-e</p>
+                                </div>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Portaria PGFN nº 6.757/2022</p>
+                                <p className="text-[10px] text-muted-foreground">
+                                    {new Date(analysis.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* Corpo do documento */}
+                        <div className="bg-white text-slate-800 px-8 md:px-12 py-10 print:px-8 print:py-6">
+                            <div className="
+                                [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:text-slate-900 [&_h1]:border-b-2 [&_h1]:border-slate-200 [&_h1]:pb-2 [&_h1]:tracking-tight
+                                [&_h2]:text-base [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-slate-800 [&_h2]:uppercase [&_h2]:tracking-wide [&_h2]:border-l-4 [&_h2]:border-primary [&_h2]:pl-3
+                                [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:text-slate-700
+                                [&_p]:text-sm [&_p]:text-slate-600 [&_p]:leading-7 [&_p]:mb-3 [&_p]:text-justify
+                                [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1.5 [&_ul]:mb-4
+                                [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1.5 [&_ol]:mb-4
+                                [&_li]:text-sm [&_li]:text-slate-600 [&_li]:leading-6
+                                [&_strong]:text-slate-900 [&_strong]:font-semibold
+                                [&_em]:text-slate-500 [&_em]:italic
+                                [&_hr]:border-slate-200 [&_hr]:my-8
+                                [&_blockquote]:border-l-4 [&_blockquote]:border-primary/40 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-500 [&_blockquote]:bg-slate-50 [&_blockquote]:py-3 [&_blockquote]:px-4 [&_blockquote]:rounded-r-lg [&_blockquote]:mb-4
+                                [&_code]:bg-slate-100 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono [&_code]:text-slate-700 [&_code]:border [&_code]:border-slate-200
+                                [&_table]:w-full [&_table]:text-sm [&_table]:border-collapse [&_table]:mb-6 [&_table]:shadow-sm
+                                [&_thead]:bg-slate-100
+                                [&_th]:border [&_th]:border-slate-300 [&_th]:p-2.5 [&_th]:text-left [&_th]:font-semibold [&_th]:text-xs [&_th]:text-slate-700 [&_th]:uppercase [&_th]:tracking-wide
+                                [&_td]:border [&_td]:border-slate-200 [&_td]:p-2.5 [&_td]:text-slate-600 [&_td]:text-sm
+                                [&_tr:nth-child(even)_td]:bg-slate-50/50
+                            ">
+                                <ReactMarkdown>{reportMarkdown}</ReactMarkdown>
+                            </div>
+
+                            {/* Rodapé do documento */}
+                            <div className="mt-12 pt-6 border-t-2 border-slate-200 flex items-center justify-between text-[10px] text-slate-400">
+                                <span>Gerado por Rating.ai — Sistema Especialista em CAPAG-e</span>
+                                <span>Portaria PGFN nº 6.757/2022 · {new Date(analysis.created_at).toLocaleDateString('pt-BR')}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}

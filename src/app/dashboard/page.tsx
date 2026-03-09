@@ -6,28 +6,25 @@ import { Button } from '@/components/ui/button'
 
 export default async function DashboardPage() {
     const supabase = await createClient()
-    /*
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
         return <div className="p-8">Não autenticado.</div>
     }
-    */
-    const user = { id: 'mock-user-id', user_metadata: { full_name: 'Usuário Homologação' } }
 
-
-    // Puxar perfil do usuário (advogado)
+    // Puxar perfil do usuário
     const { data: profile } = await supabase
         .from('tributario_profiles')
         .select('*')
         .eq('id', user.id)
         .single()
 
-    // Buscar todas as análises do usuário para calcular métricas
+    // Buscar todas as análises do usuário
     const { data: allAnalyses } = await supabase
         .from('tributario_analyses')
-        .select('*')
+        .select('id, company_name, status, original_rating, simulated_rating, potential_discount_percentage, valor_divida_tributaria, calc_json, created_at')
         .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
 
     // Saudação baseada no horário
     const hour = new Date().getHours()
@@ -37,22 +34,21 @@ export default async function DashboardPage() {
 
     // Métricas reais
     const completedAnalysesList = allAnalyses?.filter(a => a.status === 'completed') || []
-    const totalAnalyses = allAnalyses?.length || 0
     const completedAnalyses = completedAnalysesList.length
 
-    // Agregação de valores monetários a partir do calc_json
-    const metrics = completedAnalysesList.reduce((acc, curr) => {
-        const calc = curr.calc_json || {}
+    // Passivo analisado = soma das dívidas de todas as análises
+    // Economia potencial = soma dos ganhos_do_laudo das análises concluídas
+    const metrics = (allAnalyses || []).reduce((acc, curr) => {
+        const ganho = curr.calc_json?.ganho_do_laudo || 0
+        const divida = Number(curr.valor_divida_tributaria) || 0
         return {
-            passivo: acc.passivo + (Number(calc.passivo_total) || 0),
-            economia: acc.economia + (Number(calc.economia_estimada) || 0)
+            passivo: acc.passivo + divida,
+            economia: acc.economia + (curr.status === 'completed' ? Number(ganho) : 0)
         }
     }, { passivo: 0, economia: 0 })
 
-    // Lista de Análises Recentes (últimas 5)
-    const recentAnalyses = allAnalyses
-        ?.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-        .slice(0, 5) || []
+    // Lista de Análises Recentes (últimas 5) — já ordenado por created_at DESC na query
+    const recentAnalyses = (allAnalyses || []).slice(0, 5)
 
     const formatCurrency = (value: number) => {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value)
