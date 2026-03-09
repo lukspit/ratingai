@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { PDFParse } from 'pdf-parse';
+import { Buffer } from 'node:buffer';
 
 export async function POST(req: Request) {
+  console.log('--- POST /api/analyses INICIADO ---');
   try {
+    console.log('Recebendo FormData...');
     const formData = await req.formData();
+    console.log('FormData recebido com sucesso.');
     const files = formData.getAll('files') as File[];
     const companyName = formData.get('companyName') as string;
     const cnpj = formData.get('cnpj') as string;
@@ -60,6 +63,7 @@ export async function POST(req: Request) {
         // a. Extrair texto para a IA
         try {
           console.log(`[PDF-PARSE] Iniciando extração de ${file.name} (${file.size} bytes)`);
+          const { PDFParse } = await import('pdf-parse');
           const parser = new PDFParse({ data: buffer });
           const data = await parser.getText();
           await parser.destroy();
