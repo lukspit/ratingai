@@ -47,22 +47,30 @@ function calcularCenario(ac: number, pc: number, pcnc: number, pl: number, ebitd
 }
 
 const JUSTIFICATIVA_PROMPT = (base: any, ajustado: any, ganho: number) => `
-Você é um perito contábil tributário especialista em Transação Tributária com a PGFN.
-Escreva em 3-4 frases a justificativa técnica do Laudo de CAPAG-e.
+[PERSONA E ESPECIALIZAÇÃO]
+Você é um Engenheiro Financeiro Tributário, especialista na matemática da Portaria PGFN 6.757/2022.
 
-A estratégia é DEMONSTRAR que o EBITDA real da empresa é menor do que o PGFN presumiu,
-pois o resultado operacional estava INFLADO por receitas não recorrentes que não representam
-capacidade operacional sustentável.
+[OBJETIVO DO RESULTADO]
+Escreva em 3 a 5 frases a fundamentação matemática do Laudo de CAPAG-e, criando a narrativa de "antes x depois".
+
+[METODOLOGIA E "MALÍCIA" TRIBUTÁRIA]
+A estratégia é DEMONSTRAR que os indicadores reais da empresa (principalmente Margem Operacional e Lucratividade/EBITDA) são piores do que a PGFN presumiu.
+Você usará a remoção de receitas extraordinárias ou ajuste de passivos para argumentar que a capacidade operacional sustentável da empresa é FRÁGIL e que o rating PGFN estava mascarado por eventos que não se repetirão. Se o rating não mudar, use a malícia para dizer que ainda assim a empresa demonstrou saúde financeira piorada.
+
+[TOM E ESTILO]
+Frio, puramente numérico, incontestável e altamente persuasivo. Mostre que o cálculo revela a "verdade".
+
+[BARREIRAS E LIMITAÇÕES OBRIGATÓRIAS]
+- Sem formatação Markdown e sem blá-blá-blá.
 
 Cenário PGFN Presumido (EBITDA inflado):
 - IL=${base.il.toFixed(2)} (Rating ${base.rIL}), IA=${base.ia.toFixed(2)} (Rating ${base.rIA}), MO=${(base.mo * 100).toFixed(1)}% (Rating ${base.rMO})
 - Rating Final: ${base.rating} — Desconto: ${base.desconto}%
 
-Cenário Laudo (EBITDA real, sem receitas não recorrentes):
+Cenário Laudo Contestado (EBITDA ajustado):
 - IL=${ajustado.il.toFixed(2)} (Rating ${ajustado.rIL}), IA=${ajustado.ia.toFixed(2)} (Rating ${ajustado.rIA}), MO=${(ajustado.mo * 100).toFixed(1)}% (Rating ${ajustado.rMO})
 - Rating Final: ${ajustado.rating} — Desconto: ${ajustado.desconto}%
-
-Ganho estimado para o contribuinte: R$ ${ganho.toLocaleString('pt-BR')}
+- Ganho Estimado da Revisão: R$ ${ganho.toLocaleString('pt-BR')}
 
 Explique que receitas não recorrentes inflavam o EBITDA, que o Laudo as exclui conforme
 Portaria PGFN 6.757/2022, e qual o impacto na Margem Operacional real.
@@ -90,7 +98,7 @@ export async function POST(req: Request) {
 
         // ── CENÁRIO 1: Rating PGFN Presumido (EBITDA com tudo incluído) ──────
         const base = calcularCenario(ac, pc, pcnc, pl, ebitda, rb);
-        console.log(`[CALCULATOR] BASE: IL=${base.il.toFixed(4)}(${base.rIL}) IA=${base.ia.toFixed(4)}(${base.rIA}) MO=${(base.mo * 100).toFixed(2)}%(${base.rMO}) → Rating ${base.rating}`);
+        console.log(`[CALCULATOR] BASE: IL = ${base.il.toFixed(4)} (${base.rIL}) IA = ${base.ia.toFixed(4)} (${base.rIA}) MO = ${(base.mo * 100).toFixed(2)}% (${base.rMO}) → Rating ${base.rating} `);
 
         // ── CENÁRIO 2: Rating Laudo (EBITDA real, sem receitas não recorrentes)
         //
@@ -176,7 +184,7 @@ export async function POST(req: Request) {
 
         // IL e IA usam os dados do BP sem modificação (já refletem a situação real)
         const ajustado = calcularCenario(ac, pc, pcnc, pl, ebitda_aj, rb);
-        console.log(`[CALCULATOR] AJUSTADO: IL=${ajustado.il.toFixed(4)}(${ajustado.rIL}) IA=${ajustado.ia.toFixed(4)}(${ajustado.rIA}) MO=${(ajustado.mo * 100).toFixed(2)}%(${ajustado.rMO}) → Rating ${ajustado.rating}`);
+        console.log(`[CALCULATOR] AJUSTADO: IL = ${ajustado.il.toFixed(4)} (${ajustado.rIL}) IA = ${ajustado.ia.toFixed(4)} (${ajustado.rIA}) MO = ${(ajustado.mo * 100).toFixed(2)}% (${ajustado.rMO}) → Rating ${ajustado.rating} `);
 
         // ── Impacto financeiro ───────────────────────────────────────────────
         const economia_base = divida * (base.desconto / 100);
@@ -188,7 +196,7 @@ export async function POST(req: Request) {
             { role: 'user', content: JUSTIFICATIVA_PROMPT(base, ajustado, ganho_do_laudo) }
         ];
         const justificativa = await callAI(messages, false, MODEL_REASONER)
-            || `EBITDA real de R$ ${ebitda_aj.toLocaleString('pt-BR')} vs R$ ${ebitda.toLocaleString('pt-BR')} presumido. Rating contestado: ${ajustado.rating} (${ajustado.desconto}% desconto).`;
+            || `EBITDA real de R$ ${ebitda_aj.toLocaleString('pt-BR')} vs R$ ${ebitda.toLocaleString('pt-BR')} presumido.Rating contestado: ${ajustado.rating} (${ajustado.desconto}% desconto).`;
 
         const calcData = {
             cenario_base: {

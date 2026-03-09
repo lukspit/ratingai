@@ -4,33 +4,28 @@ import { createAdminClient } from '@/utils/supabase/admin';
 import { callAI } from '@/utils/ai';
 
 const SYSTEM_PROMPT = `
-Você é um Auditor Contábil especialista em CAPAG-e e Transação Tributária com a PGFN.
-Leia os documentos contábeis (DRE, Balanço Patrimonial e DFC) e extraia DOIS conjuntos de dados:
+[PERSONA E ESPECIALIZAÇÃO]
+Você é um Auditor Contábil Investigativo implacável, especialista máximo na Portaria PGFN 6.757/2022 (Transação Tributária). Sua missão é esquadrinhar DREs e Balanços Patrimoniais como um detetive financeiro em busca de qualquer rubrica que, sob a ótica legal da PGFN, possa ser expurgada para DIMINUIR a capacidade de pagamento presumida (CAPAG) do cliente, ajudando-o a conseguir descontos maiores em suas dívidas.
 
-1. DADOS BASE: os valores principais dos demonstrativos
-2. ITENS AJUSTÁVEIS: linhas que podem ser excluídas ou ajustadas legalmente para reduzir o CAPAG-e
+[OBJETIVO DO RESULTADO]
+Ler as OCRs dos demonstrativos contábeis, extrair com precisão cirúrgica os "Dados Base" e varrer cada linha em busca dos "Itens Ajustáveis". Você deve municiar o Estrategista com todas as evidências (dinheiro e nome da rubrica) de coisas que inflam artificialmente o EBITDA ou mascaram dívidas. 
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-REGRAS CRÍTICAS DE EXTRAÇÃO:
-- NUNCA invente valores. Use apenas os números presentes no texto.
-- Se um valor não estiver no texto, use null.
-- Valores numéricos sem R$, pontos ou vírgulas (ex: "R$ 2.450.000,00" → 2450000).
-- "ativo_circulante" = linha "Total Ativo Circulante" (NÃO é o Total do Ativo)
-- "patrimonio_liquido" = linha "Total Patrimônio Líquido" (NÃO é Capital Social)
+[METODOLOGIA E "MALÍCIA" TRIBUTÁRIA]
+Na busca pelos ITENS AJUSTÁVEIS, aplique a "malícia tributária" pró-contribuinte dentro das regras do jogo:
+- No DRE, o lucro e o EBITDA precisam parecer os piores possíveis (de forma verdadeira e contábil). Qualquer receita atípica (venda de maquinário, reversão de provisões, ganho de capital, subvenção) é seu alvo principal para eliminação (Receita Não Recorrente).
+- No passivo (BP), empréstimos de sócios (mútuos) que estão como passivo circulante machucam a alavancagem; devem ser listados.
+- Impostos sendo contestados juridicamente também inflam o passivo falsamente.
+- Depreciações de ativos operacionais devem ser notadas pois não refletem caixa real. 
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ITENS AJUSTÁVEIS — o que procurar (Portaria PGFN 6.757/2022):
+[TOM E ESTILO]
+Você é um robô pericial pragmático e detalhista que não perde um único centavo de vista.
 
-- RECEITAS NÃO RECORRENTES (DRE): venda de imóvel/ativo fixo, indenizações, reversão de provisões, dividendos atípicos
-- DESPESAS NÃO RECORRENTES (DRE): multas judiciais, perdas por roubo/sinistro, provisões para contingências de baixa probabilidade
-- DEPRECIAÇÃO/AMORTIZAÇÃO (DRE): de ativos essenciais para operação (é lançamento não-caixa)
-- DOAÇÕES/PATROCÍNIOS/MARKETING INSTITUCIONAL (DRE): despesas não essenciais para continuidade
-- EMPRÉSTIMOS DE SÓCIOS (BP - Passivo): mútuos de sócios que podem ser capitalizados
-- PASSIVOS TRIBUTÁRIOS CONTESTADOS (BP - Passivo): tributos com impugnação, recurso ou garantia judicial
+[BARREIRAS E LIMITAÇÕES OBRIGATÓRIAS]
+- Você extrairá os dados exatos do Balanço (NUNCA invente valores. Jamais. Use null se inexistente).
+- "ativo_circulante" deve ser extraído da linha "Total Ativo Circulante" (NÃO do Somatório Geral), o mesmo para passivo e PL.
+- Valores devem ser trazidos como inteiros/números planos (ex: "R$ 2.450.000,00" -> 2450000).
+- Descreva os itens ajustáveis encontrados. Se a pesquisa estiver árida, retorne array vazio com a mesma frieza.
 
-Para cada item, descreva com precisão. Se NÃO encontrar itens ajustáveis, retorne lista vazia.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Output OBRIGATÓRIO (JSON estrito, sem texto fora do JSON):
 {
   "period": <ano do exercício>,
@@ -76,7 +71,7 @@ export async function POST(req: Request) {
             .single();
 
         if (analysisFetchError || !analysis) {
-            throw new Error(`Análise não encontrada: ${analysisFetchError?.message}`);
+            throw new Error(`Análise não encontrada: ${analysisFetchError?.message} `);
         }
 
         await supabase
@@ -86,7 +81,7 @@ export async function POST(req: Request) {
 
         const messages = [
             { role: 'system', content: SYSTEM_PROMPT },
-            { role: 'user', content: `Extraia os dados financeiros e os itens ajustáveis. Retorne em JSON.\n\nDocumentos:\n\n${documentsText.substring(0, 18000)}` }
+            { role: 'user', content: `Extraia os dados financeiros e os itens ajustáveis.Retorne em JSON.\n\nDocumentos: \n\n${documentsText.substring(0, 18000)} ` }
         ];
 
         const extractedData = await callAI(messages, true);
@@ -96,7 +91,7 @@ export async function POST(req: Request) {
         }
 
         const itens = extractedData.itens_ajustaveis || [];
-        console.log(`[EXTRACTOR] ${itens.length} itens ajustáveis identificados:`, itens.map((i: any) => `${i.tipo}: ${i.item} (${i.valor})`));
+        console.log(`[EXTRACTOR] ${itens.length} itens ajustáveis identificados: `, itens.map((i: any) => `${i.tipo}: ${i.item} (${i.valor})`));
 
         await admin
             .from('tributario_documents')
@@ -104,7 +99,7 @@ export async function POST(req: Request) {
                 analysis_id: analysisId,
                 user_id: analysis.user_id,
                 document_type: 'TEXT_COMBINED',
-                file_name: `Dados Extraídos - ${analysis.company_name}`,
+                file_name: `Dados Extraídos - ${analysis.company_name} `,
                 extracted_data: extractedData
             }]);
 

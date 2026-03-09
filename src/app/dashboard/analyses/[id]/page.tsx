@@ -368,24 +368,20 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
                         {/* Corpo do documento */}
                         <div className="bg-white text-slate-800 px-8 md:px-12 py-10 print:px-8 print:py-6">
                             <div className="
-                                [&_h1]:text-2xl [&_h1]:font-black [&_h1]:mt-10 [&_h1]:mb-6 [&_h1]:text-slate-900 [&_h1]:border-b-4 [&_h1]:border-primary/20 [&_h1]:pb-4 [&_h1]:tracking-tight [&_h1]:text-center
-                                [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:text-slate-800 [&_h2]:uppercase [&_h2]:tracking-wider [&_h2]:border-l-4 [&_h2]:border-primary [&_h2]:pl-4 [&_h2]:bg-slate-50 [&_h2]:py-2
-                                [&_h3]:text-base [&_h3]:font-bold [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-slate-700 [&_h3]:underline [&_h3]:underline-offset-4 [&_h3]:decoration-primary/30
-                                [&_p]:text-sm [&_p]:text-slate-600 [&_p]:leading-8 [&_p]:mb-4 [&_p]:text-justify
-                                [&_ul]:list-disc [&_ul]:pl-8 [&_ul]:space-y-2 [&_ul]:mb-6
-                                [&_ol]:list-decimal [&_ol]:pl-8 [&_ol]:space-y-2 [&_ol]:mb-6
-                                [&_li]:text-sm [&_li]:text-slate-600 [&_li]:leading-7
-                                [&_strong]:text-slate-950 [&_strong]:font-bold
+                                [&_h1]:text-2xl [&_h1]:font-black [&_h1]:mt-8 [&_h1]:mb-6 [&_h1]:text-slate-900 [&_h1]:tracking-tight [&_h1]:text-center
+                                [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:text-slate-800 [&_h2]:uppercase [&_h2]:tracking-wider
+                                [&_h3]:text-base [&_h3]:font-bold [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-slate-700
+                                [&_p]:text-sm [&_p]:text-slate-600 [&_p]:leading-relaxed [&_p]:mb-4
+                                [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-8 [&_ol]:mb-8
+                                [&_ol>li]:font-semibold [&_ol>li]:text-slate-900 [&_ol>li]:text-lg [&_ol>li]:border-b [&_ol>li]:border-slate-200/60 [&_ol>li]:pb-2
+                                [&_ol>li::marker]:text-primary [&_ol>li::marker]:font-bold
+                                [&_ul]:list-none [&_ul]:pl-2 [&_ul]:space-y-3 [&_ul]:mt-4
+                                [&_ul>li]:relative [&_ul>li]:pl-5 [&_ul>li]:text-sm [&_ul>li]:text-slate-600 [&_ul>li]:leading-relaxed [&_ul>li]:font-normal
+                                [&_ul>li::before]:content-[''] [&_ul>li::before]:absolute [&_ul>li::before]:left-0 [&_ul>li::before]:top-[10px] [&_ul>li::before]:w-1.5 [&_ul>li::before]:h-1.5 [&_ul>li::before]:bg-primary/60 [&_ul>li::before]:rounded-full
+                                [&_strong]:text-slate-900 [&_strong]:font-bold
                                 [&_em]:text-slate-500 [&_em]:italic
-                                [&_hr]:border-slate-300 [&_hr]:my-12 [&_hr]:border-dashed
-                                [&_blockquote]:border-l-4 [&_blockquote]:border-primary/60 [&_blockquote]:pl-6 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:bg-primary/5 [&_blockquote]:py-4 [&_blockquote]:px-6 [&_blockquote]:rounded-r-xl [&_blockquote]:mb-6 [&_blockquote]:shadow-sm
-                                [&_code]:bg-slate-100 [&_code]:px-2 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:text-xs [&_code]:font-mono [&_code]:text-primary [&_code]:border [&_code]:border-slate-200
-                                [&_table]:w-full [&_table]:text-sm [&_table]:border-collapse [&_table]:mb-8 [&_table]:shadow-md [&_table]:rounded-xl [&_table]:overflow-hidden [&_table]:border [&_table]:border-slate-300
-                                [&_thead]:bg-slate-900 [&_thead]:text-white
-                                [&_th]:border [&_th]:border-slate-800 [&_th]:p-3 [&_th]:text-left [&_th]:font-bold [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-widest
-                                [&_td]:border [&_td]:border-slate-200 [&_td]:p-3 [&_td]:text-slate-700 [&_td]:text-sm [&_td]:bg-white
-                                [&_tr:nth-child(even)_td]:bg-slate-50
-                                [&_tr:hover_td]:bg-primary/5 [&_tr:hover_td]:transition-colors
+                                [&_hr]:border-slate-200 [&_hr]:my-10
+                                [&_blockquote]:border-l-4 [&_blockquote]:border-primary/60 [&_blockquote]:pl-6 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:bg-primary/5 [&_blockquote]:py-4 [&_blockquote]:px-6 [&_blockquote]:rounded-r-xl [&_blockquote]:mb-6
                             ">
                                 <ReactMarkdown>{reportMarkdown}</ReactMarkdown>
                             </div>
