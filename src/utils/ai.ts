@@ -9,12 +9,15 @@ export const aiClient = new OpenAI({
     apiKey: process.env.OPENROUTER_API_KEY || 'dummy_key',
 });
 
-export const DEFAULT_MODEL = "deepseek/deepseek-chat"; // DeepSeek V3: melhor raciocínio lógico-contábil para identificar ajustes ocultos e cruzar dados.
+// Na API do OpenRouter, a versão mais atual do DeepSeek V3 atende pelo nome 'deepseek-chat'.
+// Já o Reasoning Model R1 atende exatamente por 'deepseek-r1'.
+export const MODEL_EXTRACTOR = "deepseek/deepseek-chat";
+export const MODEL_REASONER = "deepseek/deepseek-r1";
 
 /**
  * Função utilitária para chamar a IA com tratamento padronizado.
  */
-export async function callAI(messages: any[], isJson = false, model = DEFAULT_MODEL) {
+export async function callAI(messages: any[], isJson = false, model = MODEL_EXTRACTOR) {
     try {
         const response = await aiClient.chat.completions.create({
             model: model,

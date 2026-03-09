@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-import { callAI } from '@/utils/ai';
+import { callAI, MODEL_REASONER } from '@/utils/ai';
 
 // ── Funções de rating por indicador (Portaria PGFN 6.757/2022) ───────────────
 function ratingIL(il: number): string {
@@ -55,11 +55,11 @@ pois o resultado operacional estava INFLADO por receitas não recorrentes que n�
 capacidade operacional sustentável.
 
 Cenário PGFN Presumido (EBITDA inflado):
-- IL=${base.il.toFixed(2)} (Rating ${base.rIL}), IA=${base.ia.toFixed(2)} (Rating ${base.rIA}), MO=${(base.mo*100).toFixed(1)}% (Rating ${base.rMO})
+- IL=${base.il.toFixed(2)} (Rating ${base.rIL}), IA=${base.ia.toFixed(2)} (Rating ${base.rIA}), MO=${(base.mo * 100).toFixed(1)}% (Rating ${base.rMO})
 - Rating Final: ${base.rating} — Desconto: ${base.desconto}%
 
 Cenário Laudo (EBITDA real, sem receitas não recorrentes):
-- IL=${ajustado.il.toFixed(2)} (Rating ${ajustado.rIL}), IA=${ajustado.ia.toFixed(2)} (Rating ${ajustado.rIA}), MO=${(ajustado.mo*100).toFixed(1)}% (Rating ${ajustado.rMO})
+- IL=${ajustado.il.toFixed(2)} (Rating ${ajustado.rIL}), IA=${ajustado.ia.toFixed(2)} (Rating ${ajustado.rIA}), MO=${(ajustado.mo * 100).toFixed(1)}% (Rating ${ajustado.rMO})
 - Rating Final: ${ajustado.rating} — Desconto: ${ajustado.desconto}%
 
 Ganho estimado para o contribuinte: R$ ${ganho.toLocaleString('pt-BR')}
@@ -80,17 +80,17 @@ export async function POST(req: Request) {
         const supabase = await createClient();
 
         // ── Dados base ───────────────────────────────────────────────────────
-        const ac     = Number(extractedData.ativo_circulante)       || 0;
-        const pc     = Number(extractedData.passivo_circulante)     || 0;
-        const pcnc   = Number(extractedData.passivo_nao_circulante) || 0;
-        const pl     = Number(extractedData.patrimonio_liquido)     || 0;
-        const ebitda = Number(extractedData.ebitda)                 || 0;
-        const rb     = Number(extractedData.receita_bruta)          || 0;
+        const ac = Number(extractedData.ativo_circulante) || 0;
+        const pc = Number(extractedData.passivo_circulante) || 0;
+        const pcnc = Number(extractedData.passivo_nao_circulante) || 0;
+        const pl = Number(extractedData.patrimonio_liquido) || 0;
+        const ebitda = Number(extractedData.ebitda) || 0;
+        const rb = Number(extractedData.receita_bruta) || 0;
         const divida = Number(valorDivida) || 0;
 
         // ── CENÁRIO 1: Rating PGFN Presumido (EBITDA com tudo incluído) ──────
         const base = calcularCenario(ac, pc, pcnc, pl, ebitda, rb);
-        console.log(`[CALCULATOR] BASE: IL=${base.il.toFixed(4)}(${base.rIL}) IA=${base.ia.toFixed(4)}(${base.rIA}) MO=${(base.mo*100).toFixed(2)}%(${base.rMO}) → Rating ${base.rating}`);
+        console.log(`[CALCULATOR] BASE: IL=${base.il.toFixed(4)}(${base.rIL}) IA=${base.ia.toFixed(4)}(${base.rIA}) MO=${(base.mo * 100).toFixed(2)}%(${base.rMO}) → Rating ${base.rating}`);
 
         // ── CENÁRIO 2: Rating Laudo (EBITDA real, sem receitas não recorrentes)
         //
@@ -113,8 +113,8 @@ export async function POST(req: Request) {
 
         let ebitda_aj = ebitda;
 
-        const ajustesAplicados: Array<{item: string; tipo: string; valor: number; impacto: string}> = [];
-        const itensIdentificados: Array<{item: string; tipo: string; valor: number; nota: string}> = [];
+        const ajustesAplicados: Array<{ item: string; tipo: string; valor: number; impacto: string }> = [];
+        const itensIdentificados: Array<{ item: string; tipo: string; valor: number; nota: string }> = [];
 
         for (const item of itens) {
             const val = Number(item.valor) || 0;
@@ -176,18 +176,18 @@ export async function POST(req: Request) {
 
         // IL e IA usam os dados do BP sem modificação (já refletem a situação real)
         const ajustado = calcularCenario(ac, pc, pcnc, pl, ebitda_aj, rb);
-        console.log(`[CALCULATOR] AJUSTADO: IL=${ajustado.il.toFixed(4)}(${ajustado.rIL}) IA=${ajustado.ia.toFixed(4)}(${ajustado.rIA}) MO=${(ajustado.mo*100).toFixed(2)}%(${ajustado.rMO}) → Rating ${ajustado.rating}`);
+        console.log(`[CALCULATOR] AJUSTADO: IL=${ajustado.il.toFixed(4)}(${ajustado.rIL}) IA=${ajustado.ia.toFixed(4)}(${ajustado.rIA}) MO=${(ajustado.mo * 100).toFixed(2)}%(${ajustado.rMO}) → Rating ${ajustado.rating}`);
 
         // ── Impacto financeiro ───────────────────────────────────────────────
-        const economia_base     = divida * (base.desconto / 100);
+        const economia_base = divida * (base.desconto / 100);
         const economia_ajustada = divida * (ajustado.desconto / 100);
-        const ganho_do_laudo    = economia_ajustada - economia_base;
+        const ganho_do_laudo = economia_ajustada - economia_base;
 
         // ── Justificativa (IA para texto) ────────────────────────────────────
         const messages = [
             { role: 'user', content: JUSTIFICATIVA_PROMPT(base, ajustado, ganho_do_laudo) }
         ];
-        const justificativa = await callAI(messages, false)
+        const justificativa = await callAI(messages, false, MODEL_REASONER)
             || `EBITDA real de R$ ${ebitda_aj.toLocaleString('pt-BR')} vs R$ ${ebitda.toLocaleString('pt-BR')} presumido. Rating contestado: ${ajustado.rating} (${ajustado.desconto}% desconto).`;
 
         const calcData = {

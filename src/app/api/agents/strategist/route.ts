@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { createAdminClient } from '@/utils/supabase/admin';
-import { callAI } from '@/utils/ai';
+import { callAI, MODEL_REASONER } from '@/utils/ai';
 import { searchKnowledge } from '@/utils/knowledge';
 
 const TIPO_LABEL: Record<string, string> = {
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
             { role: 'user', content: userContent }
         ];
 
-        const stratData = await callAI(messages, true);
+        const stratData = await callAI(messages, true, MODEL_REASONER);
 
         if (!stratData) throw new Error("Falha ao parsear resposta da IA.");
 
