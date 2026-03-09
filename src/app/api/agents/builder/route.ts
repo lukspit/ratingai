@@ -27,7 +27,11 @@ Breve narrativa do escopo do estudo, mencionando que o parecer foi amparado pelo
 Em forma de texto, aponte a situação como a Receita presumia: detalhe o Rating base da empresa, a dívida estimada, o perfil de indicadores presumido (IL, IA, MO limpos) e explique qual foi o enquadramento de desconto.
 
 ## Constatações Técnicas e Fundamentação de Expurgos
-Coração do Laudo. Construa um ou mais parágrafos argumentativos (incisivos e de malícia tributária legal) detalhando os itens extraídos, e fundamente o expurgo das receitas não operacionais ou passivos usando a tese que consta na "Validação Jurídica (Strategist)". Conecte os expurgos à distorção que eles causavam na capacidade de sustentabilidade e liquidez. CITE E TRANSCREVA LITERALMENTE os artigos e incisos da base de conhecimento fornecida. Use aspas e blockquotes do Markdown (>) para transcrever o texto da norma ("ipsis litteris").
+Coração do Laudo. Detalhe os itens extraídos e fundamente o expurgo usando a "Validação Jurídica (Strategist)". Conecte os expurgos à distorção de liquidez e sustentabilidade.
+MANDATÓRIO: PARA CADA ITEM AJUSTADO, VOCÊ É OBRIGADO A TRANSCREVER LITERALMENTE (COPIAR E COLAR) O TRECHO EXATO DA LEI, PORTARIA OU JURISPRUDÊNCIA QUE O JUSTIFICA (use o texto exato fornecido na sua BASE DE CONHECIMENTO).
+Formate a citação OBRIGATORIAMENTE EM UM BLOCKQUOTE DO MARKDOWN (começando a linha com "> " e o texto em itálico).
+Exemplo de formatação exigida:
+> *"Art. 14. Aplica-se às negociações... "*
 
 ## Conclusão Pericial e Reflexos no CAPAG-e
 Apresente o resultado final pleiteado, ressaltando os novos indicadores recalculados (agora com as métricas realistas do EBITDA). Conclua definitivamente qual o impacto tributário na capacidade de pagamento (Mesmo que o Rating não seja rebaixado para "D", por exemplo, reforce o impacto financeiro de fragilidade da "Margem Operacional"). Seja assertivo e sugira pelo deferimento da revisão.

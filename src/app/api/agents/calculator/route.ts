@@ -166,7 +166,26 @@ export async function POST(req: Request) {
                 case 'emprestimo_socio':
                     itensIdentificados.push({
                         item: item.item, tipo: item.tipo, valor: val,
-                        nota: 'Já incluso no Passivo — eleva o Índice de Alavancagem (IA), evidenciando dependência de capital de sócios'
+                        nota: 'Mútuo de Sócios já incluso no Passivo Circulante, agravando drasticamente a dependência de caixa.'
+                    });
+                    ajustesAplicados.push({
+                        item: item.item,
+                        tipo: item.tipo,
+                        valor: val,
+                        impacto: `Passivo agravado por Mútuo Emergencial de R$ ${(val / 1000000).toFixed(1)}M, indicando socorro dos sócios por falta de liquidez própria.`
+                    });
+                    break;
+
+                case 'impairment':
+                    itensIdentificados.push({
+                        item: item.item, tipo: item.tipo, valor: val,
+                        nota: 'Perda por Impairment reconhecida — deterioração patrimonial irretratável.'
+                    });
+                    ajustesAplicados.push({
+                        item: item.item,
+                        tipo: item.tipo,
+                        valor: val,
+                        impacto: `Impairment de R$ ${(val / 1000000).toFixed(1)}M comprova perda severa de capacidade e desvalorização do patrimônio.`
                     });
                     break;
 
