@@ -28,6 +28,8 @@ Você é um robô pericial pragmático e detalhista que não perde um único cen
 
 Output OBRIGATÓRIO (JSON estrito, sem texto fora do JSON):
 {
+  "empresa": "<Razão Social ou Nome da Empresa extraído do arquivo. null se não achar>",
+  "cnpj": "<CNPJ extraído do arquivo. null se não achar>",
   "period": <ano do exercício>,
   "ativo_circulante": <Total Ativo Circulante do BP>,
   "ativo_nao_circulante": <Total Ativo Não Circulante do BP>,

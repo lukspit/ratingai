@@ -12,6 +12,7 @@ REGRAS CRÍTICAS DE ESTILO E FORMATAÇÃO:
 - PARE DE USAR TÓPICOS NUMERADOS COMO ROBÔ (Jamais crie seções prefixadas com números como "1. Identificação", "2. Objetivo").
 - EVITE EXCESSO DE BULLET POINTS. Use parágrafos encadeados e justificados. Empregue bullet points apenas quando estritamente necessário para listar rubricas específicas e de forma pontual.
 - NUNCA use tabelas Markdown.
+- NUNCA crie campos genéricos para assinatura, linha para datar, cidade, [Nome do Perito], ou [CRC]. Termine o documento secamente após a conclusão.
 - ARREDONDAMENTO OBRIGATÓRIO: Você está recebendo os cálculos brutos no contexto (muitas casas decimais). É SEU DEVER PROFISSIONAL arredondar qualquer indicador (IL, IA) para apenas **duas casas decimais**. Ex: se no JSON estiver 1.19512..., escreva "1,20". A Margem Operacional (MO) deve ser convertida para PORCENTAGEM (ex: se 0.2, escreva 20,0%). Dinheiro sempre vem no formato R$ X.XXX,XX.
 
 ESTRUTURA SUGERIDA DE SEÇÕES (Empregue H2 ou H3, texto corrido e negritos onde couber):
@@ -26,7 +27,7 @@ Breve narrativa do escopo do estudo, mencionando que o parecer foi amparado pelo
 Em forma de texto, aponte a situação como a Receita presumia: detalhe o Rating base da empresa, a dívida estimada, o perfil de indicadores presumido (IL, IA, MO limpos) e explique qual foi o enquadramento de desconto.
 
 ## Constatações Técnicas e Fundamentação de Expurgos
-Coração do Laudo. Construa um ou mais parágrafos argumentativos (incisivos e de malícia tributária legal) detalhando os itens extraídos, e fundamente o expurgo das receitas não operacionais ou passivos usando a tese que consta na "Validação Jurídica (Strategist)". Conecte os expurgos à distorção que eles causavam na capacidade de sustentabilidade e liquidez.
+Coração do Laudo. Construa um ou mais parágrafos argumentativos (incisivos e de malícia tributária legal) detalhando os itens extraídos, e fundamente o expurgo das receitas não operacionais ou passivos usando a tese que consta na "Validação Jurídica (Strategist)". Conecte os expurgos à distorção que eles causavam na capacidade de sustentabilidade e liquidez. CITE E TRANSCREVA os artigos exatos da base de conhecimento fornecida abaixo.
 
 ## Conclusão Pericial e Reflexos no CAPAG-e
 Apresente o resultado final pleiteado, ressaltando os novos indicadores recalculados (agora com as métricas realistas do EBITDA). Conclua definitivamente qual o impacto tributário na capacidade de pagamento (Mesmo que o Rating não seja rebaixado para "D", por exemplo, reforce o impacto financeiro de fragilidade da "Margem Operacional"). Seja assertivo e sugira pelo deferimento da revisão.
@@ -46,18 +47,19 @@ export async function POST(req: Request) {
         const descontoBase = calcData?.cenario_base?.desconto || 0;
         const descontoAj = calcData?.cenario_ajustado?.desconto || 0;
 
+        // Montar query dinâmica para resgatar chunks precisos (ex: "receita não recorrente artigo 2") 
+        const termosAjustes = calcData?.ajustes_aplicados?.map((a: any) => a.descricao || a.item).join(" ") || "receita não recorrente lucros";
+        const queryConhecimento = `laudo CAPAG-e Portaria PGFN 6757 artigos ajuste ${termosAjustes}`;
+
         // Busca chunks da base de conhecimento para fundamentação legal precisa
-        const knowledgeChunks = await searchKnowledge(
-            'laudo técnico CAPAG-e formato estrutura documento pericial PGFN Portaria 6757 artigos ajuste receita não recorrente',
-            6
-        );
+        const knowledgeChunks = await searchKnowledge(queryConhecimento, 6);
 
         const systemWithKnowledge = knowledgeChunks
             ? `${SYSTEM_PROMPT}\n\n## BASE DE CONHECIMENTO (use para citar artigos corretos)\n\n${knowledgeChunks}`
             : SYSTEM_PROMPT;
 
         const contexto = `
-Empresa: ${extractedData?.company_name || 'Empresa em análise'}
+Empresa: ${extractedData?.empresa || extractedData?.company_name || 'Empresa em análise'}
 CNPJ: ${extractedData?.cnpj || 'N/A'}
 Período - base: ${extractedData?.period || 'Exercício 2023'}
 Valor da dívida: R$ ${Number(valorDivida).toLocaleString('pt-BR')}
