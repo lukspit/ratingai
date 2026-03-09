@@ -47,19 +47,25 @@ function calcularCenario(ac: number, pc: number, pcnc: number, pl: number, ebitd
 }
 
 const JUSTIFICATIVA_PROMPT = (base: any, ajustado: any, ganho: number) => `
-Você é um perito contábil tributário. Escreva em 3-4 frases uma justificativa técnica para o Laudo de CAPAG-e.
+Você é um perito contábil tributário especialista em Transação Tributária com a PGFN.
+Escreva em 3-4 frases a justificativa técnica do Laudo de CAPAG-e.
 
-Cenário PGFN Presumido (sem ajustes):
+A estratégia é DEMONSTRAR que o EBITDA real da empresa é menor do que o PGFN presumiu,
+pois o resultado operacional estava INFLADO por receitas não recorrentes que não representam
+capacidade operacional sustentável.
+
+Cenário PGFN Presumido (EBITDA inflado):
 - IL=${base.il.toFixed(2)} (Rating ${base.rIL}), IA=${base.ia.toFixed(2)} (Rating ${base.rIA}), MO=${(base.mo*100).toFixed(1)}% (Rating ${base.rMO})
 - Rating Final: ${base.rating} — Desconto: ${base.desconto}%
 
-Cenário Laudo (com ajustes contábeis legais):
+Cenário Laudo (EBITDA real, sem receitas não recorrentes):
 - IL=${ajustado.il.toFixed(2)} (Rating ${ajustado.rIL}), IA=${ajustado.ia.toFixed(2)} (Rating ${ajustado.rIA}), MO=${(ajustado.mo*100).toFixed(1)}% (Rating ${ajustado.rMO})
 - Rating Final: ${ajustado.rating} — Desconto: ${ajustado.desconto}%
 
-Ganho estimado do laudo: R$ ${ganho.toLocaleString('pt-BR')}
+Ganho estimado para o contribuinte: R$ ${ganho.toLocaleString('pt-BR')}
 
-Explique por que o laudo contesta a classificação presumida e qual é o embasamento legal (Portaria PGFN 6.757/2022).
+Explique que receitas não recorrentes inflavam o EBITDA, que o Laudo as exclui conforme
+Portaria PGFN 6.757/2022, e qual o impacto na Margem Operacional real.
 Responda apenas com o texto, sem introdução.
 `;
 
@@ -82,20 +88,33 @@ export async function POST(req: Request) {
         const rb     = Number(extractedData.receita_bruta)          || 0;
         const divida = Number(valorDivida) || 0;
 
-        // ── CENÁRIO 1: Rating PGFN Presumido ────────────────────────────────
+        // ── CENÁRIO 1: Rating PGFN Presumido (EBITDA com tudo incluído) ──────
         const base = calcularCenario(ac, pc, pcnc, pl, ebitda, rb);
         console.log(`[CALCULATOR] BASE: IL=${base.il.toFixed(4)}(${base.rIL}) IA=${base.ia.toFixed(4)}(${base.rIA}) MO=${(base.mo*100).toFixed(2)}%(${base.rMO}) → Rating ${base.rating}`);
 
-        // ── CENÁRIO 2: Rating Laudo (com ajustes legais) ─────────────────────
+        // ── CENÁRIO 2: Rating Laudo (EBITDA real, sem receitas não recorrentes)
+        //
+        // REGRA FUNDAMENTAL: o objetivo do laudo é mostrar que o EBITDA real
+        // é MENOR que o presumido, porque está inflado por receitas não recorrentes.
+        // Rating mais baixo = mais desconto = cliente paga menos.
+        //
+        // O que PIORA os indicadores (o que queremos):
+        //   receita_nao_recorrente → REMOVER do EBITDA → MO cai → rating piora → mais desconto ✓
+        //
+        // O que NÃO deve ser ajustado (já está refletido nos dados e já piora os indicadores):
+        //   despesa_nao_recorrente  → já reduz o EBITDA (mantém MO baixo) ✓
+        //   depreciacao             → já reduz o EBITDA (mantém MO baixo) ✓
+        //   doacao_patrocinio       → já reduz o EBITDA (mantém MO baixo) ✓
+        //   emprestimo_socio        → já está no Passivo (mantém IA alto) ✓
+        //   passivo_tributario      → já está no Passivo (mantém IA alto) ✓
+        // ─────────────────────────────────────────────────────────────────────
+
         const itens: any[] = extractedData.itens_ajustaveis || [];
 
-        let rb_aj    = rb;
         let ebitda_aj = ebitda;
-        let pc_aj    = pc;
-        let pcnc_aj  = pcnc;
-        let pl_aj    = pl;
 
         const ajustesAplicados: Array<{item: string; tipo: string; valor: number; impacto: string}> = [];
+        const itensIdentificados: Array<{item: string; tipo: string; valor: number; nota: string}> = [];
 
         for (const item of itens) {
             const val = Number(item.valor) || 0;
@@ -103,46 +122,60 @@ export async function POST(req: Request) {
 
             switch (item.tipo) {
                 case 'receita_nao_recorrente':
-                    rb_aj    -= val;
+                    // ÚNICO ajuste que piora os indicadores: retira receita não recorrente do EBITDA
+                    // (Outras Receitas como venda de imóvel não entram na Receita Bruta operacional)
                     ebitda_aj -= val;
-                    ajustesAplicados.push({ item: item.item, tipo: item.tipo, valor: val, impacto: 'Redução em Receita Bruta e EBITDA' });
+                    ajustesAplicados.push({
+                        item: item.item,
+                        tipo: item.tipo,
+                        valor: val,
+                        impacto: `EBITDA reduzido em R$ ${val.toLocaleString('pt-BR')} → Margem Operacional real cai`
+                    });
                     break;
 
                 case 'despesa_nao_recorrente':
-                    ebitda_aj += val;
-                    ajustesAplicados.push({ item: item.item, tipo: item.tipo, valor: val, impacto: 'Exclusão de despesa atípica — EBITDA ajustado positivamente' });
+                    // Já está deduzida do EBITDA — manter. Documentar como evidência de fragilidade.
+                    itensIdentificados.push({
+                        item: item.item, tipo: item.tipo, valor: val,
+                        nota: 'Despesa extraordinária já deduzida do EBITDA — contribui para manter a Margem Operacional baixa'
+                    });
                     break;
 
                 case 'depreciacao':
-                    ebitda_aj += val;
-                    ajustesAplicados.push({ item: item.item, tipo: item.tipo, valor: val, impacto: 'Exclusão de D&A (despesa não-caixa)' });
+                    itensIdentificados.push({
+                        item: item.item, tipo: item.tipo, valor: val,
+                        nota: 'D&A já deduzida do EBITDA — evidencia intensidade de capital e compromissos futuros de reposição'
+                    });
                     break;
 
                 case 'doacao_patrocinio':
-                    ebitda_aj += val;
-                    ajustesAplicados.push({ item: item.item, tipo: item.tipo, valor: val, impacto: 'Exclusão de despesa não essencial' });
+                    itensIdentificados.push({
+                        item: item.item, tipo: item.tipo, valor: val,
+                        nota: 'Despesa não essencial já deduzida — demonstra comprometimento de resultado com gastos não operacionais'
+                    });
                     break;
 
                 case 'emprestimo_socio':
-                    if (val <= pc_aj) { pc_aj -= val; } else { pcnc_aj -= val; }
-                    pl_aj += val;
-                    ajustesAplicados.push({ item: item.item, tipo: item.tipo, valor: val, impacto: 'Capitalização: reduz Passivo e aumenta PL' });
+                    itensIdentificados.push({
+                        item: item.item, tipo: item.tipo, valor: val,
+                        nota: 'Já incluso no Passivo — eleva o Índice de Alavancagem (IA), evidenciando dependência de capital de sócios'
+                    });
                     break;
 
                 case 'passivo_tributario_contestado':
-                    if (val <= pcnc_aj) { pcnc_aj -= val; } else { pc_aj -= val; }
-                    ajustesAplicados.push({ item: item.item, tipo: item.tipo, valor: val, impacto: 'Exclusão de passivo tributário contestado' });
+                    itensIdentificados.push({
+                        item: item.item, tipo: item.tipo, valor: val,
+                        nota: 'Já incluso no Passivo — demonstra obrigações tributárias adicionais que elevam a alavancagem real da empresa'
+                    });
                     break;
             }
         }
 
-        // Garante que valores não fiquem negativos
-        rb_aj   = Math.max(rb_aj, 1);
-        pc_aj   = Math.max(pc_aj, 0);
-        pcnc_aj = Math.max(pcnc_aj, 0);
-        pl_aj   = Math.max(pl_aj, 1);
+        // EBITDA ajustado não pode ser negativo para cálculo
+        ebitda_aj = Math.max(ebitda_aj, 0);
 
-        const ajustado = calcularCenario(ac, pc_aj, pcnc_aj, pl_aj, ebitda_aj, rb_aj);
+        // IL e IA usam os dados do BP sem modificação (já refletem a situação real)
+        const ajustado = calcularCenario(ac, pc, pcnc, pl, ebitda_aj, rb);
         console.log(`[CALCULATOR] AJUSTADO: IL=${ajustado.il.toFixed(4)}(${ajustado.rIL}) IA=${ajustado.ia.toFixed(4)}(${ajustado.rIA}) MO=${(ajustado.mo*100).toFixed(2)}%(${ajustado.rMO}) → Rating ${ajustado.rating}`);
 
         // ── Impacto financeiro ───────────────────────────────────────────────
@@ -150,12 +183,12 @@ export async function POST(req: Request) {
         const economia_ajustada = divida * (ajustado.desconto / 100);
         const ganho_do_laudo    = economia_ajustada - economia_base;
 
-        // ── Justificativa (IA apenas para texto) ─────────────────────────────
+        // ── Justificativa (IA para texto) ────────────────────────────────────
         const messages = [
             { role: 'user', content: JUSTIFICATIVA_PROMPT(base, ajustado, ganho_do_laudo) }
         ];
         const justificativa = await callAI(messages, false)
-            || `Rating contestado ${ajustado.rating} (${ajustado.desconto}%) vs Rating PGFN ${base.rating} (${base.desconto}%).`;
+            || `EBITDA real de R$ ${ebitda_aj.toLocaleString('pt-BR')} vs R$ ${ebitda.toLocaleString('pt-BR')} presumido. Rating contestado: ${ajustado.rating} (${ajustado.desconto}% desconto).`;
 
         const calcData = {
             cenario_base: {
@@ -164,7 +197,8 @@ export async function POST(req: Request) {
                 rating: base.rating,
                 desconto: base.desconto,
                 economia_estimada: economia_base,
-                passivo_total: base.passivo_total
+                passivo_total: base.passivo_total,
+                ebitda_original: ebitda
             },
             cenario_ajustado: {
                 indicadores: { il: ajustado.il, ia: ajustado.ia, mo: ajustado.mo },
@@ -172,9 +206,11 @@ export async function POST(req: Request) {
                 rating: ajustado.rating,
                 desconto: ajustado.desconto,
                 economia_estimada: economia_ajustada,
-                passivo_total: ajustado.passivo_total
+                passivo_total: ajustado.passivo_total,
+                ebitda_ajustado: ebitda_aj
             },
             ajustes_aplicados: ajustesAplicados,
+            itens_identificados: itensIdentificados,
             ganho_do_laudo,
             valor_divida: divida,
             justificativa

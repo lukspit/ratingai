@@ -50,25 +50,29 @@ Construtora Horizonte Ltda | CNPJ: 12.345.678/0001-90
 Receita Bruta de Obras e Serviços...........  R$ 8.200.000,00
 (-) Deduções e Impostos sobre Receita.......  R$ (820.000,00)
 (=) Receita Líquida..........................  R$ 7.380.000,00
-(-) Custo dos Serviços Prestados (CSP)......  R$ (4.920.000,00)
-(=) Lucro Bruto..............................  R$ 2.460.000,00
+(-) Custo dos Serviços Prestados (CSP)......  R$ (5.600.000,00)
+(=) Lucro Bruto..............................  R$ 1.780.000,00
 
 Despesas Operacionais:
-  Despesas Administrativas...................  R$ (680.000,00)
-  Despesas com Pessoal.......................  R$ (420.000,00)
-  Depreciação e Amortização de Equipamentos  R$ (380.000,00)
-  Doações e Patrocínios Institucionais.....  R$ (150.000,00)
-  Provisão para Contingências Trabalhistas.  R$ (220.000,00)
+  Despesas Administrativas...................  R$ (600.000,00)
+  Despesas com Pessoal.......................  R$ (450.000,00)
+  Depreciação e Amortização de Equipamentos  R$ (230.000,00)
+  Doações e Patrocínios Institucionais.....  R$ (80.000,00)
+  Provisão para Contingências Trabalhistas.  R$ (70.000,00)
 
-Outras Receitas (Não Operacionais):
-  Resultado na Venda de Imóvel Antigo......  R$ 480.000,00
-  Indenização de Seguro por Sinistro.......  R$ 120.000,00
+(=) Resultado Operacional (antes de itens não recorrentes)  R$ 350.000,00
 
-(=) EBITDA / Lucro Operacional..............  R$ 1.210.000,00
+Outras Receitas Não Recorrentes (itens extraordinários):
+  Resultado na Venda de Terreno (Av. Industrial, 450)  R$ 500.000,00
+  Indenização de Seguro por Sinistro em Obra.........  R$ 150.000,00
+  Ganho na Liquidação de Aplicação Financeira........  R$ 250.000,00
+  Total de Receitas Não Recorrentes..................  R$ 900.000,00
+
+(=) EBITDA / Lucro Operacional..............  R$ 1.250.000,00
 (-) Despesas Financeiras....................  R$ (310.000,00)
-(=) Lucro Antes do IR.......................  R$ 900.000,00
-(-) IRPJ e CSLL.............................  R$ (270.000,00)
-(=) Lucro Líquido do Exercício..............  R$ 630.000,00\n`;
+(=) Lucro Antes do IR.......................  R$ 940.000,00
+(-) IRPJ e CSLL.............................  R$ (282.000,00)
+(=) Lucro Líquido do Exercício..............  R$ 658.000,00\n`;
                     if (isBp) mockContent += `BALANÇO PATRIMONIAL — 31/12/2023
 Construtora Horizonte Ltda | CNPJ: 12.345.678/0001-90
 
