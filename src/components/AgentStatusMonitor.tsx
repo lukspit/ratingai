@@ -111,7 +111,7 @@ export function AgentStatusMonitor({ currentStep, isError }: AgentStatusMonitorP
                 <div className="flex items-center justify-between">
                     <div>
                         <CardTitle className="text-xl">Processamento de Inteligência</CardTitle>
-                        <p className="text-sm text-muted-foreground">Analisando documentos via DeepSeek-v3</p>
+                        <p className="text-sm text-muted-foreground">Analisando documentos via Gemini 3.1 Flash</p>
                     </div>
                     {currentStep < stepsData.length && !isError ? (
                         <Badge variant="outline" className="animate-pulse">Em Execução</Badge>

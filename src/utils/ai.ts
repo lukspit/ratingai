@@ -9,7 +9,7 @@ export const aiClient = new OpenAI({
     apiKey: process.env.OPENROUTER_API_KEY || 'dummy_key',
 });
 
-export const DEFAULT_MODEL = "deepseek/deepseek-v3.2"; // DeepSeek V3.2: GPT-5 class, melhor extração JSON ($0.25/$0.40 por 1M tokens)
+export const DEFAULT_MODEL = "google/gemini-3.1-flash-lite-preview"; // Gemini 3.1 Flash Lite: raciocínio forte (GPQA 86.9%), mais rápido e barato ($0.25/$1.50 por 1M tokens)
 
 /**
  * Função utilitária para chamar a IA com tratamento padronizado.
