@@ -55,6 +55,7 @@ export async function POST(req: Request) {
     let combinedText = '';
     let totalExtractedLength = 0;
     const documentRecords = [];
+    const pdfErrors: string[] = [];
 
     for (const file of files) {
       if (file.type === 'application/pdf') {
@@ -80,6 +81,7 @@ export async function POST(req: Request) {
         } catch (pdfError: any) {
           console.error(`[PDF-PARSE FALHOU] ${file.name}:`, pdfError);
           combinedText += `\n--- ARQUIVO: ${file.name} (Erro na Extração: O PDF não pôde ser lido.) ---\n`;
+          pdfErrors.push(`[${file.name}]: ${pdfError.message || String(pdfError)}`);
         }
 
         // b. Salvar arquivo no Storage
@@ -123,8 +125,12 @@ export async function POST(req: Request) {
     }
 
     if (totalExtractedLength < 100) {
+      let errorMsg = 'Nenhum texto contábil pôde ser extraído dos documentos enviados. Verifique se os PDFs não estão protegidos por senha e se não são apenas imagens digitalizadas.';
+      if (pdfErrors.length > 0) {
+        errorMsg += ' Erros técnicos encontrados: ' + pdfErrors.join(' | ');
+      }
       return NextResponse.json({
-        error: 'Nenhum texto contábil pôde ser extraído dos documentos enviados. Verifique se os PDFs não estão protegidos por senha e se não são apenas imagens digitalizadas.'
+        error: errorMsg
       }, { status: 400 });
     }
 
