@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
-// @ts-ignore
-import pdfParse from 'pdf-parse';
+import { PDFParse } from 'pdf-parse';
 
 export async function POST(req: Request) {
   try {
@@ -58,7 +57,9 @@ export async function POST(req: Request) {
 
         // a. Extrair texto para a IA
         try {
-          const data = await pdfParse(buffer);
+          const parser = new PDFParse({ data: buffer });
+          const data = await parser.getText();
+          await parser.destroy();
           const extractedText = data.text || '';
 
           if (extractedText.trim().length < 50) {
