@@ -15,6 +15,7 @@ import {
     Sparkles,
     History
 } from 'lucide-react'
+import Image from 'next/image'
 import { useSidebar } from '@/contexts/SidebarContext'
 
 interface DashboardSidebarProps {
@@ -64,15 +65,24 @@ export function DashboardSidebar({ email, hasCompletedOnboarding = true }: Dashb
             <div className={`p-6 flex items-center justify-center min-h-[6rem] transition-all duration-300 ${isCollapsed ? 'px-2' : 'px-6'}`}>
                 <div className="relative w-full flex items-center justify-center">
                     {!isCollapsed ? (
-                        <div className="text-2xl font-black tracking-tighter text-primary flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-                                <Activity className="w-5 h-5" />
-                            </div>
-                            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Rating<span className="text-primary/50">.ai</span></span>
+                        <div className="relative h-12 w-full">
+                            <Image
+                                src="/logos/logo_horizontal.png"
+                                alt="Rating.ai Logo"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
                         </div>
                     ) : (
-                        <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-                            <Activity className="w-6 h-6" />
+                        <div className="relative h-10 w-10">
+                            <Image
+                                src="/logos/logo_symbol.png"
+                                alt="Rating.ai Logo"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
                         </div>
                     )}
                 </div>
