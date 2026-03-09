@@ -4,7 +4,6 @@ import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { RegisterForm } from './register-form'
 import Link from 'next/link'
-import { Activity } from 'lucide-react'
 
 export default async function RegisterPage({
     searchParams,
@@ -34,14 +33,15 @@ export default async function RegisterPage({
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 via-primary to-primary/50" />
 
             <Card className="w-full max-w-md border-border bg-white shadow-xl z-10">
-                <CardHeader className="space-y-4 pb-8">
-                    <div className="flex justify-center items-center h-14 relative mb-2">
-                        <div className="text-3xl font-black tracking-tighter text-primary flex items-center gap-2">
-                            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-                                <Activity className="w-6 h-6" />
-                            </div>
-                            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Rating<span className="text-primary/50">.ai</span></span>
-                        </div>
+                <CardHeader className="space-y-4 pb-4">
+                    <div className="flex justify-center items-center h-48 relative -mt-8 -mb-4">
+                        <Image
+                            src="/logos/logo_vertical_cropped.png"
+                            alt="Rating.ai Logo"
+                            fill
+                            className="object-contain"
+                            priority
+                        />
                     </div>
                     <CardTitle className="text-center text-2xl font-bold text-slate-800">
                         Finalize seu Cadastro

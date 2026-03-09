@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Activity } from 'lucide-react'
+import Image from 'next/image'
 import Link from 'next/link'
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
@@ -12,15 +12,17 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         <div className="flex min-h-screen items-center justify-center p-4 bg-slate-50 relative overflow-hidden">
             <Card className="w-full max-w-md border-border bg-white shadow-sm z-10">
                 <CardHeader className="space-y-4">
-                    <div className="flex flex-col items-center justify-center mb-2 gap-2">
-                        <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mb-2">
-                            <Activity className="w-10 h-10" />
+                    <div className="flex flex-col items-center justify-center mb-0">
+                        <div className="relative w-48 h-48 -mt-8 -mb-4">
+                            <Image
+                                src="/logos/logo_vertical_cropped.png"
+                                alt="Rating.ai Logo"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
                         </div>
-                        <CardTitle className="text-2xl font-bold tracking-tight text-primary">Rating.ai</CardTitle>
                     </div>
-                    <CardDescription className="text-center text-muted-foreground">
-                        Acesse sua conta para gerenciar análises CAPAG.
-                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     {params?.error && (
