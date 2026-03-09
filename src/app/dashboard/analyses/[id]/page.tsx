@@ -74,16 +74,16 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
 
     // Suporta estrutura nova (dual-cenário) e antiga (indicadores únicos)
     const isDualScenario = !!calcData?.cenario_base
-    const cenarioBase    = calcData?.cenario_base    || null
-    const cenarioAj      = calcData?.cenario_ajustado || null
-    const ganhoDoLaudo   = calcData?.ganho_do_laudo  || 0
-    const valorDivida    = calcData?.valor_divida     || 0
+    const cenarioBase = calcData?.cenario_base || null
+    const cenarioAj = calcData?.cenario_ajustado || null
+    const ganhoDoLaudo = calcData?.ganho_do_laudo || 0
+    const valorDivida = calcData?.valor_divida || 0
 
     // Fallback para estrutura antiga
     const indBase = cenarioBase?.indicadores || calcData?.indicadores || {}
-    const ratingBase = cenarioBase?.rating    || analysis.original_rating  || '?'
-    const ratingAj   = cenarioAj?.rating      || analysis.simulated_rating || '?'
-    const descontoAj = cenarioAj?.desconto    || analysis.potential_discount_percentage || 0
+    const ratingBase = cenarioBase?.rating || analysis.original_rating || '?'
+    const ratingAj = cenarioAj?.rating || analysis.simulated_rating || '?'
+    const descontoAj = cenarioAj?.desconto || analysis.potential_discount_percentage || 0
 
     const ratingChanged = ratingBase !== ratingAj
     const hasData = calcData || reportMarkdown
@@ -368,23 +368,24 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
                         {/* Corpo do documento */}
                         <div className="bg-white text-slate-800 px-8 md:px-12 py-10 print:px-8 print:py-6">
                             <div className="
-                                [&_h1]:text-xl [&_h1]:font-bold [&_h1]:mt-8 [&_h1]:mb-4 [&_h1]:text-slate-900 [&_h1]:border-b-2 [&_h1]:border-slate-200 [&_h1]:pb-2 [&_h1]:tracking-tight
-                                [&_h2]:text-base [&_h2]:font-bold [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:text-slate-800 [&_h2]:uppercase [&_h2]:tracking-wide [&_h2]:border-l-4 [&_h2]:border-primary [&_h2]:pl-3
-                                [&_h3]:text-sm [&_h3]:font-semibold [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:text-slate-700
-                                [&_p]:text-sm [&_p]:text-slate-600 [&_p]:leading-7 [&_p]:mb-3 [&_p]:text-justify
-                                [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-1.5 [&_ul]:mb-4
-                                [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:space-y-1.5 [&_ol]:mb-4
-                                [&_li]:text-sm [&_li]:text-slate-600 [&_li]:leading-6
-                                [&_strong]:text-slate-900 [&_strong]:font-semibold
+                                [&_h1]:text-2xl [&_h1]:font-black [&_h1]:mt-10 [&_h1]:mb-6 [&_h1]:text-slate-900 [&_h1]:border-b-4 [&_h1]:border-primary/20 [&_h1]:pb-4 [&_h1]:tracking-tight [&_h1]:text-center
+                                [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:text-slate-800 [&_h2]:uppercase [&_h2]:tracking-wider [&_h2]:border-l-4 [&_h2]:border-primary [&_h2]:pl-4 [&_h2]:bg-slate-50 [&_h2]:py-2
+                                [&_h3]:text-base [&_h3]:font-bold [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-slate-700 [&_h3]:underline [&_h3]:underline-offset-4 [&_h3]:decoration-primary/30
+                                [&_p]:text-sm [&_p]:text-slate-600 [&_p]:leading-8 [&_p]:mb-4 [&_p]:text-justify
+                                [&_ul]:list-disc [&_ul]:pl-8 [&_ul]:space-y-2 [&_ul]:mb-6
+                                [&_ol]:list-decimal [&_ol]:pl-8 [&_ol]:space-y-2 [&_ol]:mb-6
+                                [&_li]:text-sm [&_li]:text-slate-600 [&_li]:leading-7
+                                [&_strong]:text-slate-950 [&_strong]:font-bold
                                 [&_em]:text-slate-500 [&_em]:italic
-                                [&_hr]:border-slate-200 [&_hr]:my-8
-                                [&_blockquote]:border-l-4 [&_blockquote]:border-primary/40 [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:text-slate-500 [&_blockquote]:bg-slate-50 [&_blockquote]:py-3 [&_blockquote]:px-4 [&_blockquote]:rounded-r-lg [&_blockquote]:mb-4
-                                [&_code]:bg-slate-100 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono [&_code]:text-slate-700 [&_code]:border [&_code]:border-slate-200
-                                [&_table]:w-full [&_table]:text-sm [&_table]:border-collapse [&_table]:mb-6 [&_table]:shadow-sm
-                                [&_thead]:bg-slate-100
-                                [&_th]:border [&_th]:border-slate-300 [&_th]:p-2.5 [&_th]:text-left [&_th]:font-semibold [&_th]:text-xs [&_th]:text-slate-700 [&_th]:uppercase [&_th]:tracking-wide
-                                [&_td]:border [&_td]:border-slate-200 [&_td]:p-2.5 [&_td]:text-slate-600 [&_td]:text-sm
-                                [&_tr:nth-child(even)_td]:bg-slate-50/50
+                                [&_hr]:border-slate-300 [&_hr]:my-12 [&_hr]:border-dashed
+                                [&_blockquote]:border-l-4 [&_blockquote]:border-primary/60 [&_blockquote]:pl-6 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_blockquote]:bg-primary/5 [&_blockquote]:py-4 [&_blockquote]:px-6 [&_blockquote]:rounded-r-xl [&_blockquote]:mb-6 [&_blockquote]:shadow-sm
+                                [&_code]:bg-slate-100 [&_code]:px-2 [&_code]:py-0.5 [&_code]:rounded-md [&_code]:text-xs [&_code]:font-mono [&_code]:text-primary [&_code]:border [&_code]:border-slate-200
+                                [&_table]:w-full [&_table]:text-sm [&_table]:border-collapse [&_table]:mb-8 [&_table]:shadow-md [&_table]:rounded-xl [&_table]:overflow-hidden [&_table]:border [&_table]:border-slate-300
+                                [&_thead]:bg-slate-900 [&_thead]:text-white
+                                [&_th]:border [&_th]:border-slate-800 [&_th]:p-3 [&_th]:text-left [&_th]:font-bold [&_th]:text-xs [&_th]:uppercase [&_th]:tracking-widest
+                                [&_td]:border [&_td]:border-slate-200 [&_td]:p-3 [&_td]:text-slate-700 [&_td]:text-sm [&_td]:bg-white
+                                [&_tr:nth-child(even)_td]:bg-slate-50
+                                [&_tr:hover_td]:bg-primary/5 [&_tr:hover_td]:transition-colors
                             ">
                                 <ReactMarkdown>{reportMarkdown}</ReactMarkdown>
                             </div>

@@ -5,155 +5,71 @@ import { searchKnowledge } from '@/utils/knowledge';
 
 const SYSTEM_PROMPT = `
 Você é um Perito Contábil Tributário com registro ativo no CRC, especialista em Transação Tributária com a PGFN.
-Elabore um LAUDO TÉCNICO DE CAPACIDADE DE PAGAMENTO ESPECÍFICA (CAPAG-e) completo em Markdown formal.
+Elabore um LAUDO TÉCNICO DE CAPACIDADE DE PAGAMENTO ESPECÍFICA (CAPAG-e) completo em Markdown formal, com estética de documento oficial de alto nível.
 
-REGRAS CRÍTICAS:
+REGRAS CRÍTICAS DE ESTILO E ESTRUTURA:
+- NUNCA use traços horizontais (---) para separar seções. Use espaçamento e hierarquia de títulos (H1 e H2).
 - Use EXCLUSIVAMENTE os valores fornecidos nos dados. NUNCA invente valores.
 - Linguagem jurídico-contábil formal brasileira — este documento será submetido à PGFN.
-- Cite artigos específicos da Portaria PGFN nº 6.757/2022 para cada ajuste.
-- Se a BASE DE CONHECIMENTO estiver disponível, use-a para citar os artigos corretos.
+- Seja PERSUASIVO e TÉCNICO nas justificativas de cada ajuste.
+- Cite artigos específicos da Portaria PGFN nº 6.757/2022.
 
-ESTRUTURA OBRIGATÓRIA DO LAUDO:
-
----
+ESTRUTURA OBRIGATORIA DO LAUDO (Markdown):
 
 # LAUDO TÉCNICO DE CAPACIDADE DE PAGAMENTO ESPECÍFICA (CAPAG-e)
 **Transação Tributária com a PGFN — Portaria PGFN nº 6.757/2022**
 
----
-
 ## I. IDENTIFICAÇÃO E QUALIFICAÇÃO
-
-| Campo | Informação |
-|-------|-----------|
-| **Empresa** | [razão social] |
-| **CNPJ** | [cnpj] |
-| **Período-base** | Exercício Social [ano] |
-| **Dívida em Negociação** | R$ [valor] |
-| **Modalidade** | [modalidade] |
-| **Data de Elaboração** | [data atual] |
-| **Elaborado por** | Rating.ai — Sistema Especialista em CAPAG-e |
-
----
+Apresente os dados abaixo de forma limpa:
+- **Empresa:** [razão social]
+- **CNPJ:** [cnpj]
+- **Período-base:** Exercício Social [ano]
+- **Dívida em Negociação:** R$ [valor]
+- **Modalidade:** [modalidade]
+- **Data de Elaboração:** [data atual]
+- **Responsável Técnico:** Rating.ai — Sistema Especialista em CAPAG-e
 
 ## II. OBJETO E FINALIDADE
-
-O presente laudo tem por objeto a determinação da Capacidade de Pagamento Específica (CAPAG-e) da empresa identificada, nos termos do Art. 19 da Portaria PGFN nº 6.757/2022, que assegura ao contribuinte o direito de contestar a classificação presumida (CAPAG-P) mediante apresentação de documentação técnica.
-
-A finalidade é demonstrar que a classificação presumida pelo sistema da PGFN não reflete a real capacidade econômico-financeira da empresa, em razão da presença de receitas não recorrentes que inflam artificialmente o resultado operacional.
-
----
+O presente documento técnico fundamenta-se no Art. 19 da Portaria PGFN nº 6.757/2022. O objetivo é a revisão da Capacidade de Pagamento Presumida (CAPAG-P) para a modalidade Específica (CAPAG-e), demonstrando que a classificação automática não reflete a realidade financeira da requerente devido a distorções por receitas não operacionais e não recorrentes.
 
 ## III. DOCUMENTAÇÃO ANALISADA
+Liste os documentos suporte (DRE [ano], BP [data], etc.).
 
-- Demonstração do Resultado do Exercício (DRE) — Exercício [ano]
-- Balanço Patrimonial (BP) — Data-base [data]
-- Documentos complementares de suporte aos ajustes identificados
+## IV. METODOLOGIA E FUNDAMENTAÇÃO
+Explique brevemente o cálculo dos indicadores (IL, IA, MO) conforme a Portaria.
+Mencione a Tabela de Descontos (Art. 4º): A (0%), B (30%), C (50%), D (70%).
 
----
-
-## IV. METODOLOGIA ADOTADA
-
-A análise segue a metodologia de indicadores estabelecida pela Portaria PGFN nº 6.757/2022:
-
-| Indicador | Fórmula | Finalidade |
-|-----------|---------|-----------|
-| **IL** — Índice de Liquidez | Ativo Circulante / Passivo Circulante | Capacidade de honrar obrigações de CP |
-| **IA** — Índice de Alavancagem | Passivo Total / Patrimônio Líquido | Grau de endividamento relativo ao PL |
-| **MO** — Margem Operacional | EBITDA / Receita Bruta | Eficiência operacional recorrente |
-
-**Rating Final:** determinado pelo pior indicador (critério conservador).
-
-**Tabela de Descontos (Art. 4º, Portaria 6.757/2022):**
-| Rating | Desconto |
-|--------|---------|
-| A | 0% |
-| B | 30% |
-| C | 50% |
-| D | 70% |
-
----
-
-## V. CENÁRIO PGFN PRESUMIDO (CAPAG-P)
-
-Análise com os dados financeiros conforme registrados nas demonstrações contábeis, sem qualquer ajuste:
-
+## V. ANÁLISE DO CENÁRIO PRESUMIDO (CAPAG-P)
+Apresente uma tabela simples com os indicadores atuais sem ajustes:
 | Indicador | Cálculo | Valor | Rating |
-|-----------|---------|-------|--------|
+| :--- | :--- | :--- | :--- |
 | IL | [AC] / [PC] | [valor] | [rating] |
 | IA | [PT] / [PL] | [valor] | [rating] |
 | MO | [EBITDA] / [RB] | [valor]% | [rating] |
-| **Rating Final** | — | — | **[PIOR]** |
-| **Desconto PGFN** | — | — | **[X]%** |
-| **Economia na base** | — | — | **R$ [valor]** |
+**Rating Final Presumido: [PIOR]** | **Desconto Equivalente: [X]%**
 
----
-
-## VI. AJUSTES TÉCNICOS E FUNDAMENTAÇÃO LEGAL
-
-(Para cada ajuste identificado, uma subseção:)
-
-### VI.[N] [Nome do Item]
-
-- **Tipo:** [tipo]
-- **Valor:** R$ [valor]
-- **Origem:** [DRE/BP]
-- **Impacto:** [qual indicador e direção]
+## VI. MEMORIAL DE AJUSTES TÉCNICOS
+Para cada item identificado:
+### VI.[N] [Título do Ajuste]
+- **Natureza:** [tipo] | **Valor:** R$ [valor]
 - **Fundamento Legal:** [artigo específico da Portaria 6.757/2022]
-- **Justificativa Técnica:** [explicação técnica em 2-3 frases — por que é excluível]
+- **Justificativa Pericial:** [Texto técnico detalhado em 2-3 frases explicando por que este item deve ser excluído conforme as normas da PGFN.]
 
----
-
-## VII. CENÁRIO LAUDO — CAPAG-e (Após Ajustes)
-
-Análise com os dados financeiros ajustados, excluindo receitas não recorrentes que distorcem o resultado operacional:
-
+## VII. DIAGNÓSTICO DA CAPAG-e (Cenário Ajustado)
+Apresente a tabela final com os dados retificados:
 | Indicador | Cálculo | Valor | Rating |
-|-----------|---------|-------|--------|
+| :--- | :--- | :--- | :--- |
 | IL | [AC] / [PC] | [valor] | [rating] |
 | IA | [PT] / [PL] | [valor] | [rating] |
 | MO | [EBITDA_aj] / [RB] | [valor]% | [rating] |
-| **Rating Contestado** | — | — | **[PIOR_AJ]** |
-| **Desconto Pleiteado** | — | — | **[Y]%** |
-| **Economia com Laudo** | — | — | **R$ [valor]** |
+**Rating Contestado: [PIOR_AJ]** | **Desconto Pleiteado: [Y]%**
 
----
+## VIII. CONCLUSÃO E PARECER TÉCNICO
+Sintetize o ganho financeiro (R$ [ganho]) e a fundamentação para a reclassificação. 
+Finalize com os passos recomendados protocolares.
 
-## VIII. COMPARATIVO E IMPACTO FINANCEIRO
-
-| Métrica | PGFN Presumido | Laudo (CAPAG-e) | Variação |
-|---------|:--------------:|:---------------:|:--------:|
-| IL | [valor] — [rating] | [valor] — [rating] | → |
-| IA | [valor] — [rating] | [valor] — [rating] | → |
-| MO | [valor]% — [rating] | [valor]% — [rating] | ↓ |
-| **Rating Final** | **[X]** | **[Y]** | ↓ |
-| Desconto | [A]% | **[B]%** | +[diff]pp |
-| Economia | R$ [base] | **R$ [ajustado]** | — |
-| **Ganho do Laudo** | — | — | **+R$ [ganho]** |
-
----
-
-## IX. CONCLUSÃO E RECOMENDAÇÃO TÉCNICA
-
-Com base na análise realizada, conclui-se que:
-
-1. O CAPAG-P presumido pela PGFN (**Rating [X]**, [A]% de desconto) está distorcido pela inclusão de receitas não recorrentes no EBITDA.
-2. Excluídos os itens não recorrentes (conforme autorizado pela Portaria 6.757/2022), a Margem Operacional real da empresa é de [valor]%, revelando Rating [Y].
-3. O desconto juridicamente cabível é de **[B]%**, gerando uma **economia estimada de R$ [ganho]** na transação.
-
-**Próximos passos recomendados:**
-[listar 3-4 ações concretas: documentar os itens, protocolar a impugnação, etc.]
-
----
-
-## X. RESSALVAS TÉCNICAS
-
-- Os valores utilizados neste laudo baseiam-se nas demonstrações contábeis fornecidas.
-- A aprovação final do CAPAG-e está sujeita à análise da PGFN conforme procedimentos da Portaria 6.757/2022.
-- Este laudo não substitui assessoria jurídico-tributária especializada para o caso concreto.
-- Os descontos indicados são estimativas baseados na tabela vigente — valores finais dependem de negociação.
-
----
+## IX. RESSALVAS
+Mencione que a decisão final cabe à PGFN e que o laudo baseia-se em dados fornecidos.
 `;
 
 export async function POST(req: Request) {
@@ -183,7 +99,7 @@ export async function POST(req: Request) {
         const contexto = `
 Empresa: ${extractedData?.company_name || 'Empresa em análise'}
 CNPJ: ${extractedData?.cnpj || 'N/A'}
-Período-base: ${extractedData?.period || 'Exercício 2023'}
+Período - base: ${extractedData?.period || 'Exercício 2023'}
 Valor da dívida: R$ ${Number(valorDivida).toLocaleString('pt-BR')}
 Modalidade: ${modalidade || 'N/A'}
 
@@ -191,17 +107,17 @@ Dados Financeiros Extraídos:
 ${JSON.stringify(extractedData, null, 2)}
 
 Cálculos:
-- Cenário Base (PGFN Presumido): ${JSON.stringify(calcData?.cenario_base)}
-- Cenário Ajustado (Laudo): ${JSON.stringify(calcData?.cenario_ajustado)}
-- Ajustes aplicados (receitas não recorrentes excluídas): ${JSON.stringify(calcData?.ajustes_aplicados)}
-- Itens identificados (já refletidos no balanço): ${JSON.stringify(calcData?.itens_identificados)}
+- Cenário Base(PGFN Presumido): ${JSON.stringify(calcData?.cenario_base)}
+- Cenário Ajustado(Laudo): ${JSON.stringify(calcData?.cenario_ajustado)}
+- Ajustes aplicados(receitas não recorrentes excluídas): ${JSON.stringify(calcData?.ajustes_aplicados)}
+- Itens identificados(já refletidos no balanço): ${JSON.stringify(calcData?.itens_identificados)}
 - Ganho do laudo: R$ ${ganho.toLocaleString('pt-BR')}
 
 Validação Jurídica (Strategist): ${JSON.stringify(stratData)}
 
 RESUMO DO IMPACTO:
 Rating PGFN Presumido: ${ratingBase} (${descontoBase}% desconto)
-Rating Laudo (CAPAG-e): ${ratingAj} (${descontoAj}% desconto)
+Rating Laudo(CAPAG - e): ${ratingAj} (${descontoAj}% desconto)
 Economia estimada: R$ ${ganho.toLocaleString('pt-BR')}
 `;
 
