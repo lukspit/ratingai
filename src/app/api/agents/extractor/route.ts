@@ -60,12 +60,24 @@ export async function POST(req: Request) {
     try {
         const { analysisId, documentsText } = await req.json();
 
-        if (!analysisId || !documentsText) {
-            return NextResponse.json({ error: 'Missing parameters' }, { status: 400 });
+        if (!analysisId || !documentsText || documentsText.trim().length < 100) {
+            return NextResponse.json({
+                error: 'Texto dos documentos insuficiente para análise técnica. Verifique se os PDFs contêm texto legível (não são apenas imagens).'
+            }, { status: 400 });
         }
 
         const supabase = await createClient();
         const admin = createAdminClient();
+
+        const { data: analysis, error: analysisFetchError } = await supabase
+            .from('tributario_analyses')
+            .select('user_id, company_name')
+            .eq('id', analysisId)
+            .single();
+
+        if (analysisFetchError || !analysis) {
+            throw new Error(`Análise não encontrada: ${analysisFetchError?.message}`);
+        }
 
         await supabase
             .from('tributario_analyses')
@@ -90,7 +102,9 @@ export async function POST(req: Request) {
             .from('tributario_documents')
             .insert([{
                 analysis_id: analysisId,
+                user_id: analysis.user_id,
                 document_type: 'TEXT_COMBINED',
+                file_name: `Dados Extraídos - ${analysis.company_name}`,
                 extracted_data: extractedData
             }]);
 

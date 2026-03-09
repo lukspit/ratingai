@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 // @ts-ignore
-import pdfParse from 'pdf-parse-debugging-disabled';
+import pdfParse from 'pdf-parse';
 
 export async function POST(req: Request) {
   try {
@@ -59,12 +59,18 @@ export async function POST(req: Request) {
         // a. Extrair texto para a IA
         try {
           const data = await pdfParse(buffer);
-          console.log(`[PDF-PARSE OK] ${file.name} — ${data.text.length} caracteres extraídos`);
-          combinedText += `\n--- ARQUIVO: ${file.name} ---\n${data.text}\n`;
+          const extractedText = data.text || '';
+
+          if (extractedText.trim().length < 50) {
+            console.warn(`[PDF-PARSE AVISO] ${file.name} — Texto insuficiente (${extractedText.length} chars). Pode ser imagem ou protegido.`);
+            combinedText += `\n--- ARQUIVO: ${file.name} (Texto Insuficiente/Imagem) ---\n[O PDF parece ser uma imagem ou está protegido. Os dados podem não ser extraídos corretamente.]\n`;
+          } else {
+            console.log(`[PDF-PARSE OK] ${file.name} — ${extractedText.length} caracteres extraídos`);
+            combinedText += `\n--- ARQUIVO: ${file.name} ---\n${extractedText}\n`;
+          }
         } catch (pdfError) {
           console.error(`[PDF-PARSE FALHOU] ${file.name}:`, pdfError);
-          // MANTÉM MOCK FALLBACK PARA DEMO SE PARSE FALHAR
-          combinedText += `\n--- ARQUIVO: ${file.name} (Texto Simulada) ---\n[Simulação de extração de dados para fins de processamento IA]\n`;
+          combinedText += `\n--- ARQUIVO: ${file.name} (Erro na Extração) ---\n[Falha técnica ao extrair texto deste documento.]\n`;
         }
 
         // b. Salvar arquivo no Storage
