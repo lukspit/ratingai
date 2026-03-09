@@ -130,11 +130,21 @@ Economia estimada: R$ ${ganho.toLocaleString('pt-BR')}
 
         if (!markdownReport) throw new Error("Falha ao gerar o laudo.");
 
+        // Limpa possíveis blocos de formatação markdown injetados pelo LLM (```markdown ... ```)
+        let cleanMarkdown = markdownReport.trim();
+        if (cleanMarkdown.startsWith('```markdown')) {
+            cleanMarkdown = cleanMarkdown.replace(/^```markdown\n?/i, '');
+        }
+        if (cleanMarkdown.endsWith('```')) {
+            cleanMarkdown = cleanMarkdown.replace(/```$/i, '');
+        }
+        cleanMarkdown = cleanMarkdown.trim();
+
         const { error: updateError } = await supabase
             .from('tributario_analyses')
             .update({
                 status: 'completed',
-                report_markdown: markdownReport
+                report_markdown: cleanMarkdown
             })
             .eq('id', analysisId);
 
