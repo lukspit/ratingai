@@ -65,10 +65,13 @@ export async function POST(req: Request) {
         // a. Extrair texto para a IA
         try {
           console.log(`[PDF-PARSE] Iniciando extração de ${file.name} (${file.size} bytes)`);
-          // @ts-ignore
-          const pdfParse = (await import('pdf-parse-debugging-disabled')).default;
-          const data = await pdfParse(buffer);
-          const extractedText = data.text || '';
+
+          const { extractText } = await import('unpdf');
+          const uint8Array = new Uint8Array(buffer);
+          const data = await extractText(uint8Array);
+
+          const textRaw = data.text || '';
+          const extractedText = Array.isArray(textRaw) ? textRaw.join('\n') : textRaw;
 
           if (extractedText.trim().length < 50) {
             console.warn(`[PDF-PARSE AVISO] ${file.name} — Texto insuficiente (${extractedText.length} chars).`);
