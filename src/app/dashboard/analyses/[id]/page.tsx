@@ -12,9 +12,9 @@ import ReactMarkdown from 'react-markdown'
 // ───────────────────────────────────────────────
 const RATINGS: Record<string, { bg: string; ring: string; text: string; label: string; desc: string }> = {
     A: { bg: 'from-emerald-500/20 to-green-500/10', ring: 'ring-emerald-500/40', text: 'text-emerald-400', label: 'Excelente', desc: '0% de desconto' },
-    B: { bg: 'from-blue-500/20 to-sky-500/10', ring: 'ring-blue-500/40', text: 'text-blue-400', label: 'Bom', desc: '30% de desconto' },
-    C: { bg: 'from-amber-500/20 to-yellow-500/10', ring: 'ring-amber-500/40', text: 'text-amber-400', label: 'Regular', desc: '50% de desconto' },
-    D: { bg: 'from-red-500/20 to-rose-500/10', ring: 'ring-red-500/40', text: 'text-red-400', label: 'Crítico', desc: '70% de desconto' },
+    B: { bg: 'from-blue-500/20 to-sky-500/10', ring: 'ring-blue-500/40', text: 'text-blue-400', label: 'Bom', desc: '0% de desconto' },
+    C: { bg: 'from-amber-500/20 to-yellow-500/10', ring: 'ring-amber-500/40', text: 'text-amber-400', label: 'Regular', desc: 'até 65% de desconto' },
+    D: { bg: 'from-red-500/20 to-rose-500/10', ring: 'ring-red-500/40', text: 'text-red-400', label: 'Crítico', desc: 'até 70% de desconto' },
 }
 
 function RatingCard({ rating, sublabel }: { rating: string; sublabel: string }) {
@@ -78,6 +78,7 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
     const cenarioAj = calcData?.cenario_ajustado || null
     const ganhoDoLaudo = calcData?.ganho_do_laudo || 0
     const valorDivida = calcData?.valor_divida || 0
+    const capagE = calcData?.capag_e || null
 
     // Fallback para estrutura antiga
     const indBase = cenarioBase?.indicadores || calcData?.indicadores || {}
@@ -155,6 +156,54 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
                                     <span className="text-emerald-400/50 text-xs uppercase tracking-wider">Desconto obtido:</span>
                                     <span className="font-bold text-emerald-300">{descontoAj}%</span>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── CAPAG-e Card ────────────────────────────────────────── */}
+            {capagE && (
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-950 via-purple-900/80 to-indigo-800/60 border border-violet-500/30 shadow-2xl shadow-violet-500/10 p-8 print:hidden">
+                    <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-violet-500/10 blur-3xl pointer-events-none" />
+                    <div className="relative">
+                        <div className="flex items-center gap-2 mb-4">
+                            <TrendingDown className="w-5 h-5 text-violet-400" />
+                            <span className="text-sm font-bold uppercase tracking-widest text-violet-400/80">CAPAG-e — Capacidade de Pagamento Efetiva</span>
+                        </div>
+                        <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6">
+                            <div>
+                                <div className="text-5xl sm:text-6xl font-black text-violet-300 leading-none tracking-tight">
+                                    {formatBRL(capagE.valor_final)}
+                                </div>
+                                <p className="text-violet-400/70 text-sm mt-2">
+                                    capacidade de pagamento real via <span className="font-bold text-violet-300">{capagE.metodologia_escolhida}</span>
+                                </p>
+                            </div>
+                            <div className="sm:ml-auto flex flex-col gap-2 text-sm">
+                                <div className="flex items-center gap-2 text-violet-300/70">
+                                    <span className="text-violet-400/50 text-xs uppercase tracking-wider">PLR:</span>
+                                    <span className="font-bold">{formatBRL(capagE.plr)}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-violet-300/70">
+                                    <span className="text-violet-400/50 text-xs uppercase tracking-wider">Met. 1 (ROA+PLR):</span>
+                                    <span className="font-bold">{formatBRL(capagE.metodologia_1?.valor ?? 0)}</span>
+                                </div>
+                                {capagE.metodologia_2?.disponivel && (
+                                    <div className="flex items-center gap-2 text-violet-300/70">
+                                        <span className="text-violet-400/50 text-xs uppercase tracking-wider">Met. 2 (FCO+PLR):</span>
+                                        <span className="font-bold">{formatBRL(capagE.metodologia_2?.valor ?? 0)}</span>
+                                    </div>
+                                )}
+                                <div className="flex items-center gap-2 mt-1 pt-1 border-t border-violet-500/20">
+                                    <span className="text-violet-400/50 text-xs uppercase tracking-wider">GRE:</span>
+                                    <span className={`font-black text-base ${capagE.gre < 0.5 ? 'text-red-400' : capagE.gre < 1 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                                        {(capagE.gre * 100).toFixed(1)}%
+                                    </span>
+                                </div>
+                                <p className={`text-xs ${capagE.gre < 0.5 ? 'text-red-400/80' : capagE.gre < 1 ? 'text-amber-400/80' : 'text-emerald-400/80'}`}>
+                                    {capagE.interpretacao_gre}
+                                </p>
                             </div>
                         </div>
                     </div>

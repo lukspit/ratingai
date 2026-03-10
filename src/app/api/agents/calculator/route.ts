@@ -29,7 +29,7 @@ function worstRating(ratings: string[]): string {
     return ratings.reduce((worst, r) => order.indexOf(r) > order.indexOf(worst) ? r : worst, 'A');
 }
 
-const DESCONTO: Record<string, number> = { A: 0, B: 30, C: 50, D: 70 };
+const DESCONTO: Record<string, number> = { A: 0, B: 0, C: 65, D: 70 };
 
 function calcularCenario(ac: number, pc: number, pcnc: number, pl: number, ebitda: number, rb: number) {
     const il = pc > 0 ? ac / pc : 0;
@@ -96,6 +96,14 @@ export async function POST(req: Request) {
         const rb = Number(extractedData.receita_bruta) || 0;
         const divida = Number(valorDivida) || 0;
 
+        // Novos campos para CAPAG-e
+        const disponibilidades = Number(extractedData.disponibilidades) || 0;
+        const contas_a_receber = Number(extractedData.contas_a_receber) || 0;
+        const estoques = Number(extractedData.estoques) || 0;
+        const aplicacoes_financeiras = Number(extractedData.aplicacoes_financeiras) || 0;
+        const resultado_operacional = Number(extractedData.resultado_operacional) || ebitda;
+        const fco_operacional = Number(extractedData.fco_operacional) || 0;
+
         // ── CENÁRIO 1: Rating PGFN Presumido (EBITDA com tudo incluído) ──────
         const base = calcularCenario(ac, pc, pcnc, pl, ebitda, rb);
         console.log(`[CALCULATOR] BASE: IL = ${base.il.toFixed(4)} (${base.rIL}) IA = ${base.ia.toFixed(4)} (${base.rIA}) MO = ${(base.mo * 100).toFixed(2)}% (${base.rMO}) → Rating ${base.rating} `);
@@ -120,6 +128,7 @@ export async function POST(req: Request) {
         const itens: any[] = extractedData.itens_ajustaveis || [];
 
         let ebitda_aj = ebitda;
+        let resultado_operacional_aj = resultado_operacional;
 
         const ajustesAplicados: Array<{ item: string; tipo: string; valor: number; impacto: string }> = [];
         const itensIdentificados: Array<{ item: string; tipo: string; valor: number; nota: string }> = [];
@@ -130,9 +139,8 @@ export async function POST(req: Request) {
 
             switch (item.tipo) {
                 case 'receita_nao_recorrente':
-                    // ÚNICO ajuste que piora os indicadores: retira receita não recorrente do EBITDA
-                    // (Outras Receitas como venda de imóvel não entram na Receita Bruta operacional)
                     ebitda_aj -= val;
+                    resultado_operacional_aj -= val;
                     ajustesAplicados.push({
                         item: item.item,
                         tipo: item.tipo,
@@ -142,7 +150,6 @@ export async function POST(req: Request) {
                     break;
 
                 case 'despesa_nao_recorrente':
-                    // Já está deduzida do EBITDA — manter. Documentar como evidência de fragilidade.
                     itensIdentificados.push({
                         item: item.item, tipo: item.tipo, valor: val,
                         nota: 'Despesa extraordinária já deduzida do EBITDA — contribui para manter a Margem Operacional baixa'
@@ -198,12 +205,50 @@ export async function POST(req: Request) {
             }
         }
 
-        // EBITDA ajustado não pode ser negativo para cálculo
+        // EBITDA e ROA ajustados não podem ser negativos para cálculo de rating
         ebitda_aj = Math.max(ebitda_aj, 0);
 
         // IL e IA usam os dados do BP sem modificação (já refletem a situação real)
         const ajustado = calcularCenario(ac, pc, pcnc, pl, ebitda_aj, rb);
         console.log(`[CALCULATOR] AJUSTADO: IL = ${ajustado.il.toFixed(4)} (${ajustado.rIL}) IA = ${ajustado.ia.toFixed(4)} (${ajustado.rIA}) MO = ${(ajustado.mo * 100).toFixed(2)}% (${ajustado.rMO}) → Rating ${ajustado.rating} `);
+
+        // ── CAPAG-e: Cálculo real em R$ (Portaria PGFN 6.757/2022) ───────────
+        //
+        // PLR = Patrimônio Líquido Realizável (ativos circulantes de fácil conversão)
+        const plr = disponibilidades + contas_a_receber + estoques + aplicacoes_financeiras;
+
+        // Metodologia 1: ROA (Resultado Operacional Ajustado) + PLR
+        // ROA = resultado operacional ajustado (sem receitas não recorrentes)
+        const roa_aj = Math.max(resultado_operacional_aj, 0);
+        const capag_m1_valor = roa_aj + plr;
+
+        // Metodologia 2: FCO (Fluxo de Caixa Operacional) + PLR
+        // Se FCO for negativo, considerar como zero
+        const fco_aj = Math.max(fco_operacional, 0);
+        const capag_m2_valor = fco_aj + plr;
+
+        // Escolher a menor CAPAG-e (mais vantajosa para o contribuinte)
+        const tem_fco = fco_operacional !== 0;
+        let metodologia_escolhida: string;
+        let capag_final: number;
+
+        if (tem_fco && capag_m2_valor < capag_m1_valor) {
+            metodologia_escolhida = 'FCO + PLR';
+            capag_final = capag_m2_valor;
+        } else {
+            metodologia_escolhida = 'ROA + PLR';
+            capag_final = capag_m1_valor;
+        }
+
+        // GRE = Grau de Recuperação Esperada
+        const gre = divida > 0 ? capag_final / divida : 0;
+        const interpretacao_gre = gre >= 1
+            ? 'Dívida potencialmente recuperável (GRE ≥ 100%)'
+            : gre >= 0.5
+                ? `Dívida parcialmente recuperável (GRE = ${(gre * 100).toFixed(1)}%)`
+                : `Dívida irrecuperável (GRE = ${(gre * 100).toFixed(1)}%)`;
+
+        console.log(`[CALCULATOR] CAPAG-e: PLR=R$${plr.toLocaleString('pt-BR')} | M1(ROA+PLR)=R$${capag_m1_valor.toLocaleString('pt-BR')} | M2(FCO+PLR)=R$${capag_m2_valor.toLocaleString('pt-BR')} | Escolhida: ${metodologia_escolhida} = R$${capag_final.toLocaleString('pt-BR')} | GRE=${(gre * 100).toFixed(1)}%`);
 
         // ── Impacto financeiro ───────────────────────────────────────────────
         const economia_base = divida * (base.desconto / 100);
@@ -215,9 +260,29 @@ export async function POST(req: Request) {
             { role: 'user', content: JUSTIFICATIVA_PROMPT(base, ajustado, ganho_do_laudo) }
         ];
         const justificativa = await callAI(messages, false, MODEL_REASONER)
-            || `EBITDA real de R$ ${ebitda_aj.toLocaleString('pt-BR')} vs R$ ${ebitda.toLocaleString('pt-BR')} presumido.Rating contestado: ${ajustado.rating} (${ajustado.desconto}% desconto).`;
+            || `EBITDA real de R$ ${ebitda_aj.toLocaleString('pt-BR')} vs R$ ${ebitda.toLocaleString('pt-BR')} presumido. Rating contestado: ${ajustado.rating} (${ajustado.desconto}% desconto).`;
 
         const calcData = {
+            capag_e: {
+                plr,
+                metodologia_1: {
+                    nome: 'ROA + PLR',
+                    roa: roa_aj,
+                    plr,
+                    valor: capag_m1_valor
+                },
+                metodologia_2: {
+                    nome: 'FCO + PLR',
+                    fco: fco_aj,
+                    plr,
+                    valor: capag_m2_valor,
+                    disponivel: tem_fco
+                },
+                metodologia_escolhida,
+                valor_final: capag_final,
+                gre,
+                interpretacao_gre
+            },
             cenario_base: {
                 indicadores: { il: base.il, ia: base.ia, mo: base.mo },
                 ratings: { il: base.rIL, ia: base.rIA, mo: base.rMO },

@@ -76,7 +76,7 @@ export async function POST(req: Request) {
             : SYSTEM_PROMPT;
 
         const userContent = ajustesAplicados.length > 0
-            ? `Valide juridicamente os ajustes abaixo.\n\nRating PGFN Presumido: ${ratingBase}\nRating Após Ajustes: ${ratingAjustado}\nGanho estimado: R$ ${ganho.toLocaleString('pt-BR')}\n\nAjustes aplicados:\n${JSON.stringify(ajustesAplicados, null, 2)}`
+            ? `Valide juridicamente os ajustes abaixo.\n\nRating PGFN Presumido: ${ratingBase}\nRating Após Ajustes: ${ratingAjustado}\nGanho estimado: R$ ${ganho.toLocaleString('pt-BR')}\n\nCAPAG-e Calculada:\n- PLR (Patrimônio Líquido Realizável): R$ ${Number(calcData?.capag_e?.plr || 0).toLocaleString('pt-BR')}\n- Metodologia escolhida: ${calcData?.capag_e?.metodologia_escolhida || 'ROA + PLR'}\n- Valor da CAPAG-e: R$ ${Number(calcData?.capag_e?.valor_final || 0).toLocaleString('pt-BR')}\n- GRE: ${((calcData?.capag_e?.gre || 0) * 100).toFixed(1)}% — ${calcData?.capag_e?.interpretacao_gre || 'N/A'}\n\nAjustes aplicados:\n${JSON.stringify(ajustesAplicados, null, 2)}`
             : `Nenhum ajuste foi identificado nos documentos. Rating PGFN: ${ratingBase}. Redija a tese explicando que o rating presumido reflete a real capacidade de pagamento e recomende próximos passos para o contribuinte buscar dados adicionais.`;
 
         const messages = [

@@ -33,8 +33,15 @@ Formate a citação OBRIGATORIAMENTE EM UM BLOCKQUOTE DO MARKDOWN (começando a 
 Exemplo de formatação exigida:
 > *"Art. 14. Aplica-se às negociações... "*
 
+## Cálculo da CAPAG-e (Capacidade de Pagamento Efetiva)
+Apresente o cálculo da CAPAG-e em R$ conforme as metodologias oficiais da Portaria PGFN 6.757/2022.
+MOSTRE AMBAS as metodologias calculadas (ROA + PLR e FCO + PLR), explique qual foi escolhida e por que é mais vantajosa ao contribuinte.
+Defina e apresente os componentes: PLR (Patrimônio Líquido Realizável = disponibilidades + contas a receber + estoques + aplicações financeiras).
+Apresente o GRE (Grau de Recuperação Esperada = CAPAG-e / Valor da Dívida) e interprete se a dívida é irrecuperável, parcialmente recuperável ou recuperável.
+Use os valores exatos fornecidos (não invente) e formate todos os valores em R$ X.XXX,XX.
+
 ## Conclusão Pericial e Reflexos no CAPAG-e
-Apresente o resultado final pleiteado, ressaltando os novos indicadores recalculados (agora com as métricas realistas do EBITDA). Conclua definitivamente qual o impacto tributário na capacidade de pagamento (Mesmo que o Rating não seja rebaixado para "D", por exemplo, reforce o impacto financeiro de fragilidade da "Margem Operacional"). Seja assertivo e sugira pelo deferimento da revisão.
+Apresente o resultado final pleiteado, ressaltando: (1) o valor da CAPAG-e em R$ e a metodologia mais vantajosa, (2) o GRE demonstrando a irrecuperabilidade/parcial recuperabilidade da dívida, (3) os novos indicadores recalculados. Conclua definitivamente qual o impacto tributário na capacidade de pagamento. Seja assertivo e sugira pelo deferimento da revisão.
 `;
 
 export async function POST(req: Request) {
@@ -79,12 +86,17 @@ Cálculos:
 - Itens identificados(já refletidos no balanço): ${JSON.stringify(calcData?.itens_identificados)}
 - Ganho do laudo: R$ ${ganho.toLocaleString('pt-BR')}
 
+CAPAG-e (Capacidade de Pagamento Efetiva):
+${JSON.stringify(calcData?.capag_e, null, 2)}
+
 Validação Jurídica (Strategist): ${JSON.stringify(stratData)}
 
 RESUMO DO IMPACTO:
 Rating PGFN Presumido: ${ratingBase} (${descontoBase}% desconto)
 Rating Laudo(CAPAG - e): ${ratingAj} (${descontoAj}% desconto)
 Economia estimada: R$ ${ganho.toLocaleString('pt-BR')}
+CAPAG-e Final: R$ ${Number(calcData?.capag_e?.valor_final || 0).toLocaleString('pt-BR')}
+GRE: ${((calcData?.capag_e?.gre || 0) * 100).toFixed(1)}% — ${calcData?.capag_e?.interpretacao_gre || 'N/A'}
 `;
 
         const messages = [
