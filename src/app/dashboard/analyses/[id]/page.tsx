@@ -114,8 +114,8 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
                 </div>
             </div>
 
-            {/* Print header */}
-            <div className="hidden print:flex flex-col border-b pb-6 mb-2">
+            {/* Print header (Removido pois agora só imprimimos o laudo final) */}
+            <div className="hidden flex-col border-b pb-6 mb-2">
                 <div className="flex items-center gap-2 mb-1">
                     <Scale className="w-5 h-5" />
                     <span className="font-black tracking-tight">Rating.ai</span>
@@ -128,7 +128,7 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
 
             {/* ── MONEY SHOT: Economia Estimada ─────────────────────────────── */}
             {isDualScenario && ganhoDoLaudo > 0 && (
-                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900/80 to-emerald-800/60 border border-emerald-500/30 shadow-2xl shadow-emerald-500/10 p-8 print:border print:border-emerald-600">
+                <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-950 via-emerald-900/80 to-emerald-800/60 border border-emerald-500/30 shadow-2xl shadow-emerald-500/10 p-8 print:hidden">
                     <div className="absolute -right-16 -top-16 w-64 h-64 rounded-full bg-emerald-500/10 blur-3xl pointer-events-none" />
                     <div className="relative">
                         <div className="flex items-center gap-2 mb-4">
@@ -162,7 +162,7 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
             )}
 
             {/* ── Comparativo de Ratings ────────────────────────────────────── */}
-            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-primary/5 border border-border/50 shadow-xl p-8">
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-card via-card to-primary/5 border border-border/50 shadow-xl p-8 print:hidden">
                 <div className="absolute -right-12 -top-12 w-48 h-48 rounded-full bg-primary/5 blur-3xl pointer-events-none" />
                 <div className="relative">
                     <div className="flex items-center gap-2 mb-6">
@@ -254,7 +254,7 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
 
             {/* ── Ajustes identificados (novo formato) ─────────────────────── */}
             {isDualScenario && calcData?.ajustes_aplicados?.length > 0 && (
-                <div className="rounded-2xl bg-card border border-border/50 shadow-lg p-6 space-y-4">
+                <div className="rounded-2xl bg-card border border-border/50 shadow-lg p-6 space-y-4 print:hidden">
                     <div className="flex items-center gap-2">
                         <TrendingUp className="w-5 h-5 text-primary" />
                         <h2 className="font-bold text-base">Ajustes Contábeis Legais Identificados</h2>
@@ -295,7 +295,7 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
 
             {/* ── Ajustes (formato antigo — fallback) ──────────────────────── */}
             {!isDualScenario && adjustments.length > 0 && (
-                <div className="rounded-2xl bg-card border border-border/50 shadow-lg p-6 space-y-4">
+                <div className="rounded-2xl bg-card border border-border/50 shadow-lg p-6 space-y-4 print:hidden">
                     <div className="flex items-center gap-2">
                         <Gavel className="w-5 h-5 text-primary" />
                         <h2 className="font-bold text-base">Ajustes Contábeis Propostos</h2>
@@ -334,7 +334,7 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
 
             {/* ── Laudo Técnico Formal ──────────────────────────────────────── */}
             {reportMarkdown && (
-                <div className="space-y-4">
+                <div className="space-y-4 print:space-y-0 print:m-0 print:p-0">
                     {/* Header externo com botão de exportar */}
                     <div className="flex items-center justify-between print:hidden">
                         <div className="flex items-center gap-2">
@@ -345,28 +345,28 @@ export default async function AnalysisDetailPage({ params }: { params: Promise<{
                     </div>
 
                     {/* Documento formal */}
-                    <div className="rounded-2xl border border-border/60 shadow-xl overflow-hidden">
+                    <div className="rounded-2xl border border-border/60 shadow-xl overflow-hidden print:border-none print:shadow-none print:rounded-none">
                         {/* Topo do documento — header oficial */}
-                        <div className="bg-slate-900 border-b border-slate-700 px-8 py-5 flex items-center justify-between print:bg-white print:border-slate-300">
+                        <div className="bg-slate-900 border-b border-slate-700 px-8 py-5 flex items-center justify-between print:bg-white print:border-b-2 print:border-slate-300 print:px-0 print:py-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-                                    <Scale className="w-4 h-4 text-primary" />
+                                <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center print:bg-transparent print:border print:border-slate-300">
+                                    <Scale className="w-4 h-4 text-primary print:text-slate-800" />
                                 </div>
                                 <div>
-                                    <p className="text-xs font-bold uppercase tracking-widest text-primary/80">Rating.ai</p>
-                                    <p className="text-[10px] text-muted-foreground">Sistema Especialista em CAPAG-e</p>
+                                    <p className="text-xs font-bold uppercase tracking-widest text-primary/80 print:text-slate-900">Rating.ai</p>
+                                    <p className="text-[10px] text-muted-foreground print:text-slate-600">Sistema Especialista em CAPAG-e</p>
                                 </div>
                             </div>
                             <div className="text-right">
-                                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Portaria PGFN nº 6.757/2022</p>
-                                <p className="text-[10px] text-muted-foreground">
+                                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground print:text-slate-600">Portaria PGFN nº 6.757/2022</p>
+                                <p className="text-[10px] text-muted-foreground print:text-slate-500">
                                     {new Date(analysis.created_at).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })}
                                 </p>
                             </div>
                         </div>
 
                         {/* Corpo do documento */}
-                        <div className="bg-white text-slate-800 px-8 md:px-12 py-10 print:px-8 print:py-6">
+                        <div className="bg-white text-slate-800 px-8 md:px-12 py-10 print:px-0 print:py-6">
                             <div className="
                                 [&_h1]:text-2xl [&_h1]:font-black [&_h1]:mt-8 [&_h1]:mb-6 [&_h1]:text-slate-900 [&_h1]:tracking-tight [&_h1]:text-center
                                 [&_h2]:text-lg [&_h2]:font-bold [&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:text-slate-800 [&_h2]:uppercase [&_h2]:tracking-wider
