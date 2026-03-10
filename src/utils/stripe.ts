@@ -7,7 +7,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
     apiVersion: '2026-02-25.clover', // Update to the latest version you're using.
     appInfo: {
-        name: 'Nexus Clínicas SaaS',
+        name: 'Rating.ai',
         version: '0.1.0',
     },
 })

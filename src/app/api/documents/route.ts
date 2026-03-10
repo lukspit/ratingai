@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 
 export async function POST(req: Request) {
     try {
@@ -40,8 +41,9 @@ export async function POST(req: Request) {
                     continue;
                 }
 
-                // Criar registro na tabela de documentos
-                const { data: doc, error: docError } = await supabase
+                // Criar registro na tabela de documentos (usa admin para bypass RLS)
+                const admin = createAdminClient();
+                const { data: doc, error: docError } = await admin
                     .from('tributario_documents')
                     .insert({
                         user_id: userId,

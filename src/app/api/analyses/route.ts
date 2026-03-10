@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { Buffer } from 'node:buffer';
 
 export async function POST(req: Request) {
@@ -116,14 +117,19 @@ export async function POST(req: Request) {
     }
 
     // SALVAR DOCUMENTOS NO DB (se houver registros)
+    // Usa adminClient para bypass RLS (autenticação já foi verificada acima)
     if (documentRecords.length > 0) {
-      const { error: docError } = await supabase
+      const admin = createAdminClient();
+      const { data: savedDocs, error: docError } = await admin
         .from('tributario_documents')
-        .insert(documentRecords);
+        .insert(documentRecords)
+        .select();
 
       if (docError) {
         console.error('[DB ERROR] Salvando documentos:', docError);
-        // Se der erro de coluna, pelo menos a análise foi criada.
+        console.error('[DB ERROR] Records tentados:', JSON.stringify(documentRecords));
+      } else {
+        console.log(`[DB OK] ${savedDocs?.length} documentos salvos com sucesso`);
       }
     }
 
