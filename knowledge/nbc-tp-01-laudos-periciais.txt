@@ -1,0 +1,27 @@
+# NBC TP 01 (R2) - NORMA BRASILEIRA DE CONTABILIDADE: PERÍCIA CONTÁBIL E LAUDO PERICIAL
+
+A Norma Brasileira de Contabilidade Técnica de Perícia 01 (NBC TP 01 (R2)), em vigência a partir de março de 2025, estabelece os procedimentos técnico-científicos a serem observados pelos peritos contábeis corporativos, judiciais e extrajudiciais. Todo laudo de Revisão de CAPAG-e apresentado à PGFN deve, obrigatoriamente, observar a forma e o rigor exigidos pela NBC TP 01 para gozar de presunção de veracidade e valor probatório.
+
+## PRINCÍPIOS E EXIGÊNCIAS FORMAIS DO PERITO E DO LAUDO
+
+1. **Competência Exclusiva:** A elaboração do laudo pericial contábil e do parecer técnico contábil é atribuição exclusiva e indelegável de Contador com registro ativo no Conselho Regional de Contabilidade (CRC).
+2. **Método Científico:** O trabalho pericial consiste no conjunto de procedimentos periciais exigidos pela disciplina contábil. Estes procedimentos englobam: exame, vistoria, indagação, investigação, arbitramento, mensuração, avaliação e certificação.
+3. **Escrita Formal e Imparcial (Linguagem):** 
+   - O laudo deve ser redigido em linguagem clara, objetiva, precisa, concisa e gramaticalmente correta.
+   - Devem-se evitar jargões ininteligíveis sem a devida explicação (Glossário) e eliminar qualquer viés opinativo pessoal, atendo-se unicamente ao fato contábil demonstrado.
+4. **Fundamentação Consistente:** Nenhuma conclusão pode ser genérica. Toda firmação sobre receitas atípicas, despesas não recorrentes ou inflação de EBITDA deve apontar o lastro (Livro Diário, DRE, Balancete, Contrato) que a fundamenta.
+5. **Apresentação Visual:** A norma desaconselha (ou restringe) relatórios mal estruturados, com excesso de listas de tópicos fragmentados e sem concatenação lógica ("estilo bullet-point desenfreado"). Exige-se formatação coesa que demonstre a evolução do raciocínio técnico.
+
+## ESTRUTURA REQUISITADA DO LAUDO PERICIAL CONTÁBIL 
+Ainda que seja aplicável na via extrajudicial/administrativa perante a PGFN, o laudo deve mimetizar a qualidade de um laudo judicial, contemplando:
+
+- **1. Objetivo da Perícia (Qualificação e Objeto):** Descrição clara do que foi pedido. Neste caso, atestar a realidade da capacidade de geração de caixa e de solver obrigações (liquidez/sustentabilidade) em contraponto à medição padronizada da PGFN, visando a revisão da Capacidade de Pagamento prevista na Portaria PGFN nº 6.757/2022.
+- **2. Síntese do Objeto da Perícia (Diagnóstico Presumido):** Descrição do status quo (rating atual, dívida, indicadores aplicados pelo avaliador federal).
+- **3. Metodologia Adotada:** Declaração de quais normas do CFC, metodologias financeiras (ex: ROA vs FCO) e base legal foram empregadas.
+- **4. Relato e Fundamentação das Constatações (Desenvolvimento):** O coração da perícia. Onde o perito desconstrói o DRE da empresa demonstrando onde moram as receitas extraordinárias (venda de ativos, reversões de provisão) e onde o EBTIDA foi distorcido. 
+  - Todo expurgo/ajuste realizado pelo Perito **DEVE TER A DESCRIÇÃO TÉCNICA correspondente baseada nos Princípios de Contabilidade e nas normas CPC aplicáveis**.
+- **5. Respostas aos Quesitos (se aplicável):** Em muitos processos administrativos, o laudo pode ser construído em forma de respostas aos incisos e parágrafos da própria Portaria pertinente.
+- **6. Conclusão Pericial:** O clímax do documento, onde se declara conclusivamente, por exemplo: *"Comprova-se a total iliquidez da empresa, recaindo inegavelmente em Rating D, devido ao grau de recuperação de apenas X%, conforme a fórmula FCO + PLR expressa no artigo aplicável da Portaria"*.
+
+## APLICAÇÃO NA REVISÃO DE RATING (MALÍCIA CONTÁBIL LÍCITA)
+Quando a inteligência artificial ou o perito humano atua reduzindo a Margem Operacional da empresa através do expurgo de receitas não recorrentes (vendas de imobilizado, subvenções de capital, acordos esporádicos), ele não está sonegando informação; está **aplicando estritamente a NBC TP 01 e os conceitos de lucro econômico sustentável**. A NBC dita que o perito busque a "verdade real" do litígio financeiro. Se o EBITDA presumido pelo algoritmo do governo incluiu 5 milhões de ganhos judiciais pontuais que jamais se repetirão, isso é uma inverdade econômica para projetar fluxos futuros (típico da essência do cálculo CAPAG), e cabe ao laudo amparado pela NBC TP 01 corrigir.

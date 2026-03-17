@@ -1,0 +1,41 @@
+# EBITDA REPORTADO VS EBITDA AJUSTADO (NORMATIZADO) E O COMBATE À CAPAG INFLACIONADA
+
+O entendimento profundo da diferença entre EBITDA Reportado e EBITDA Ajustado é a principal arma na revisão da capacidade de pagamento tributária perante a Procuradoria-Geral da Fazenda Nacional (PGFN).
+
+O algoritmo automático da PGFN (que cruza ECF, EFD, Balanços e Notas Fiscais) calcula o **EBITDA Reportado**. Ele é "cego", tomando a totalidade da receita bruta e diminuindo custos/despesas, incluindo nessa conta operações que não fazem parte do "core business" da empresa, o que frequebtemente gera Rating "A" ou "B" ilusórios para empresas em grave crise.
+
+## EBITDA REPORTADO
+É o Lucro Antes de Juros, Impostos, Depreciação e Amortização extraído de modo bruto e linear das demonstrações financeiras (DRE) regulares, sem nenhum filtro interpretativo sobre a perenidade das operações causadoras dessas cifras.
+
+## EBITDA AJUSTADO (OU NORMALIZADO)
+É a ferramenta analítica técnica que remove os "ruídos contábeis" (itens extraordinários, esporádicos e não recorrentes). O objetivo é apresentar o real e perene poder de geração de caixa das operações contínuas da companhia. **É com base no EBITDA Ajustado que o grau de solvência futuro de uma empresa endividada deve ser medido judicialmente ou administrativamente em laudos da Portaria 6.757/2022.**
+
+## MAPA DE AJUSTES E EXPURGOS CONTÁBEIS PARA REDUÇÃO DO RATING
+
+Na elaboração de Laudos de Revisão de CAPAG-e que visam demonstrar a verdadeira baixa de Margem Operacional (MO), o perito deve subtrair do EBITDA presumido as seguintes categorias de ingressos:
+
+### 1. Venda ou Baixa de Ativo Imobilizado (Alienação)
+A entrada massiva de R$ 5 milhões pela venda do galpão da fábrica entra como "Outras Receitas Operacionais" no DRE. O algoritmo da Receita joga o EBITDA para a lua. 
+**Ação Pericial:** Expurgo total. Trata-se de reestruturação de capital/imobilizado e esvaziamento patrimonial, não operação recorrente.
+
+### 2. Ganhos em Processos Judiciais e Indenizações
+Ingresso de receitas derivadas do encerramento favorável em lides cíveis, tributárias ou trabalhistas.
+**Ação Pericial:** Expurgo total. Fator pontual, não previsível, não compõe esteira produtiva.
+
+### 3. Recuperação de Impostos (Ex: Tese do Século - exclusão do ICMS do PIS/COFINS)
+Trânsito em julgado gera lançamento atípico via habilitação de crédito para compensação. A PGFN costuma interpretar o efeito no DRE e ECF como elevação abrupta e estrutural do lucro.
+**Ação Pericial:** Dedução integral do EBITDA. Fator de distorção não-linear.
+
+### 4. Subvenções de Investimento (Governamentais)
+Benefícios fiscais recebidos por estados/governos (ICMS, por exemplo) muitas vezes transitam no resultado global contábil.
+
+### 5. Reversão de Provisões
+Quando a empresa super-dimensiona uma provisão (ex: perdas com devedores, ações jurídicas) num ano anterior e, no ano base fiscalizado, reverte essa provisão (uma vez que não se materializou). A reversão infla o lucro líquido e consequentemente o EBITDA reportado do ano base, mas NENHUM centavo entrou no caixa da empresa naquele momento.
+**Ação Pericial:** Expurgo obrigatório do EBITDA, pois é transação puramente escritural, gerando EBITDA fantasma que não paga boletos nem impostos atrasados.
+
+## IMPACTO DO EBITDA AJUSTADO NA FÓRMULA DE RATING
+Ao excluir esses eventos, o EBITDA Ajustado desaba.
+A fórmula do Indicador de Margem Operacional (MO) da Portaria 6.757 é:
+`MO = EBITDA / RECEITA BRUTA`
+
+Com um EBITDA corrigido para a sua essência "paupérrima", o MO passará a refletir o cenário de Rating "D" ou "C" (menor que 0.05 / 5%). Com isso, independentemente de um Ativo Circulante saudável (que gera um IL artificialmente bom) ou um Patrimônio Líquido mediano (IA bom), a regulação da PGFN dita que a Classificação Final (Rating) **toma sempre a PIOR nota** dentre os 3 indicadores. Um MO baixo derruba o pacote completo e habilita o teto máximo de descontos no edital.

@@ -1,0 +1,39 @@
+# EDITAIS PGDAU (PROGRAMA DE GESTÃO DA DÍVIDA ATIVA DA UNIÃO) E TRANSAÇÃO TRIBUTÁRIA - 2024 E 2025
+
+A Procuradoria-Geral da Fazenda Nacional (PGFN) utiliza editais (PGDAU) para regulamentar e abrir janelas de adesão à Transação Tributária (com base na Lei 13.988/2020 e Portaria 6.757/2022). 
+Estes editais são fundamentais para que o contribuinte saiba quais modalidades estão abertas, quais os prazos limites e quais os benefícios máximos aplicáveis conforme sua Capacidade de Pagamento (CAPAG).
+
+## REGRAS GERAIS DOS EDITAIS RECENTES
+- **Público-alvo:** Débitos inscritos em Dívida Ativa da União (tributários ou não tributários) e FGTS.
+- **Teto do Valor Consolidado:** Em regra, até R$ 45 milhões por modalidade.
+- **Benefícios Máximos (Capacidade de Pagamento C ou D):** Descontos de até 100% sobre juros de mora, multas de mora e encargos legais. *Atenção: O desconto não pode reduzir o valor do principal e é limitado a 65% do valor total consolidado da inscrição (70% para pessoas físicas, ME/EPP, Santas Casas).*
+- **Prazos de Parcelamento Máximos:** Até 114 meses para débitos gerais e até 60 meses para contribuições previdenciárias (limite constitucional). Para Pessoas Físicas, ME/EPP, e afins, o prazo chega a 133 meses na modalidade geral.
+- **Requisito de Temporalidade (Nova Regra Portaria 1.457/2024):** A partir de setembro de 2024, somente podem ser negociados débitos que estejam inscritos em Dívida Ativa da União há, no mínimo, 90 dias.
+
+## PRINCIPAIS EDITAIS ATIVOS E RECENTES (2024/2025)
+
+### 1. EDITAL PGDAU Nº 11/2025 (O MAIS IMPORTANTE ATUALMENTE)
+- **Data de Publicação:** 02 de junho de 2025.
+- **Prazo de Adesão:** PRORROGADO até as 19h (Brasília) do dia **29 de maio de 2026**.
+- **Modalidades Inclusas:**
+  - Transação por Capacidade de Pagamento.
+  - Transação de Débitos Considerados Irrecuperáveis (como débitos inscritos há mais de 15 anos).
+  - Transação de Pequeno Valor.
+  - Transação de Débitos Garantidos por Seguro Garantia ou Carta Fiança.
+- **Benefícios Específicos:** Entrada mínima de 6% do valor consolidado (podendo ser parcelada em até 6 vezes). O saldo devedor pode ser dividido em até 114 mensais (ou 133 para perfis específicos), com os respectivos descontos baseados na CAPAG.
+
+### 2. EDITAL PGDAU Nº 04/2025 E Nº 01/2025
+- Lançado durante a II Semana Nacional da Regularização Tributária (março/2025).
+- Trazia oportunidades semelhantes ao Edital 11/2025. O edital 01/2025 teve prazo até 30 de maio de 2025, sendo posteriormente englobado e atualizado pelos termos do Edital 11/2025.
+
+### 3. EDITAIS PGFN/RFB Nº 52, 53 e 54/2025 (Teses de Disseminada Controvérsia Jurídica)
+- **Data de Publicação:** 22 de agosto de 2025.
+- **Prazo de Adesão:** Até 28 de novembro de 2025 (19h).
+- Foco exclusivo em transações no contencioso tributário de relevante e disseminada controvérsia. Oferece descontos fixos (até 65%) de acordo com o nível de classificação e parcelamento em até 60 meses, além de exigir renúncia a ações judiciais relacionadas à tese.
+
+### 4. EDITAIS PGDAU 2024 (Histórico Recente)
+- **Edital PGDAU 06/2024 e 07/2024:** Lançados em novembro de 2024, abrangiam transações gerais e específicas para o Simples Nacional. O prazo de adesão inicialmente ia até o início de 2025, mas foi formalmente prorrogado para até **30 de maio de 2025**.
+- **Edital PGDAU 02/2024:** Prazo encerrado em outubro de 2024.
+
+## CONCLUSÃO PARA APLICAÇÃO PERICIAL
+Ao formular um pedido de revisão de CAPAG-e com o objetivo de buscar maiores descontos na negociação, a adesão ocorrerá, no presente momento, primordialmente sob o escopo do **Edital PGDAU 11/2025**, que se encontra vigente até 29 de maio de 2026. A comprovação de iliquidez e deterioração dos indicadores financeiros visa reclassificar o rating da empresa para "C" ou "D", permitindo a fruição do limite máximo de benefícios deste edital (100% dos acessórios, limitado a 65% do débito).
