@@ -54,12 +54,8 @@ export async function updateSession(request: NextRequest) {
         const activeStatuses = ['active', 'trialing']
 
         if (!subscription || !activeStatuses.includes(subscription.status)) {
-            // Permitir acesso temporário se for o admin ou para testes se necessário, 
-            // mas por padrão redireciona para pricing
-            // return NextResponse.redirect(new URL('/pricing', request.url))
-
-            // Por enquanto vamos deixar passar para não bloquear o desenvolvimento, 
-            // mas manter a lógica aqui para o futuro.
+            // Redireciona para a página beta para assinar
+            return NextResponse.redirect(new URL('/beta', request.url))
         }
 
         // Verificar se tem perfil tributário

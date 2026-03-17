@@ -24,7 +24,7 @@ export async function GET(request: Request) {
                 },
             ],
             success_url: `${origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${origin}/pricing?canceled=true`,
+            cancel_url: `${origin}/beta?canceled=true`,
         });
 
         if (!stripeSession.url) {

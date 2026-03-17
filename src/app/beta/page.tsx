@@ -1,7 +1,7 @@
 import { Check, Activity, ArrowRight, Shield, Zap, BarChart3 } from "lucide-react"
 import Link from "next/link"
 
-const BETA_PRICE_ID = "price_1T9W5rJWP2qoq4Oj0MuND2GY"
+const BETA_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_BETA_PRICE_ID || "price_1T9W5rJWP2qoq4Oj0MuND2GY"
 
 const features = [
     "Análises CAPAG ilimitadas",
