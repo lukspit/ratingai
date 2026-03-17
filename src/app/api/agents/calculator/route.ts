@@ -47,21 +47,17 @@ function calcularCenario(ac: number, pc: number, pcnc: number, pl: number, ebitd
 }
 
 const JUSTIFICATIVA_PROMPT = (base: any, ajustado: any, ganho: number) => `
-[PERSONA E ESPECIALIZAÇÃO]
-Você é um Engenheiro Financeiro Tributário, especialista na matemática da Portaria PGFN 6.757/2022.
+[PERSONA]
+Você é um Engenheiro Financeiro Tributário — especialista na matemática fria da Portaria PGFN 6.757/2022. Você traduz números em narrativas que convencem auditores fiscais.
 
-[OBJETIVO DO RESULTADO]
-Escreva em 3 a 5 frases a fundamentação matemática do Laudo de CAPAG-e, criando a narrativa de "antes x depois".
+[OBJETIVO]
+Escrever em 3-5 frases a fundamentação matemática do impacto do Laudo de CAPAG-e, criando a narrativa "antes vs. depois" dos indicadores.
 
-[METODOLOGIA E "MALÍCIA" TRIBUTÁRIA]
-A estratégia é DEMONSTRAR que os indicadores reais da empresa (principalmente Margem Operacional e Lucratividade/EBITDA) são piores do que a PGFN presumiu.
-Você usará a remoção de receitas extraordinárias ou ajuste de passivos para argumentar que a capacidade operacional sustentável da empresa é FRÁGIL e que o rating PGFN estava mascarado por eventos que não se repetirão. Se o rating não mudar, use a malícia para dizer que ainda assim a empresa demonstrou saúde financeira piorada.
+[METODOLOGIA]
+Demonstre que os indicadores reais da empresa (MO, IL, IA) são piores do que a PGFN presumiu. Argumente que receitas extraordinárias inflavam o EBITDA e que, após o expurgo conforme a Portaria PGFN 6.757/2022, a capacidade operacional sustentável revela uma empresa mais frágil. Se os ratings não mudarem, argumente que a deterioração dos indicadores já é evidência relevante.
 
-[TOM E ESTILO]
-Frio, puramente numérico, incontestável e altamente persuasivo. Mostre que o cálculo revela a "verdade".
-
-[BARREIRAS E LIMITAÇÕES OBRIGATÓRIAS]
-- Sem formatação Markdown e sem blá-blá-blá.
+[LIMITES]
+Responda apenas com o texto puro, sem formatação Markdown, sem introdução e sem preâmbulo.
 
 Cenário PGFN Presumido (EBITDA inflado):
 - IL=${base.il.toFixed(2)} (Rating ${base.rIL}), IA=${base.ia.toFixed(2)} (Rating ${base.rIA}), MO=${(base.mo * 100).toFixed(1)}% (Rating ${base.rMO})
@@ -72,9 +68,7 @@ Cenário Laudo Contestado (EBITDA ajustado):
 - Rating Final: ${ajustado.rating} — Desconto: ${ajustado.desconto}%
 - Ganho Estimado da Revisão: R$ ${ganho.toLocaleString('pt-BR')}
 
-Explique que receitas não recorrentes inflavam o EBITDA, que o Laudo as exclui conforme
-Portaria PGFN 6.757/2022, e qual o impacto na Margem Operacional real.
-Responda apenas com o texto, sem introdução.
+Explique o impacto.
 `;
 
 export async function POST(req: Request) {
