@@ -1,0 +1,118 @@
+PORTARIA PGFN Nº 6.757, DE 29 DE JULHO DE 2022
+Regulamenta a transação na cobrança de créditos da União e do FGTS
+
+=== CAPÍTULO I — DISPOSIÇÕES GERAIS ===
+
+Art. 1º Esta Portaria regulamenta os procedimentos, os requisitos e as condições necessárias à realização da transação na cobrança da dívida ativa da União e do FGTS, nos termos da Lei nº 13.988, de 14 de abril de 2020.
+
+Art. 2º A transação da dívida ativa da União e do FGTS poderá ser realizada nas seguintes modalidades:
+I — transação por adesão à proposta da Procuradoria-Geral da Fazenda Nacional;
+II — transação individual proposta pela Procuradoria-Geral da Fazenda Nacional;
+III — transação individual proposta pelo devedor inscrito em dívida ativa da União e do FGTS, incluindo a simplificada.
+
+Art. 5º São compromissos do devedor que aderir à transação:
+I — fornecer, sempre que solicitado, informações sobre bens, direitos, valores, transações e operações que lhe sejam atribuíveis;
+II — não utilizar a transação de forma abusiva ou com a finalidade de prejudicar, limitar, ou de qualquer forma diminuir a capacidade de arrecadação da União;
+III — declarar que não utiliza pessoa natural ou jurídica interposta para ocultar ou dissimular a origem ou a destinação de bens, de direitos e de valores;
+IV — não alienar nem onerar bens ou direitos sem a devida comunicação ao órgão competente, quando exigível em lei;
+V — manter a regularidade perante o FGTS;
+VI — manter atualizadas suas informações cadastrais perante a Secretaria Especial da Receita Federal do Brasil.
+
+Art. 16. A transação deve abranger todas as inscrições elegíveis do sujeito passivo, vedada a adesão parcial, salvo exceções específicas previstas nesta Portaria.
+
+=== CAPÍTULO IV — CLASSIFICAÇÃO DOS CRÉDITOS E CAPACIDADE DE PAGAMENTO ===
+
+Art. 20. Para os fins da transação de que trata esta Portaria, a PGFN estimará a capacidade de pagamento dos devedores, com base na verificação da situação econômica, observados os rendimentos e patrimônio do devedor.
+Parágrafo único. A estimativa da capacidade de pagamento considerará as informações cadastrais, patrimoniais e econômico-fiscais prestadas pelo devedor ou por terceiros à Secretaria Especial da Receita Federal do Brasil e à PGFN.
+
+Art. 22. A PGFN poderá solicitar dados e documentos adicionais para subsidiar a estimativa da capacidade de pagamento, incluindo a transmissão da Escrituração Contábil Fiscal (ECF).
+
+Art. 24. Os créditos inscritos em dívida ativa da União e do FGTS serão classificados em ordem decrescente de recuperabilidade, da seguinte forma:
+I — Tipo A: créditos com alta perspectiva de recuperação;
+II — Tipo B: créditos com média perspectiva de recuperação;
+III — Tipo C: créditos considerados de difícil recuperação;
+IV — Tipo D: créditos considerados irrecuperáveis.
+
+§1º A classificação considerará, entre outros critérios:
+I — a capacidade de pagamento do devedor;
+II — o histórico de inadimplência;
+III — a existência de garantias;
+IV — o tempo de inscrição em dívida ativa.
+
+Art. 25. São considerados irrecuperáveis os créditos inscritos em dívida ativa de titularidade de devedores:
+I — falidos, em recuperação judicial ou extrajudicial, em liquidação judicial ou em intervenção ou liquidação extrajudicial;
+II — em situação de pessoa jurídica cuja existência de fato tenha sido encerrada ou esteja inativa.
+A comprovação de dificuldades financeiras deve ser robusta e documentada.
+
+=== CAPÍTULO V — DESCONTOS E CONDIÇÕES ===
+
+Art. 30. O devedor poderá solicitar, por requerimento protocolado no portal REGULARIZE, a revisão da capacidade de pagamento estimada pela PGFN.
+
+§1º O pedido de revisão deverá indicar:
+I — o valor da capacidade de pagamento estimada pelo contribuinte;
+II — a metodologia de cálculo utilizada;
+III — os documentos que sustentam as alegações.
+
+§2º Para pessoa jurídica, devem ser apresentados obrigatoriamente:
+I — Laudo técnico firmado por profissional habilitado;
+II — Balanço Patrimonial dos dois últimos exercícios e do exercício em curso;
+III — Demonstração de Resultado do Exercício (DRE);
+IV — Demonstração do Fluxo de Caixa (DFC) pelo método direto.
+
+§3º O prazo para apresentação do pedido de revisão é de 30 dias contados da data em que o contribuinte teve ciência de sua capacidade de pagamento.
+
+Art. 31. A PGFN analisará o pedido de revisão e poderá solicitar documentos adicionais para fundamentar a decisão.
+
+Art. 32. Da decisão que indeferir o pedido de revisão caberá recurso, no prazo de 10 dias contados da ciência da decisão.
+
+Art. 33. O contribuinte tem a responsabilidade de manter atualizadas suas informações cadastrais, patrimoniais e econômico-fiscais junto à Secretaria Especial da Receita Federal do Brasil.
+
+Art. 34-A (incluído pela Portaria PGFN/MF nº 1.241/2023). Disciplina procedimentos adicionais para a revisão da capacidade de pagamento e aumenta a transparência nos critérios de classificação.
+
+=== CONDIÇÕES PARA PESSOA JURÍDICA ===
+- Desconto máximo: até 65% sobre o valor total do crédito (juros, multas e encargos)
+- Prazo máximo de parcelamento: até 120 parcelas mensais
+- Entrada mínima: 6% do valor total da dívida, parcelada em até 12 meses
+
+=== CONDIÇÕES PARA PESSOA FÍSICA, ME E EPP ===
+- Desconto máximo: até 70% sobre o valor total do crédito
+- Prazo máximo de parcelamento: até 145 parcelas mensais
+
+=== POSSIBILIDADE DE UTILIZAÇÃO DE CRÉDITOS ===
+- Prejuízo fiscal e base de cálculo negativa da CSLL podem ser utilizados para abatimento de até 70% do saldo remanescente da dívida após descontos
+
+Art. 41. As propostas de transação por adesão definem a elegibilidade de débitos com base no tempo de inscrição em dívida ativa.
+
+Art. 49. Para contribuintes falidos, estabelece condições específicas para exclusão de débitos, percentual de desconto e ordem de prioridade.
+
+Art. 50. O devedor que formular proposta de transação individual deverá apresentar:
+I — exposição da situação econômica, patrimonial e financeira;
+II — as razões da crise econômico-financeira;
+III — a capacidade de pagamento estimada;
+IV — a proposta de plano de recuperação fiscal.
+
+=== PORTARIAS COMPLEMENTARES ===
+
+PORTARIA PGFN/MF Nº 1.241/2023
+- Aprimora a comunicação com os contribuintes
+- Aumenta a transparência nos critérios de classificação dos créditos
+- Disponibiliza informações detalhadas sobre a CAPAG no site da PGFN
+- Acrescenta o Art. 34-A à Portaria 6.757/2022
+
+PORTARIA PGFN Nº 1.457/2024
+- Alterou disposições da Portaria 6.757/2022 sobre o procedimento de revisão
+- Exigiu documentos adicionais como laudo técnico obrigatório
+- Reforçou a necessidade de DFC pelo método direto
+
+PORTARIA PGFN Nº 721/2025
+- Institui transação na cobrança de débitos judicializados de alto impacto econômico
+- Parcelamento em até 120 vezes e descontos de até 65%
+- Para débitos iguais ou superiores a R$ 50 milhões
+- Utiliza o Potencial Razoável de Recuperação do Crédito Judicializado (PRJ) ao invés da CAPAG
+
+EDITAL PGDAU Nº 11/2025
+- Novas modalidades de transação tributária
+- Parcelamento em até 140 meses
+- Descontos de até 100% sobre juros, multas e encargos legais
+- Para débitos inscritos em Dívida Ativa até 4 de março de 2025
+- Valor por inscrição de até R$ 45 milhões

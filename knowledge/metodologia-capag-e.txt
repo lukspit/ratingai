@@ -1,0 +1,138 @@
+METODOLOGIA CAPAG-e — CÁLCULO DA CAPACIDADE DE PAGAMENTO EFETIVA
+Guia Técnico para Laudos de Revisão de Capacidade Contributiva
+
+=== 1. CONCEITOS FUNDAMENTAIS ===
+
+A CAPAG (Capacidade de Pagamento) é o critério central utilizado pela PGFN para definir os benefícios concedidos na transação tributária. Existem duas modalidades:
+
+CAPAG-P (Presumida): Calculada automaticamente pela PGFN usando modelos estatísticos baseados em dados históricos e informações de bases governamentais (SPED, DCTF, EFD, ECF). Nem sempre reflete a real situação econômica do contribuinte.
+
+CAPAG-e (Efetiva): Apurada a partir do pedido de revisão do contribuinte. Uma vez deferida, substitui a CAPAG-P de forma DEFINITIVA e NÃO admite nova revisão. Por isso, o pedido inicial deve ser absolutamente robusto.
+
+=== 2. INDICADORES FINANCEIROS (RATING PGFN) ===
+
+A PGFN classifica os contribuintes em ratings A, B, C ou D baseando-se em três indicadores financeiros extraídos das demonstrações contábeis:
+
+--- ÍNDICE DE LIQUIDEZ (IL) ---
+Fórmula: IL = Ativo Circulante / Passivo Circulante
+Mede a capacidade de honrar compromissos de curto prazo.
+
+Rating IL:
+- A: IL > 1,50 (empresa saudável, paga suas dívidas de curto prazo com folga)
+- B: 1,00 ≤ IL ≤ 1,50 (empresa equilibrada, mas sem margem de segurança)
+- C: 0,50 ≤ IL < 1,00 (empresa com dificuldades de liquidez)
+- D: IL < 0,50 (empresa em situação crítica de liquidez)
+
+--- ÍNDICE DE ALAVANCAGEM (IA) ---
+Fórmula: IA = (Passivo Circulante + Passivo Não Circulante) / Patrimônio Líquido
+Mede o grau de endividamento em relação ao capital próprio.
+
+Rating IA:
+- A: IA < 1,00 (mais capital próprio que dívida)
+- B: 1,00 ≤ IA < 2,00 (endividamento moderado)
+- C: 2,00 ≤ IA < 4,00 (endividamento elevado)
+- D: IA ≥ 4,00 (endividamento crítico, altamente alavancada)
+
+--- MARGEM OPERACIONAL (MO) ---
+Fórmula: MO = EBITDA / Receita Bruta
+Mede a eficiência operacional e a capacidade de geração de caixa.
+
+Rating MO:
+- A: MO > 15% (empresa altamente rentável)
+- B: 5% ≤ MO ≤ 15% (rentabilidade moderada)
+- C: 0% ≤ MO < 5% (rentabilidade baixa ou marginal)
+- D: MO < 0% (prejuízo operacional, empresa queimando caixa)
+
+--- RATING FINAL ---
+O Rating Final é determinado pelo PIOR indicador entre IL, IA e MO.
+
+Exemplo: Se IL = B, IA = C, MO = A → Rating Final = C (o pior entre os três).
+
+Tabela de Descontos por Rating:
+- Rating A: 0% de desconto (crédito totalmente recuperável)
+- Rating B: 0% de desconto (crédito com média perspectiva de recuperação)
+- Rating C: 65% de desconto para PJ / 70% para PF/ME/EPP (difícil recuperação)
+- Rating D: 70% de desconto para PJ / 70% para PF/ME/EPP (irrecuperável)
+
+=== 3. CÁLCULO DA CAPAG-e EM REAIS ===
+
+Além do rating por indicadores, a CAPAG-e calcula o valor monetário da capacidade de pagamento efetiva:
+
+--- PLR (Patrimônio Líquido Realizável) ---
+PLR = Disponibilidades + Contas a Receber + Estoques + Aplicações Financeiras
+Representa os ativos de fácil conversão em caixa.
+
+--- METODOLOGIA 1: ROA + PLR ---
+CAPAG-e = Resultado Operacional Ajustado + PLR
+Onde o Resultado Operacional Ajustado exclui receitas e despesas não recorrentes.
+
+--- METODOLOGIA 2: FCO + PLR ---
+CAPAG-e = Fluxo de Caixa Operacional (se positivo) + PLR
+Onde o FCO é obtido pelo método direto da DFC.
+
+REGRA: Escolhe-se a MENOR CAPAG-e entre as duas metodologias (mais vantajosa para o contribuinte).
+
+--- GRE (Grau de Recuperação Esperada) ---
+GRE = CAPAG-e / Valor Total da Dívida Tributária
+Interpretação:
+- GRE ≥ 100%: Dívida potencialmente recuperável (pior para o contribuinte)
+- 50% ≤ GRE < 100%: Dívida parcialmente recuperável
+- GRE < 50%: Dívida irrecuperável (melhor para o contribuinte — maior desconto)
+
+=== 4. ITENS AJUSTÁVEIS PARA REDUÇÃO DO EBITDA ===
+
+O objetivo do laudo de CAPAG-e é demonstrar que o EBITDA real da empresa é MENOR que o presumido pela PGFN, porque está inflado por eventos não recorrentes.
+
+Tipos de ajustes permitidos (fundamentados na Portaria PGFN 6.757/2022):
+
+a) RECEITAS NÃO RECORRENTES (REMOVER do EBITDA):
+- Venda de ativos imobilizados (terrenos, máquinas, veículos)
+- Reversão de provisões (CPC 25)
+- Ganhos de capital extraordinários
+- Subvenções governamentais pontuais
+- Perdão de dívidas
+- Receitas de operações descontinuadas
+- Indenizações recebidas
+IMPACTO: Reduz diretamente o EBITDA → MO cai → Rating piora → Mais desconto
+
+b) DESPESAS NÃO RECORRENTES (JÁ REFLETIDAS):
+- Multas extraordinárias
+- Reestruturações empresariais
+- Despesas com litígios relevantes
+NOTA: Já estão deduzidas do EBITDA, contribuem para manter MO baixa.
+
+c) DEPRECIAÇÃO E AMORTIZAÇÃO:
+- D&A de ativos tangíveis e intangíveis
+NOTA: Já deduzida do resultado; evidencia intensidade de capital.
+
+d) EMPRÉSTIMOS DE SÓCIOS (MÚTUO):
+- Injeções emergenciais de capital dos sócios
+IMPACTO: Aumenta Passivo Circulante → Agrava IL e IA → Rating piora
+
+e) IMPAIRMENT (CPC 01):
+- Perda por redução ao valor recuperável de ativos
+IMPACTO: Comprova deterioração patrimonial irretratável
+
+f) PASSIVO TRIBUTÁRIO CONTESTADO:
+- Tributos sendo disputados judicialmente
+NOTA: Já inclusos no Passivo; elevam a alavancagem real
+
+g) PROVISÕES (CPC 25):
+- Provisões para contingências trabalhistas, cíveis, ambientais
+NOTA: Sem efeito de caixa real; atestam riscos futuros
+
+=== 5. PROCEDIMENTO DE REVISÃO DA CAPAG ===
+
+1. Acesso ao portal REGULARIZE (regularize.pgfn.gov.br)
+2. Prazo: 30 dias após ciência da classificação
+3. Documentos obrigatórios:
+   - Laudo técnico de perito habilitado
+   - Balanço Patrimonial (2 últimos exercícios + exercício em curso)
+   - DRE (mesmos períodos)
+   - DFC pelo método direto (mesmos períodos)
+   - Valor da CAPAG-e estimada pelo contribuinte
+   - Metodologia de cálculo detalhada
+4. Análise pela PGFN (pode pedir documentos adicionais — Art. 31)
+5. Em caso de indeferimento: recurso em 10 dias (Art. 32)
+
+ATENÇÃO: A CAPAG-e deferida é DEFINITIVA. Não há segunda chance.

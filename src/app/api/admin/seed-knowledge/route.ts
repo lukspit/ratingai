@@ -40,6 +40,26 @@ const KNOWLEDGE_SOURCES = [
         title: 'Ebook — Transação Tributária',
         file: 'Ebook - Transação Tributária.pdf.txt',
     },
+    {
+        source: 'portaria_6757',
+        title: 'Portaria PGFN 6.757/2022 — Artigos e Regulamentação',
+        file: 'knowledge/portaria-pgfn-6757-2022.txt',
+    },
+    {
+        source: 'metodologia_capag',
+        title: 'Metodologia CAPAG-e — Cálculo e Indicadores',
+        file: 'knowledge/metodologia-capag-e.txt',
+    },
+    {
+        source: 'normas_cpc_jurisprudencia',
+        title: 'Normas CPC, Lei 13.988/2020 e Jurisprudência',
+        file: 'knowledge/normas-cpc-jurisprudencia.txt',
+    },
+    {
+        source: 'estrategias_defesa',
+        title: 'Estratégias e Teses de Defesa Tributarista',
+        file: 'knowledge/estrategias-defesa-tributarista.txt',
+    },
 ];
 
 export async function POST(req: Request) {

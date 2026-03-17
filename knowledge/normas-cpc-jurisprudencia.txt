@@ -1,0 +1,126 @@
+NORMAS CONTÁBEIS CPC E FUNDAMENTOS PARA LAUDOS DE CAPAG-e
+Referências Técnicas para Fundamentação de Ajustes Contábeis
+
+=== CPC 01 — REDUÇÃO AO VALOR RECUPERÁVEL DE ATIVOS (IMPAIRMENT) ===
+
+OBJETIVO: Estabelecer procedimentos para garantir que os ativos não estejam registrados por valor superior ao seu valor recuperável. Equivalente ao IAS 36 (IFRS).
+
+CONCEITOS-CHAVE:
+- Valor Recuperável: é o MAIOR entre o valor justo líquido de despesa de venda e o valor em uso.
+- Perda por Desvalorização (Impairment Loss): diferença entre o valor contábil e o valor recuperável, quando o contábil excede o recuperável.
+- Valor em Uso: valor presente dos fluxos de caixa futuros esperados do ativo.
+
+RELEVÂNCIA PARA LAUDOS CAPAG-e:
+O reconhecimento de perda por impairment comprova DETERIORAÇÃO PATRIMONIAL da empresa. Este é um argumento poderosíssimo perante a PGFN porque:
+1. Demonstra que o patrimônio da empresa vale MENOS do que o registrado
+2. Não tem efeito de caixa real (não há saída de dinheiro)
+3. Reduz o resultado operacional → piora a Margem Operacional
+4. Afeta diretamente o Ativo → pode piorar o índice de liquidez
+5. É irretratável — uma vez reconhecida, evidencia dano permanente ao patrimônio
+
+EXEMPLOS DE IMPAIRMENT RELEVANTES:
+- Equipamentos industriais obsoletos ou subutilizados
+- Marcas e patentes que perderam valor comercial
+- Investimentos em coligadas/controladas com resultados negativos persistentes
+- Imóveis em regiões com desvalorização significativa
+- Ativos intangíveis de projetos descontinuados
+
+ARTIGO CPC PARA CITAR: "O CPC 01 (R1) determina que sempre que houver indicação de que um ativo possa ter sofrido desvalorização, a entidade deve estimar o valor recuperável do ativo e reconhecer a perda."
+
+=== CPC 25 — PROVISÕES, PASSIVOS CONTINGENTES E ATIVOS CONTINGENTES ===
+
+OBJETIVO: Regular o reconhecimento e a mensuração de provisões e passivos contingentes. Equivalente ao IAS 37 (IFRS).
+
+CONCEITOS-CHAVE:
+- Provisão: passivo de prazo ou valor incerto. Deve ser reconhecida quando:
+  a) Existe obrigação presente (legal ou construtiva) de evento passado
+  b) É provável que saída de recursos seja necessária
+  c) Estimativa confiável pode ser feita
+- Passivo Contingente: obrigação possível (mas não provável) de evento passado. NÃO é reconhecido no balanço, apenas divulgado em notas explicativas.
+- Ativo Contingente: benefício provável, mas ainda incerto. NÃO é reconhecido.
+
+RELEVÂNCIA PARA LAUDOS CAPAG-e:
+Provisões são aliadas do contribuinte porque:
+1. AUMENTAM o Passivo → pioram o Índice de Alavancagem (IA)
+2. REDUZEM o resultado → pioram a Margem Operacional (MO)
+3. Não representam saída efetiva de caixa (são estimativas)
+4. Demonstram riscos futuros que prejudicam a capacidade de pagamento sustentável
+
+TIPOS DE PROVISÕES ÚTEIS EM LAUDOS:
+- Provisão para contingências trabalhistas (reclamações em curso)
+- Provisão para contingências cíveis (ações de clientes, fornecedores)
+- Provisão para contingências tributárias (autos de infração contestados)
+- Provisão para contingências ambientais (remediação, multas)
+- Provisão para garantias de produtos
+- Provisão para reestruturação
+
+ARGUMENTO PARA O LAUDO: "As provisões reconhecidas conforme o CPC 25 representam obrigações que, embora de prazo e valor incertos, devem ser consideradas na avaliação da capacidade de pagamento real da empresa, pois comprometem recursos futuros de forma inevitável."
+
+=== CPC 30 — RECEITAS (ATUAL CPC 47 - RECEITA DE CONTRATO COM CLIENTE) ===
+
+OBJETIVO: Estabelecer o tratamento contábil adequado para o reconhecimento de receitas. Equivalente ao IFRS 15.
+
+CONCEITOS-CHAVE:
+- Receita: entrada bruta de benefícios econômicos durante o período, provenientes das atividades ordinárias da entidade.
+- Receita Operacional: receita proveniente das atividades CORE da empresa (venda de produtos/serviços).
+- Receita Não Operacional/Não Recorrente: receita proveniente de atividades que NÃO fazem parte do negócio principal.
+
+RELEVÂNCIA PARA LAUDOS CAPAG-e:
+A DISTINÇÃO entre receita operacional e não recorrente é o CORAÇÃO da argumentação do laudo. O CPC 30/47 fornece a base para argumentar que:
+1. Receitas extraordinárias inflam ARTIFICIALMENTE o EBITDA
+2. A PGFN presume que o EBITDA reportado reflete capacidade SUSTENTÁVEL
+3. Ao excluir receitas não recorrentes, revela-se o EBITDA operacional REAL
+4. A Margem Operacional ajustada mostra a VERDADEIRA capacidade de geração de caixa
+
+EXEMPLOS DE RECEITAS NÃO RECORRENTES A EXPURGAR:
+- Venda de imobilizado (terreno, máquinas, veículos da empresa)
+- Ganho com alienação de participações societárias
+- Reversão de provisões (quando o risco deixa de existir)
+- Subvenções governamentais pontuais
+- Recuperação de créditos tributários antigos
+- Receita de operações descontinuadas
+- Perdão de dívida por credor
+- Indenizações judiciais recebidas
+- Dividendos extraordinários recebidos
+
+=== LEI Nº 13.988/2020 — LEI DA TRANSAÇÃO TRIBUTÁRIA ===
+
+ARTIGOS FUNDAMENTAIS:
+
+Art. 1º Esta Lei estabelece os requisitos e as condições para que a União, suas autarquias e fundações, e os devedores ou as partes adversas realizem transação resolutiva de litígio.
+
+Art. 3º A transação poderá dispor sobre:
+I — a concessão de descontos nas multas, nos juros de mora e nos encargos legais relativos a créditos a serem transacionados que sejam classificados como irrecuperáveis ou de difícil recuperação;
+II — os prazos e as formas de pagamento, incluído o diferimento e a moratória;
+III — a substituição ou a alienação de garantias e de constrições.
+
+Art. 11 A transação somente será celebrada se constatada a existência, conforme o caso, de:
+I — litígio judicial instalado ou perspectiva de litígio judicial;
+II — inscrição em dívida ativa da União de créditos considerados irrecuperáveis ou de difícil recuperação;
+III — devedor falido, em recuperação judicial ou extrajudicial, em liquidação judicial ou em intervenção extrajudicial.
+
+LÍMITES LEGAIS:
+- Desconto máximo de 65% do valor total dos créditos para PJ
+- Desconto máximo de 70% para PF, ME e EPP
+- Prazo máximo de 120 meses para PJ
+- Prazo máximo de 145 meses para PF, ME e EPP
+- Vedada a transação que envolva redução do valor principal da dívida
+
+=== JURISPRUDÊNCIA RELEVANTE ===
+
+PRECEDENTES JUDICIAIS SOBRE CONTESTAÇÃO DE RATING:
+
+1. CASO INDÚSTRIA DE ÓLEO E GÁS: Empresa teve rating alterado de "C" para "B" pela PGFN. Obteve judicialmente a restauração do rating original ("C"), argumentando falta de clareza na metodologia utilizada pela PGFN. O tribunal entendeu que a mudança unilateral do rating sem fundamentação transparente violava o princípio da segurança jurídica.
+
+2. FALTA DE TRANSPARÊNCIA NA CAPAG: Diversos tribunais têm reconhecido que a metodologia de aferição da CAPAG pela PGFN carece de clareza e transparência, o que prejudica o exercício do direito de defesa do contribuinte. A Portaria PGFN/MF nº 1.241/2023 foi editada justamente em resposta a essas decisões.
+
+3. QUARENTENA DE 2 ANOS: A Portaria PGFN 6.757/2022 impõe uma "quarentena" de 2 anos que impede novas transações para devedores que tiveram acordos rescindidos. Decisões judiciais têm questionado essa restrição por limitar direitos fundamentais e acesso à justiça.
+
+4. PRINCÍPIO DA CAPACIDADE CONTRIBUTIVA: O STF reconhece que a tributação deve respeitar a capacidade contributiva do devedor (art. 145, §1º, CF). Isto é argumento adicional para fundamentar que a PGFN não pode presumir capacidade de pagamento superior à real.
+
+ARGUMENTOS JURÍDICOS PARA USO NOS LAUDOS:
+- Art. 145, §1º da Constituição Federal (princípio da capacidade contributiva)
+- Art. 5º, LV da Constituição Federal (contraditório e ampla defesa)
+- Art. 37 da Constituição Federal (princípio da transparência na administração pública)
+- Lei 13.988/2020, especialmente arts. 1º, 3º e 11
+- Portaria PGFN 6.757/2022, arts. 20, 24, 30-32
