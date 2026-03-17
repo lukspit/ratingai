@@ -14,7 +14,7 @@ export default async function RegisterPage({
     const sessionId = params.session_id
 
     if (!sessionId) {
-        redirect('/pricing')
+        redirect('/beta')
     }
 
     // Buscar o email direto do Stripe para garantir que é o que pagou
@@ -24,7 +24,7 @@ export default async function RegisterPage({
         email = session.customer_details?.email || ''
     } catch (e) {
         console.error('Stripe Session Retrieval Error:', e)
-        redirect('/pricing?error=invalid_session')
+        redirect('/beta?error=invalid_session')
     }
 
     return (
@@ -61,10 +61,6 @@ export default async function RegisterPage({
 
             <div className="absolute bottom-6 left-0 right-0 text-center flex flex-col items-center justify-center gap-2 text-sm text-muted-foreground/60 z-10">
                 <span className="italic">Segurança garantida por tecnologia Supabase & Stripe</span>
-                <div className="flex items-center gap-4 text-xs not-italic">
-                    <Link href="/termos" className="hover:text-primary transition-colors hover:underline">Termos de Uso</Link>
-                    <Link href="/privacidade" className="hover:text-primary transition-colors hover:underline">Política de Privacidade</Link>
-                </div>
             </div>
         </div>
     )

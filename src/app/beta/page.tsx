@@ -1,5 +1,6 @@
-import { Check, Activity, ArrowRight, Shield, Zap, BarChart3 } from "lucide-react"
+import { Check, ArrowRight, Shield, Zap, BarChart3 } from "lucide-react"
 import Link from "next/link"
+import Image from "next/image"
 
 const BETA_PRICE_ID = process.env.NEXT_PUBLIC_STRIPE_BETA_PRICE_ID || "price_1T9W5rJWP2qoq4Oj0MuND2GY"
 
@@ -21,10 +22,15 @@ export default function BetaPage() {
             <nav className="bg-white border-b border-[#E5E7EB] px-6 py-4">
                 <div className="mx-auto max-w-3xl flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-[#0A0F1E]/10 rounded-lg flex items-center justify-center">
-                            <Activity className="w-5 h-5 text-[#0A0F1E]" />
+                        <div className="relative h-8 w-32">
+                            <Image
+                                src="/logos/logo_horizontal_cropped.png"
+                                alt="Rating.ai Logo"
+                                fill
+                                className="object-contain"
+                                priority
+                            />
                         </div>
-                        <span className="text-xl font-bold tracking-tight text-[#0A0F1E]">Rating.ai</span>
                     </div>
                     <Link
                         href="/login"
