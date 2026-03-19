@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { createAdminClient } from '@/utils/supabase/admin'
 
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({
@@ -42,8 +43,9 @@ export async function updateSession(request: NextRequest) {
 
     // 3. Se estiver logado em rota protegida, verificar assinatura e perfil
     if (isProtectedRoute && user) {
-        // Verificar assinatura pelo email
-        const { data: subscription } = await supabase
+        // Verificar assinatura pelo email usando admin client (bypassa RLS)
+        const supabaseAdmin = createAdminClient()
+        const { data: subscription } = await supabaseAdmin
             .from('subscriptions')
             .select('status')
             .eq('customer_email', user.email)
